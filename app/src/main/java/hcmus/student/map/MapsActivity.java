@@ -2,6 +2,8 @@ package hcmus.student.map;
 
 import androidx.fragment.app.FragmentActivity;
 
+import android.hardware.Sensor;
+import android.hardware.SensorManager;
 import android.os.Bundle;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -10,15 +12,30 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import android.content.Context;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.os.Bundle;
+import android.util.Log;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private static SensorManager sensorService;
+    private MapUbility mapUbility;
+    private Sensor sensor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+        mapUbility = new MapUbility(this);
+        setContentView(mapUbility);
+        sensorService = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        sensor = sensorService.getDefaultSensor(Sensor.TYPE_ORIENTATION);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -43,4 +60,37 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (sensor != null) {
+            sensorService.registerListener(mySensorEventListener, sensor,
+                    SensorManager.SENSOR_DELAY_NORMAL);
+        }
+        else {
+            finish();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (sensor != null) sensorService.unregisterListener(mySensorEventListener);
+    }
+
+    private SensorEventListener mySensorEventListener = new SensorEventListener() {
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        }
+
+        @Override
+        public void onSensorChanged(SensorEvent event) {
+            // 0=North, 90=East, 180=South, 270=West
+            float azimuth = event.values[0];
+            Log.d("Radius", Float.toString(azimuth));
+            mapUbility.updateData(azimuth);
+        }
+    };
 }
