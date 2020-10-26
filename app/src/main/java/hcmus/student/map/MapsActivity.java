@@ -33,7 +33,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_maps);
         mMapUtility = new MapUtility(this);
         mSensorService = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mSensor = mSensorService.getDefaultSensor(Sensor.TYPE_ORIENTATION);
+        mSensor = mSensorService.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
