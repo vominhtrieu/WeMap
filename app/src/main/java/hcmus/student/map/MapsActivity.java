@@ -23,18 +23,17 @@ import android.util.Log;
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private static SensorManager sensorService;
-    private MapUbility mapUbility;
-    private Sensor sensor;
+    private static SensorManager mSensorService;
+    private MapUtility mMapUtility;
+    private Sensor mSensor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        mapUbility = new MapUbility(this);
-        setContentView(mapUbility);
-        sensorService = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        sensor = sensorService.getDefaultSensor(Sensor.TYPE_ORIENTATION);
+        mMapUtility = new MapUtility(this);
+        mSensorService = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        mSensor = mSensorService.getDefaultSensor(Sensor.TYPE_ORIENTATION);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -64,8 +63,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onResume() {
         super.onResume();
-        if (sensor != null) {
-            sensorService.registerListener(mySensorEventListener, sensor,
+        if (mSensor != null) {
+            mSensorService.registerListener(mySensorEventListener, mSensor,
                     SensorManager.SENSOR_DELAY_NORMAL);
         }
         else {
@@ -76,7 +75,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onPause() {
         super.onPause();
-        if (sensor != null) sensorService.unregisterListener(mySensorEventListener);
+        if (mSensor != null) mSensorService.unregisterListener(mySensorEventListener);
     }
 
     private SensorEventListener mySensorEventListener = new SensorEventListener() {
@@ -84,13 +83,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         @Override
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
         }
-
         @Override
         public void onSensorChanged(SensorEvent event) {
             // 0=North, 90=East, 180=South, 270=West
             float azimuth = event.values[0];
             Log.d("Radius", Float.toString(azimuth));
-            mapUbility.updateData(azimuth);
+            mMapUtility.updateData(azimuth);
         }
     };
 }
