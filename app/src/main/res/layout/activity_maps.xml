@@ -13,8 +13,8 @@
 
     <ImageButton
         android:id="@+id/btnLocation"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="5dp"
         android:layout_marginRight="5dp"

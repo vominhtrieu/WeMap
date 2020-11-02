@@ -3,6 +3,6 @@
     <item android:state_pressed="true"
         android:drawable="@drawable/location_indicator_button_pressed" />
     <item android:state_focused="true"
-        android:drawable="@drawable/location_indicator_button_pressed" />
+        android:drawable="@drawable/location_indicator_button_focused" />
     <item android:drawable="@drawable/location_indicator_button_normal" />
 </selector>
