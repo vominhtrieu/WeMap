@@ -57,6 +57,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private FusedLocationProviderClient mClient;
     private Marker mLocationIndicator;
     private LocationCallback mLocationCallBack;
+    Marker marker;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -112,6 +113,15 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         bitmapDrawable.setAntiAlias(true);
         mLocationIndicator = mMap.addMarker(new MarkerOptions().position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()))
                 .icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+      
+        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+            @Override
+            public void onMapLongClick(LatLng latLng) {
+                if (marker != null) marker.remove();
+                marker = mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
+                //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            }
+        });
 
         //Move camera to user location with default zoom
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLocation.getLatitude(),
