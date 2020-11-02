@@ -1,10 +1,11 @@
 package hcmus.student.map;
 
-import androidx.fragment.app.FragmentActivity;
-
-import android.hardware.Sensor;
+import android.content.Context;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.util.Log;
+
+import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -12,28 +13,25 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
-import android.content.Context;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
-import android.os.Bundle;
-import android.util.Log;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    private static SensorManager mSensorService;
-    private MapUtility mMapUtility;
-    private Sensor mSensor;
+    private OrientationSensor sensor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
-        mMapUtility = new MapUtility(this);
-        mSensorService = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mSensor = mSensorService.getDefaultSensor(Sensor.TYPE_ORIENTATION);
+        SensorManager sensorService = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+
+        sensor = new OrientationSensor(sensorService) {
+            @Override
+            public void onSensorChanged(float rotation) {
+                //Implement Rotation change here
+                Log.d("Azimuth", Float.toString(rotation));
+            }
+        };
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -63,32 +61,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onResume() {
         super.onResume();
-        if (mSensor != null) {
-            mSensorService.registerListener(mySensorEventListener, mSensor,
-                    SensorManager.SENSOR_DELAY_NORMAL);
-        }
-        else {
-            finish();
-        }
+        sensor.register();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (mSensor != null) mSensorService.unregisterListener(mySensorEventListener);
+        sensor.unregister();
     }
-
-    private SensorEventListener mySensorEventListener = new SensorEventListener() {
-
-        @Override
-        public void onAccuracyChanged(Sensor sensor, int accuracy) {
-        }
-        @Override
-        public void onSensorChanged(SensorEvent event) {
-            // 0=North, 90=East, 180=South, 270=West
-            float azimuth = event.values[0];
-            Log.d("Radius", Float.toString(azimuth));
-            mMapUtility.updateData(azimuth);
-        }
-    };
 }
