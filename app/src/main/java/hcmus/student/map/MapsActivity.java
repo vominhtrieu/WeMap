@@ -13,7 +13,6 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Location;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Looper;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -63,6 +62,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Marker mLocationIndicator;
     private LocationCallback mLocationCallBack;
     private Marker marker;
+    private DataBase mDataBase;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -77,6 +77,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //Implement Rotation change here
                 Log.d("Azimuth", Float.toString(rotation));
             }
+
         };
 
         mClient = LocationServices.getFusedLocationProviderClient(this);
@@ -89,6 +90,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } else {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_STATUS_CODE);
         }
+
+//        mDataBase=new DataBase(this,"AddressBook.sql",null,1);
+//        mDataBase.QueryData("CREATE TABLE IF NOT EXISTS PlaceTable(Name NVARCHAR(200),Longitude DOUBLE PRIMARY KEY, Latitude DOUBLE PRIMARY KEY, Avatar BLOG");
+
+
+
     }
 
     protected void onResume() {
