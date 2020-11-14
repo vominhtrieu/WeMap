@@ -1,17 +1,17 @@
 package hcmus.student.map;
 
-import android.content.Context;
-import android.hardware.SensorManager;
-import android.os.Bundle;
 import android.Manifest;
 import android.animation.ValueAnimator;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Looper;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -64,8 +64,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Marker mLocationIndicator;
     private LocationCallback mLocationCallBack;
     private Marker marker;
-    private DataBase mDataBase;
-    private MarkerInfoAdapter mMarkerInfoAdapter;
+    private Database mDatabase;
+    private MarkerInfoFragment mMarkerInfoFragment;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -94,11 +94,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } else {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_STATUS_CODE);
         }
-
-//        mDataBase=new DataBase(this,"AddressBook.sql",null,1);
-//        mDataBase.QueryData("CREATE TABLE IF NOT EXISTS PlaceTable(Name NVARCHAR(200),Longitude DOUBLE PRIMARY KEY, Latitude DOUBLE PRIMARY KEY, Avatar BLOG");
-
-
 
     }
 
@@ -164,8 +159,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public boolean onMarkerClick(Marker marker) {
                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                mMarkerInfoAdapter = new MarkerInfoAdapter(marker);
-                fragmentTransaction.add(R.id.frameMarkerInfo, mMarkerInfoAdapter);
+                mMarkerInfoFragment = new MarkerInfoFragment(marker);
+                fragmentTransaction.add(R.id.frameMarkerInfo, mMarkerInfoFragment);
 
                 fragmentTransaction.commit();
                 return false;
@@ -263,16 +258,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
 
-    //Should move to inteface later
+    //Should move to interface later
     public void closeMarkerInfo() {
-        if (mMarkerInfoAdapter != null) {
+        if (mMarkerInfoFragment != null) {
             FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.remove(mMarkerInfoAdapter);
+            fragmentTransaction.remove(mMarkerInfoFragment);
             fragmentTransaction.commit();
         }
     }
 
-    public void backToFragmentBefore(int id){
+    public void backToPreviousFragment(int id) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         Fragment fragment = fragmentManager.findFragmentById(id);
         if (fragmentManager.getBackStackEntryCount() > 0) {

@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -16,25 +15,22 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.maps.model.Marker;
 
-public class MarkerInfoAdapter extends Fragment implements View.OnClickListener {
-    private MapsActivity parent;
+public class MarkerInfoFragment extends Fragment implements View.OnClickListener {
+    private MapsActivity activity;
     private Marker mMarker;
     Button btnAdd, btnClose;
     TextView txtLat, txtLng;
 
-    public MarkerInfoAdapter(Marker marker) {
+    public MarkerInfoFragment(Marker marker) {
         this.mMarker = marker;
-    }
-
-    public MarkerInfoAdapter() {
-
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.marker_info, null);
-        this.parent = (MapsActivity) getActivity();
+        LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.fragment_marker_info, null);
+        this.activity = (MapsActivity) getActivity();
+
         txtLat = layout.findViewById(R.id.txtLat);
         txtLng = layout.findViewById(R.id.txtLng);
         btnAdd = layout.findViewById(R.id.btnAdd);
@@ -54,13 +50,12 @@ public class MarkerInfoAdapter extends Fragment implements View.OnClickListener 
         switch (v.getId()) {
             case R.id.btnAdd:
                 FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                Fragment fragment = new AddContacts();
+                Fragment fragment = new AddContactFragment(mMarker);
                 transaction.replace(R.id.frameMarkerInfo, fragment);
-                transaction.addToBackStack(null);
                 transaction.commit();
                 break;
             case R.id.btnClose:
-                ((MapsActivity)getActivity()).closeMarkerInfo();
+                activity.closeMarkerInfo();
                 break;
         }
     }
