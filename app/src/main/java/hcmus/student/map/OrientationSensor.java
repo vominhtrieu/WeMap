@@ -12,6 +12,7 @@ public abstract class OrientationSensor {
     private float[] mAccelerometer;
     private float[] mMagnetometer;
 
+
     public OrientationSensor(SensorManager sensorService) {
         mSensorService = sensorService;
         mMagneticFieldSensor = mSensorService.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
@@ -61,4 +62,5 @@ public abstract class OrientationSensor {
     }
 
     public abstract void onSensorChanged(float rotation);
+
 }
