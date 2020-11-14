@@ -9,10 +9,12 @@ import android.util.Log;
 import android.Manifest;
 import android.animation.ValueAnimator;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,7 +29,10 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -67,8 +72,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Marker mLocationIndicator;
     private LocationCallback mLocationCallBack;
     private Marker marker;
+    private Database mDatabase;
+    private MarkerInfoFragment mMarkerInfoFragment;
     private Transition mTransition;
-
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -90,14 +96,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_maps);
         SensorManager sensorService = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
+
         sensor = new OrientationSensor(sensorService) {
             float temp = 0;
 
             @Override
             public void onSensorChanged(float rotation) {
                 //Implement Rotation change here
-
-                Log.d("Azimuth", Float.toString(rotation));
                 if(mLocationIndicator!= null && Math.abs(temp - rotation) >= EPSILON) {
 
                     mLocationIndicator.setRotation(rotation);
@@ -106,7 +111,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
                     temp = rotation;
                 }
-
             }
         };
 
@@ -120,8 +124,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } else {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_STATUS_CODE);
         }
-
-
     }
 
 
@@ -172,14 +174,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mLocationIndicator = mMap.addMarker(new MarkerOptions().position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude())).flat(true)
                 .icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
 
-
-      
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
                 if (marker != null) marker.remove();
                 marker = mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
-//               mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+            }
+        });
+
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                mMarkerInfoFragment = new MarkerInfoFragment(marker);
+                fragmentTransaction.add(R.id.frameMarkerInfo, mMarkerInfoFragment);
+
+                fragmentTransaction.commit();
+                return false;
             }
         });
 
@@ -275,6 +287,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             dialog.show();
         }
     }
+
+
+    //Should move to interface later
+    public void closeMarkerInfo() {
+        if (mMarkerInfoFragment != null) {
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.remove(mMarkerInfoFragment);
+            fragmentTransaction.commit();
+        }
+    }
+
+    public void backToPreviousFragment(int id) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment fragment = fragmentManager.findFragmentById(id);
+        if (fragmentManager.getBackStackEntryCount() > 0) {
+            fragmentManager.popBackStack();
+        } else {
+            finish();
+        }
+    }
+
 
     private void listenToLocationChange() {
         //Request change location setting

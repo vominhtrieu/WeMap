@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">Map</string>
     <string name="title_activity_maps">Map</string>
+    <string name="txt_latitude">Latitude:</string>
+    <string name="txt_longitude">Longitude:</string>
+    <string name="btn_add_contact">Add contact</string>
+    <string name="instruction_add_contact">Please enter the information of address you want to save:</string>
+    <string name="txt_place_name">Place name:</string>
+    <string name="instruction_photo_select">Select a photo to represent the location(optional):</string>
+    <string name="btn_add">Add</string>
+    <string name="btn_cancel">Cancel</string>
 </resources>
