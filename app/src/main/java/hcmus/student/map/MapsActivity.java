@@ -64,8 +64,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Marker mLocationIndicator;
     private LocationCallback mLocationCallBack;
     private Marker marker;
+    private DataBase mDataBase;
     private MarkerInfoAdapter mMarkerInfoAdapter;
-
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -81,6 +81,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 //Implement Rotation change here
                 //Log.d("Azimuth", Float.toString(rotation));
             }
+
         };
 
         mClient = LocationServices.getFusedLocationProviderClient(this);
@@ -93,6 +94,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } else {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_STATUS_CODE);
         }
+
+//        mDataBase=new DataBase(this,"AddressBook.sql",null,1);
+//        mDataBase.QueryData("CREATE TABLE IF NOT EXISTS PlaceTable(Name NVARCHAR(200),Longitude DOUBLE PRIMARY KEY, Latitude DOUBLE PRIMARY KEY, Avatar BLOG");
+
+
+
     }
 
     protected void onResume() {
