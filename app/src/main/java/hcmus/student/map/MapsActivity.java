@@ -3,18 +3,23 @@ package hcmus.student.map;
 import android.content.Context;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.transition.Transition;
+import android.transition.TransitionValues;
 import android.util.Log;
 import android.Manifest;
 import android.animation.ValueAnimator;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.view.SurfaceControl;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageButton;
@@ -24,7 +29,10 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -55,6 +63,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final long FASTEST_UPDATE_INTERVAL = 1000;
     private static final long ANIMATION_DURATION = 500;
     private static final double FOLLOWING_THRESHOLD = 0.00000001;
+    private static final int EPSILON = 5;
 
     private GoogleMap mMap;
     private OrientationSensor sensor;
@@ -63,19 +72,45 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Marker mLocationIndicator;
     private LocationCallback mLocationCallBack;
     private Marker marker;
+    private Database mDatabase;
+    private MarkerInfoFragment mMarkerInfoFragment;
+    private Transition mTransition;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        boolean isMarkerRotating = false;
+        mTransition = new Transition() {
+            @Override
+            public void captureStartValues(TransitionValues transitionValues) {
+
+            }
+
+            @Override
+            public void captureEndValues(TransitionValues transitionValues) {
+
+            }
+        };
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         SensorManager sensorService = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
+
         sensor = new OrientationSensor(sensorService) {
+            float temp = 0;
+
             @Override
             public void onSensorChanged(float rotation) {
                 //Implement Rotation change here
-                Log.d("Azimuth", Float.toString(rotation));
+                if(mLocationIndicator!= null && Math.abs(temp - rotation) >= EPSILON) {
+
+                    mLocationIndicator.setRotation(rotation);
+
+                    mTransition.setDuration(1000);
+
+                    temp = rotation;
+                }
             }
         };
 
@@ -90,6 +125,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_STATUS_CODE);
         }
     }
+
 
     protected void onResume() {
         super.onResume();
@@ -135,24 +171,40 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 getTheme());
         Bitmap bitmap = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 72, 72, false);
         bitmapDrawable.setAntiAlias(true);
-        mLocationIndicator = mMap.addMarker(new MarkerOptions().position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()))
+        mLocationIndicator = mMap.addMarker(new MarkerOptions().position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude())).flat(true)
                 .icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
-      
+
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
                 if (marker != null) marker.remove();
                 marker = mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
-                //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
             }
         });
+
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                mMarkerInfoFragment = new MarkerInfoFragment(marker);
+                fragmentTransaction.add(R.id.frameMarkerInfo, mMarkerInfoFragment);
+
+                fragmentTransaction.commit();
+                return false;
+            }
+        });
+
 
         //Move camera to user location with default zoom
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLocation.getLatitude(),
                 mCurrentLocation.getLongitude()), DEFAULT_ZOOM));
 
         listenToLocationChange();
+
+
     }
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -236,6 +288,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+
+    //Should move to interface later
+    public void closeMarkerInfo() {
+        if (mMarkerInfoFragment != null) {
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.remove(mMarkerInfoFragment);
+            fragmentTransaction.commit();
+        }
+    }
+
+    public void backToPreviousFragment(int id) {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment fragment = fragmentManager.findFragmentById(id);
+        if (fragmentManager.getBackStackEntryCount() > 0) {
+            fragmentManager.popBackStack();
+        } else {
+            finish();
+        }
+    }
+
+
     private void listenToLocationChange() {
         //Request change location setting
         final LocationRequest request = LocationRequest.create();
@@ -270,6 +343,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         });
+
     }
 
     private void showAlert() {
