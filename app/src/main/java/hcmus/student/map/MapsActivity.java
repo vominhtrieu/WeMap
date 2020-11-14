@@ -3,7 +3,6 @@ package hcmus.student.map;
 import android.content.Context;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.Manifest;
 import android.animation.ValueAnimator;
 import android.app.AlertDialog;
@@ -23,7 +22,10 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -63,6 +65,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LocationCallback mLocationCallBack;
     private Marker marker;
     private DataBase mDataBase;
+    private MarkerInfoAdapter mMarkerInfoAdapter;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -71,11 +74,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(R.layout.activity_maps);
         SensorManager sensorService = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
+
         sensor = new OrientationSensor(sensorService) {
             @Override
             public void onSensorChanged(float rotation) {
                 //Implement Rotation change here
-                Log.d("Azimuth", Float.toString(rotation));
+                //Log.d("Azimuth", Float.toString(rotation));
             }
 
         };
@@ -144,15 +148,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         bitmapDrawable.setAntiAlias(true);
         mLocationIndicator = mMap.addMarker(new MarkerOptions().position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()))
                 .icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
-      
+
+
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
                 if (marker != null) marker.remove();
                 marker = mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
                 //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+
             }
         });
+
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+                mMarkerInfoAdapter = new MarkerInfoAdapter(marker);
+                fragmentTransaction.add(R.id.frameMarkerInfo, mMarkerInfoAdapter);
+
+                fragmentTransaction.commit();
+                return false;
+            }
+        });
+
 
         //Move camera to user location with default zoom
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLocation.getLatitude(),
@@ -242,6 +261,27 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             dialog.show();
         }
     }
+
+
+    //Should move to inteface later
+    public void closeMarkerInfo() {
+        if (mMarkerInfoAdapter != null) {
+            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+            fragmentTransaction.remove(mMarkerInfoAdapter);
+            fragmentTransaction.commit();
+        }
+    }
+
+    public void backToFragmentBefore(int id){
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        Fragment fragment = fragmentManager.findFragmentById(id);
+        if (fragmentManager.getBackStackEntryCount() > 0) {
+            fragmentManager.popBackStack();
+        } else {
+            finish();
+        }
+    }
+
 
     private void listenToLocationChange() {
         //Request change location setting
