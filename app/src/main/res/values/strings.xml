@@ -9,4 +9,5 @@
     <string name="instruction_photo_select">Select a photo to represent the location(optional):</string>
     <string name="btn_add">Add</string>
     <string name="btn_cancel">Cancel</string>
+    <string name="title_address_book">All Address</string>
 </resources>

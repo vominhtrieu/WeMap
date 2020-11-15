@@ -18,7 +18,7 @@ import java.util.Formatter;
 import java.util.Locale;
 
 public class MarkerInfoFragment extends Fragment implements View.OnClickListener {
-    private MapsActivity activity;
+    private MainActivity activity;
     private LatLng latLng;
     Button btnAdd, btnClose;
     TextView txtLat, txtLng;
@@ -35,13 +35,13 @@ public class MarkerInfoFragment extends Fragment implements View.OnClickListener
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.activity = (MapsActivity) getActivity();
+        this.activity = (MainActivity) getActivity();
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = (View) inflater.inflate(R.layout.fragment_marker_info, null);
+        View view = inflater.inflate(R.layout.fragment_marker_info, null);
 
         txtLat = view.findViewById(R.id.txtLat);
         txtLng = view.findViewById(R.id.txtLng);

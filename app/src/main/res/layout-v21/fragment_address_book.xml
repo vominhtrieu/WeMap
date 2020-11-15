@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".AddressBookFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/holo_blue_dark"
+        android:paddingHorizontal="20dp"
+        android:paddingVertical="10dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="start|center"
+            android:text="@string/title_address_book"
+            android:textColor="#fff"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_gravity="center"
+            android:background="@drawable/ic_baseline_search" />
+    </LinearLayout>
+    <!--Apply favorite feature here-->
+    <!--    <LinearLayout-->
+    <!--        android:layout_width="match_parent"-->
+    <!--        android:layout_height="wrap_content"-->
+    <!--        android:orientation="horizontal">-->
+
+    <!--        <ImageView-->
+    <!--            android:layout_width="36dp"-->
+    <!--            android:layout_height="36dp"-->
+    <!--            android:layout_margin="10dp"-->
+    <!--            android:src="@drawable/ic_baseline_favorite" />-->
+
+    <!--        <ListView-->
+    <!--            android:id="@+id/lvFavorite"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="match_parent"-->
+    <!--            android:layout_marginStart="20dp"-->
+    <!--            android:layout_marginEnd="10dp" />-->
+    <!--    </LinearLayout>-->
+
+    <ListView
+        android:id="@+id/lvAddress"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp" />
+
+</LinearLayout>
