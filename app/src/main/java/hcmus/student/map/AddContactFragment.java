@@ -18,7 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.LatLng;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -32,35 +32,48 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
     EditText edtName;
     ImageButton btnCamera, btnFolder;
     ImageView ivAvatar;
-    Marker mMarker;
+    LatLng latLng;
     byte[] selectedImage;
 
     int REQUEST_CODE_CAMERA = 123;
     int REQUEST_CODE_FOLDER = 456;
 
-    public AddContactFragment(Marker marker) {
-        this.mMarker = marker;
-        this.selectedImage = null;
+    public static AddContactFragment newInstance(LatLng latLng) {
+        AddContactFragment fragment = new AddContactFragment();
+        Bundle args = new Bundle();
+        args.putDouble("lat", latLng.latitude);
+        args.putDouble("lng", latLng.longitude);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        activity = (MapsActivity) getActivity();
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_add_contact, container, false);
-        activity = (MapsActivity) getActivity();
 
-        btnAdd = (Button) view.findViewById(R.id.btnAddContact);
-        btnCancel = (Button) view.findViewById(R.id.btnCancelContact);
-        edtName = (EditText) view.findViewById(R.id.edtName);
-        btnCamera = (ImageButton) view.findViewById(R.id.btnCamera);
-        btnFolder = (ImageButton) view.findViewById(R.id.btnFolder);
-        ivAvatar = (ImageView) view.findViewById(R.id.ivAvatar);
+        btnAdd = view.findViewById(R.id.btnAddContact);
+        btnCancel = view.findViewById(R.id.btnCancelContact);
+        edtName = view.findViewById(R.id.edtName);
+        btnCamera = view.findViewById(R.id.btnCamera);
+        btnFolder = view.findViewById(R.id.btnFolder);
+        ivAvatar = view.findViewById(R.id.ivAvatar);
 
+        ivAvatar.setEnabled(false);
         btnCamera.setOnClickListener(this);
         btnFolder.setOnClickListener(this);
         btnAdd.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
 
+        Bundle args = getArguments();
+
+        latLng = new LatLng(args.getDouble("lat"), args.getDouble("lng"));
         return view;
     }
 
@@ -83,16 +96,15 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
                 } else {
                     try {
                         Database db = new Database(getContext());
-                        db.InsertPlace(edtName.getText().toString(), mMarker.getPosition().latitude, mMarker.getPosition().longitude, selectedImage);
-
-                    }
-                    catch (Exception e) {
+                        db.InsertPlace(edtName.getText().toString(), latLng.latitude, latLng.longitude, selectedImage);
+                        activity.backToPreviousFragment();
+                    } catch (Exception e) {
                         Toast.makeText(activity, "This place is already in contact book", Toast.LENGTH_SHORT).show();
                     }
                 }
                 break;
             case R.id.btnCancelContact:
-                activity.backToPreviousFragment(R.id.frameMarkerInfo);
+                activity.backToPreviousFragment();
                 break;
         }
     }

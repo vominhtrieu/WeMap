@@ -13,22 +13,17 @@
 
     <ImageButton
         android:id="@+id/btnLocation"
-        android:layout_width="72dp"
-        android:layout_height="72dp"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="5dp"
         android:layout_marginRight="5dp"
-        android:layout_marginBottom="5dp"
+        android:layout_marginBottom="20dp"
         android:background="@drawable/location_indicator_button" />
 
     <FrameLayout
-        android:id="@+id/frameMarkerInfo"
+        android:id="@+id/frameBottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"/>
-
-    <FrameLayout
-        android:id="@+id/frameAddContact"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 </FrameLayout>

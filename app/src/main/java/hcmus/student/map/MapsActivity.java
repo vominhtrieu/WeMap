@@ -1,11 +1,5 @@
 package hcmus.student.map;
 
-import android.content.Context;
-import android.hardware.SensorManager;
-import android.os.Bundle;
-import android.transition.Transition;
-import android.transition.TransitionValues;
-import android.util.Log;
 import android.Manifest;
 import android.animation.ValueAnimator;
 import android.app.AlertDialog;
@@ -19,7 +13,6 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
-import android.view.SurfaceControl;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageButton;
@@ -31,7 +24,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -72,44 +64,24 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Marker mLocationIndicator;
     private LocationCallback mLocationCallBack;
     private Marker marker;
-    private Database mDatabase;
     private MarkerInfoFragment mMarkerInfoFragment;
-    private Transition mTransition;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        boolean isMarkerRotating = false;
-        mTransition = new Transition() {
-            @Override
-            public void captureStartValues(TransitionValues transitionValues) {
-
-            }
-
-            @Override
-            public void captureEndValues(TransitionValues transitionValues) {
-
-            }
-        };
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         SensorManager sensorService = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
-
         sensor = new OrientationSensor(sensorService) {
-            float temp = 0;
+            float previousRotation = 0;
 
             @Override
             public void onSensorChanged(float rotation) {
                 //Implement Rotation change here
-                if(mLocationIndicator!= null && Math.abs(temp - rotation) >= EPSILON) {
-
+                if (mLocationIndicator != null && Math.abs(previousRotation - rotation) >= EPSILON) {
                     mLocationIndicator.setRotation(rotation);
-
-                    mTransition.setDuration(1000);
-
-                    temp = rotation;
+                    previousRotation = rotation;
                 }
             }
         };
@@ -172,14 +144,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Bitmap bitmap = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 72, 72, false);
         bitmapDrawable.setAntiAlias(true);
         mLocationIndicator = mMap.addMarker(new MarkerOptions().position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude())).flat(true)
-                .icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+                .icon(BitmapDescriptorFactory.fromBitmap(bitmap)).anchor(0.5f, 0.5f));
 
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
                 if (marker != null) marker.remove();
                 marker = mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
             }
         });
 
@@ -187,11 +159,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             @Override
             public boolean onMarkerClick(Marker marker) {
                 FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                mMarkerInfoFragment = new MarkerInfoFragment(marker);
-                fragmentTransaction.add(R.id.frameMarkerInfo, mMarkerInfoFragment);
-
+                fragmentTransaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+                mMarkerInfoFragment = MarkerInfoFragment.newInstance(marker);
+                fragmentTransaction.add(R.id.frameBottom, mMarkerInfoFragment);
+                fragmentTransaction.addToBackStack(null);
+                fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
                 fragmentTransaction.commit();
-                return false;
+
+                return true;
             }
         });
 
@@ -290,24 +265,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
     //Should move to interface later
-    public void closeMarkerInfo() {
-        if (mMarkerInfoFragment != null) {
-            FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-            fragmentTransaction.remove(mMarkerInfoFragment);
-            fragmentTransaction.commit();
-        }
+    public void backToPreviousFragment() {
+        getSupportFragmentManager().popBackStack();
     }
 
-    public void backToPreviousFragment(int id) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        Fragment fragment = fragmentManager.findFragmentById(id);
-        if (fragmentManager.getBackStackEntryCount() > 0) {
-            fragmentManager.popBackStack();
-        } else {
-            finish();
-        }
+    public void openAddContact(LatLng latLng) {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        //fragmentTransaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right, R.anim.slide_in_right, R.anim.slide_out_left);
+        fragmentTransaction.detach(mMarkerInfoFragment);
+        fragmentTransaction.replace(R.id.frameBottom, AddContactFragment.newInstance(latLng));
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
     }
-
 
     private void listenToLocationChange() {
         //Request change location setting

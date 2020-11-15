@@ -5,43 +5,66 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+
+import java.util.Formatter;
+import java.util.Locale;
 
 public class MarkerInfoFragment extends Fragment implements View.OnClickListener {
     private MapsActivity activity;
-    private Marker mMarker;
+    private LatLng latLng;
     Button btnAdd, btnClose;
     TextView txtLat, txtLng;
 
-    public MarkerInfoFragment(Marker marker) {
-        this.mMarker = marker;
+    public static MarkerInfoFragment newInstance(Marker marker) {
+        MarkerInfoFragment fragment = new MarkerInfoFragment();
+        Bundle args = new Bundle();
+        args.putDouble("lat", marker.getPosition().latitude);
+        args.putDouble("lng", marker.getPosition().longitude);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        this.activity = (MapsActivity) getActivity();
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        LinearLayout layout = (LinearLayout) inflater.inflate(R.layout.fragment_marker_info, null);
-        this.activity = (MapsActivity) getActivity();
+        View view = (View) inflater.inflate(R.layout.fragment_marker_info, null);
 
-        txtLat = layout.findViewById(R.id.txtLat);
-        txtLng = layout.findViewById(R.id.txtLng);
-        btnAdd = layout.findViewById(R.id.btnAdd);
-        btnClose = layout.findViewById(R.id.btnClose);
+        txtLat = view.findViewById(R.id.txtLat);
+        txtLng = view.findViewById(R.id.txtLng);
+        btnAdd = view.findViewById(R.id.btnAdd);
+        btnClose = view.findViewById(R.id.btnClose);
 
-        txtLat.setText(Double.toString(mMarker.getPosition().latitude));
-        txtLng.setText(Double.toString(mMarker.getPosition().longitude));
+        StringBuilder sb = new StringBuilder();
+        Formatter formatter = new Formatter(sb, Locale.US);
+        try {
+            Bundle args = getArguments();
+            latLng = new LatLng(args.getDouble("lat"), args.getDouble("lng"));
+
+            txtLat.setText(formatter.format("Latitude: %.2f", latLng.latitude).toString());
+            sb.setLength(0);
+            txtLng.setText(formatter.format("Longitude: %.2f", latLng.longitude).toString());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         btnAdd.setOnClickListener(this);
         btnClose.setOnClickListener(this);
 
-        return layout;
+        return view;
     }
 
 
@@ -49,13 +72,10 @@ public class MarkerInfoFragment extends Fragment implements View.OnClickListener
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btnAdd:
-                FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-                Fragment fragment = new AddContactFragment(mMarker);
-                transaction.replace(R.id.frameMarkerInfo, fragment);
-                transaction.commit();
+                activity.openAddContact(latLng);
                 break;
             case R.id.btnClose:
-                activity.closeMarkerInfo();
+                activity.backToPreviousFragment();
                 break;
         }
     }

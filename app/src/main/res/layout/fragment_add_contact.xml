@@ -1,109 +1,128 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@android:color/white"
-    android:orientation="vertical"
-    android:padding="20dp">
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/instruction_add_contact"
-        android:textColor="#000"
-        android:textSize="20sp" />
+    android:layout_height="wrap_content"
+    card_view:cardCornerRadius="15dp"
+    card_view:cardElevation="15dp"
+    card_view:cardUseCompatPadding="true">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp">
+        android:layout_height="match_parent"
+        android:background="@android:color/white"
+        android:orientation="vertical"
+        android:padding="20dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/txt_place_name"
+            android:text="@string/instruction_add_contact"
             android:textColor="#000"
-            android:textSize="20sp" />
-
-        <EditText
-            android:id="@+id/edtName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColor="#000"
-            android:textSize="20sp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp">
-
-    </LinearLayout>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/instruction_photo_select"
-        android:textColor="#000"
-        android:textSize="20sp" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp">
-
-
-        <ImageView
-            android:id="@+id/ivAvatar"
-            android:layout_width="260dp"
-            android:layout_height="260dp"
-            android:background="@android:drawable/ic_menu_gallery" />
+            android:textSize="22sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp">
 
-            <ImageButton
-                android:id="@+id/btnCamera"
-                android:layout_width="84dp"
-                android:layout_height="84dp"
-                android:layout_marginBottom="20dp"
-                android:src="@android:drawable/ic_menu_camera" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/txt_place_name"
+                android:textColor="#000"
+                android:textSize="20sp" />
 
-            <ImageButton
-                android:id="@+id/btnFolder"
-                android:layout_width="84dp"
-                android:layout_height="84dp"
-                android:src="@android:drawable/ic_menu_gallery" />
+            <EditText
+                android:id="@+id/edtName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#000"
+                android:textSize="20sp" />
         </LinearLayout>
-    </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp">
-
-        <Button
-            android:id="@+id/btnAddContact"
-            android:layout_width="184dp"
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="10dp"
-            android:layout_marginRight="10dp"
-            android:text="@string/btn_add"
+            android:layout_marginTop="10dp">
+
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/instruction_photo_select"
             android:textColor="#000"
             android:textSize="20sp" />
 
-        <Button
-            android:id="@+id/btnCancelContact"
-            android:layout_width="184dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginLeft="10dp"
-            android:text="@string/btn_cancel"
-            android:textColor="#000"
-            android:textSize="20sp" />
-    </LinearLayout>
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:orientation="horizontal">
 
-</LinearLayout>
+
+            <ImageView
+                android:id="@+id/ivAvatar"
+                android:layout_width="180dp"
+                android:layout_height="180dp"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/icon_image" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:orientation="vertical">
+
+                <ImageButton
+                    android:id="@+id/btnCamera"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:layout_marginBottom="20dp"
+                    android:background="@drawable/img_btn_background"
+                    android:src="@android:drawable/ic_menu_camera" />
+
+                <ImageButton
+                    android:id="@+id/btnFolder"
+                    android:layout_width="72dp"
+                    android:layout_height="72dp"
+                    android:background="@drawable/img_btn_background"
+                    android:src="@android:drawable/ic_menu_gallery" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp">
+
+            <Button
+                android:id="@+id/btnAddContact"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/btn_background"
+                android:text="@string/btn_add"
+                android:textColor="#000"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/btnCancelContact"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginLeft="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/btn_background"
+                android:text="@string/btn_cancel"
+                android:textColor="#000"
+                android:textSize="20sp" />
+        </LinearLayout>
+
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
