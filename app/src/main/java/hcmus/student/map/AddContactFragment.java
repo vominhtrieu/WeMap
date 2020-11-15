@@ -27,7 +27,7 @@ import java.io.InputStream;
 import static android.app.Activity.RESULT_OK;
 
 public class AddContactFragment extends Fragment implements View.OnClickListener {
-    MapsActivity activity;
+    MainActivity activity;
     Button btnAdd, btnCancel;
     EditText edtName;
     ImageButton btnCamera, btnFolder;
@@ -50,7 +50,7 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activity = (MapsActivity) getActivity();
+        activity = (MainActivity) getActivity();
     }
 
     @Nullable
@@ -96,7 +96,7 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
                 } else {
                     try {
                         Database db = new Database(getContext());
-                        db.InsertPlace(edtName.getText().toString(), latLng.latitude, latLng.longitude, selectedImage);
+                        db.insertPlace(edtName.getText().toString(), latLng.latitude, latLng.longitude, selectedImage);
                         activity.backToPreviousFragment();
                     } catch (Exception e) {
                         Toast.makeText(activity, "This place is already in contact book", Toast.LENGTH_SHORT).show();

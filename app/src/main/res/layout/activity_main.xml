@@ -9,7 +9,7 @@
 
     <androidx.viewpager2.widget.ViewPager2
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         android:layout_weight="0.9"
         android:id="@+id/pager" />
 
@@ -18,6 +18,8 @@
         android:layout_height="wrap_content"
         app:tabMode="fixed"
         app:tabIndicatorColor="#ff0000"
+        app:tabIndicatorGravity="top"
+        app:tabIndicatorHeight="3dp"
         android:id="@+id/tabs">
 
         <com.google.android.material.tabs.TabItem

@@ -13,7 +13,6 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +40,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -51,7 +49,6 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 import java.util.Collections;
-import java.util.concurrent.Executor;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
@@ -61,6 +58,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private static final long FASTEST_UPDATE_INTERVAL = 1000;
     private static final long ANIMATION_DURATION = 500;
     private static final double FOLLOWING_THRESHOLD = 0.00000001;
+    private static final int EPSILON = 5;
 
     private GoogleMap mMap;
     private Location mCurrentLocation;
@@ -76,8 +74,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     @RequiresApi(api = Build.VERSION_CODES.M)
 
     public static MapsFragment newInstance() {
-        Bundle args = new Bundle();
         MapsFragment fragment = new MapsFragment();
+        Bundle args = new Bundle();
         fragment.setArguments(args);
         return fragment;
     }
@@ -88,7 +86,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         try {
             context = getActivity();
             main = (MainActivity) getActivity();
-
         } catch (IllegalStateException e) {
             throw new IllegalStateException("MainActivity must implement callbacks");
         }
@@ -105,10 +102,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         mMapView.onCreate(savedInstanceState);
         //Implement Rotation change here
         OrientationSensor sensor = new OrientationSensor(sensorService) {
+            float previousRotation = 0;
+
             @Override
             public void onSensorChanged(float rotation) {
                 //Implement Rotation change here
-                Log.d("Azimuth", Float.toString(rotation));
+                if (mLocationIndicator != null && Math.abs(previousRotation - rotation) >= EPSILON) {
+                    mLocationIndicator.setRotation(rotation);
+                    previousRotation = rotation;
+                }
             }
         };
 
@@ -145,15 +147,23 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 context.getTheme());
         Bitmap bitmap = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 72, 72, false);
         bitmapDrawable.setAntiAlias(true);
-        mLocationIndicator = mMap.addMarker(new MarkerOptions().position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()))
-                .icon(BitmapDescriptorFactory.fromBitmap(bitmap)));
+        mLocationIndicator = mMap.addMarker(new MarkerOptions().position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude())).flat(true)
+                .icon(BitmapDescriptorFactory.fromBitmap(bitmap)).anchor(0.5f, 0.5f));
 
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
                 if (marker != null) marker.remove();
                 marker = mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
-                //mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
+                mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+            }
+        });
+
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                main.openMarkerInfo(marker);
+                return true;
             }
         });
 
@@ -247,9 +257,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private void listenToLocationChange() {
         //Request change location setting
         final LocationRequest request = LocationRequest.create();
-//        request.setInterval(UPDATE_INTERVAL);
-//        request.setFastestInterval(FASTEST_UPDATE_INTERVAL);
-//        request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        request.setInterval(UPDATE_INTERVAL);
+        request.setFastestInterval(FASTEST_UPDATE_INTERVAL);
+        request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
         builder.addAllLocationRequests(Collections.singleton(request));
         SettingsClient settingsClient = LocationServices.getSettingsClient(main);

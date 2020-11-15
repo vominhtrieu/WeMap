@@ -70,7 +70,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
+        setContentView(R.layout.fragment_maps);
         SensorManager sensorService = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
         sensor = new OrientationSensor(sensorService) {
@@ -158,13 +158,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-                FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-                fragmentTransaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
-                mMarkerInfoFragment = MarkerInfoFragment.newInstance(marker);
-                fragmentTransaction.add(R.id.frameBottom, mMarkerInfoFragment);
-                fragmentTransaction.addToBackStack(null);
-                fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
-                fragmentTransaction.commit();
 
                 return true;
             }
@@ -261,21 +254,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             AlertDialog dialog = builder.create();
             dialog.show();
         }
-    }
-
-
-    //Should move to interface later
-    public void backToPreviousFragment() {
-        getSupportFragmentManager().popBackStack();
-    }
-
-    public void openAddContact(LatLng latLng) {
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        //fragmentTransaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right, R.anim.slide_in_right, R.anim.slide_out_left);
-        fragmentTransaction.detach(mMarkerInfoFragment);
-        fragmentTransaction.replace(R.id.frameBottom, AddContactFragment.newInstance(latLng));
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
     }
 
     private void listenToLocationChange() {

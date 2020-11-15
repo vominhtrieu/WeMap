@@ -14,29 +14,27 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
 
     ArrayList<Fragment> fragmentList;
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     public ViewPagerAdapter(@NonNull FragmentActivity fragmentActivity) {
         super(fragmentActivity);
         fragmentList = new ArrayList<>();
-        fragmentList.add(new MapsFragment());
+        fragmentList.add(MapsFragment.newInstance());
+        fragmentList.add(AddressBookFragment.newInstance());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        if (position == 0) {
-            return fragmentList.get(0);
-        }
-        else if (position == 1) {
-            //Address Book fragment
-            return null;
+        if (position == 0 || position == 1) {
+            return fragmentList.get(position);
         }
         return null;
     }
 
     @Override
     public int getItemCount() {
-        return 2;
+        return fragmentList.size();
     }
 }
 
