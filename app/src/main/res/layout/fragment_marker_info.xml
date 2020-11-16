@@ -45,10 +45,27 @@
         </LinearLayout>
 
         <Button
-            android:id="@+id/btnAdd"
+            android:id="@+id/btnDirection"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="40dp"
+            android:background="@drawable/btn_background"
+            android:drawableStart="@android:drawable/ic_menu_directions"
+            android:drawableLeft="@android:drawable/ic_menu_directions"
+            android:paddingVertical="10dp"
+            android:paddingStart="10dp"
+            android:paddingLeft="10dp"
+            android:paddingEnd="20dp"
+            android:paddingRight="20dp"
+            android:text="@string/btn_direction"
+            android:textColor="#000"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/btnAdd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:background="@drawable/btn_background"
             android:drawableStart="@android:drawable/ic_input_add"
             android:drawableLeft="@android:drawable/ic_input_add"

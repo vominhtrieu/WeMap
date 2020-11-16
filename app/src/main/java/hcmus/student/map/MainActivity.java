@@ -1,6 +1,5 @@
 package hcmus.student.map;
 
-import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -13,10 +12,16 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.material.tabs.TabLayout;
 
+import hcmus.student.map.map.AddContactFragment;
+import hcmus.student.map.map.MapsFragment;
+import hcmus.student.map.map.MarkerInfoFragment;
+import hcmus.student.map.map.ViewPagerAdapter;
+
 
 public class MainActivity extends FragmentActivity {
 
     private ViewPager2 mViewPager;
+    ViewPagerAdapter adapter;
     private TabLayout mTabs;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -33,7 +38,8 @@ public class MainActivity extends FragmentActivity {
         mViewPager = findViewById(R.id.pager);
         mViewPager.setUserInputEnabled(false);
 
-        mViewPager.setAdapter(new ViewPagerAdapter(this));
+        adapter = new ViewPagerAdapter(this);
+        mViewPager.setAdapter(adapter);
         mTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -64,6 +70,11 @@ public class MainActivity extends FragmentActivity {
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         fragmentTransaction.commit();
+    }
+
+    public void drawRoute(LatLng start, LatLng end) {
+        MapsFragment fragment = (MapsFragment) adapter.getFragmentList().get(0);
+        fragment.drawRoute(start, end);
     }
 
     public void openAddContact(LatLng latLng) {

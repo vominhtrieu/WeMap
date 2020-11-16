@@ -1,16 +1,14 @@
-package hcmus.student.map;
+package hcmus.student.map.database;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Database extends SQLiteOpenHelper {
     static final String DATABASE_NAME = "Contact List";

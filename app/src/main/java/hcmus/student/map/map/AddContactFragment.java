@@ -1,4 +1,4 @@
-package hcmus.student.map;
+package hcmus.student.map.map;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -23,6 +23,10 @@ import com.google.android.gms.maps.model.LatLng;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+
+import hcmus.student.map.MainActivity;
+import hcmus.student.map.R;
+import hcmus.student.map.database.Database;
 
 import static android.app.Activity.RESULT_OK;
 

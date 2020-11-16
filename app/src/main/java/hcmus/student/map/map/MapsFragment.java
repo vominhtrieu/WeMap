@@ -1,7 +1,6 @@
-package hcmus.student.map;
+package hcmus.student.map.map;
 
 import android.Manifest;
-import android.animation.ValueAnimator;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,18 +12,18 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.view.LayoutInflater;
 import android.view.View;
-import android.view.animation.LinearInterpolator;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -36,44 +35,78 @@ import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 import java.util.Collections;
+import java.util.List;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+import hcmus.student.map.MainActivity;
+import hcmus.student.map.R;
+import hcmus.student.map.map.utilities.direction.Direction;
+import hcmus.student.map.map.utilities.direction.DirectionResponse;
+import hcmus.student.map.map.utilities.direction.DirectionTask;
+import hcmus.student.map.map.utilities.MarkerAnimator;
+import hcmus.student.map.map.utilities.OrientationSensor;
+
+public class MapsFragment extends Fragment implements OnMapReadyCallback, DirectionResponse {
 
     private static final int LOCATION_STATUS_CODE = 1;
     private static final int DEFAULT_ZOOM = 15;
     private static final long UPDATE_INTERVAL = 1000;
     private static final long FASTEST_UPDATE_INTERVAL = 1000;
-    private static final long ANIMATION_DURATION = 500;
-    private static final double FOLLOWING_THRESHOLD = 0.00000001;
     private static final int EPSILON = 5;
 
     private GoogleMap mMap;
-    private OrientationSensor sensor;
     private Location mCurrentLocation;
     private FusedLocationProviderClient mClient;
     private Marker mLocationIndicator;
     private LocationCallback mLocationCallBack;
     private Marker marker;
-    private MarkerInfoFragment mMarkerInfoFragment;
+    private MapView mMapView;
+
+    private MainActivity main;
+    private Context context;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_maps);
-        SensorManager sensorService = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
 
-        sensor = new OrientationSensor(sensorService) {
+    public static MapsFragment newInstance() {
+        MapsFragment fragment = new MapsFragment();
+        Bundle args = new Bundle();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        try {
+            context = getActivity();
+            main = (MainActivity) getActivity();
+        } catch (IllegalStateException e) {
+            throw new IllegalStateException("MainActivity must implement callbacks");
+        }
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_maps, container, false);
+        SensorManager sensorService = (SensorManager) main.getSystemService(Context.SENSOR_SERVICE);
+        mMapView = view.findViewById(R.id.map);
+        mMapView.onCreate(savedInstanceState);
+        //Implement Rotation change here
+        OrientationSensor sensor = new OrientationSensor(sensorService) {
             float previousRotation = 0;
 
             @Override
@@ -86,9 +119,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         };
 
-        mClient = LocationServices.getFusedLocationProviderClient(this);
+        mClient = LocationServices.getFusedLocationProviderClient(context);
         mLocationCallBack = null;
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             enableLocation();
         } else if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
@@ -96,37 +129,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } else {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_STATUS_CODE);
         }
-    }
-
-
-    protected void onResume() {
-        super.onResume();
-        listenToLocationChange();
-        sensor.register();
+        return view;
     }
 
     @Override
-    protected void onPause() {
-        super.onPause();
-        if (mLocationCallBack != null) {
-            mClient.removeLocationUpdates(mLocationCallBack);
-            sensor.unregister();
-        }
-    }
-
-    /**
-     * Manipulates the map once available.
-     * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
-     * If Google Play services is not installed on the device, the user will be prompted to install
-     * it inside the SupportMapFragment. This method will only be triggered once the user has
-     * installed Google Play services and returned to the app.
-     */
-    @Override
-    public void onMapReady(final GoogleMap googleMap) {
+    public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        ImageButton btnLocation = findViewById(R.id.btnLocation);
+        ImageButton btnLocation = getView().findViewById(R.id.btnLocation);
 
         btnLocation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -140,7 +149,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         //Display location indicator
         BitmapDrawable bitmapDrawable = (BitmapDrawable) ResourcesCompat.getDrawable(getResources(), R.drawable.location_indicator,
-                getTheme());
+                context.getTheme());
         Bitmap bitmap = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 72, 72, false);
         bitmapDrawable.setAntiAlias(true);
         mLocationIndicator = mMap.addMarker(new MarkerOptions().position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude())).flat(true)
@@ -158,21 +167,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
-
+                if (marker.getPosition().equals(mLocationIndicator.getPosition()))
+                    return true;
+                main.openMarkerInfo(marker);
                 return true;
             }
         });
-
 
         //Move camera to user location with default zoom
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLocation.getLatitude(),
                 mCurrentLocation.getLongitude()), DEFAULT_ZOOM));
 
         listenToLocationChange();
-
-
     }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -185,61 +192,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    private void animateLocationIndicator() {
-        final ValueAnimator animator = ValueAnimator.ofFloat(0, 1);
-
-        final LatLng startLatLng = mLocationIndicator.getPosition();
-        final Location tempLocation = mCurrentLocation;
-        final LatLng endLatLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
-
-        animator.setDuration(ANIMATION_DURATION);
-        animator.setInterpolator(new LinearInterpolator());
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                if (mCurrentLocation != tempLocation) {
-                    animator.cancel();
-                    return;
-                }
-                float fraction = animation.getAnimatedFraction();
-                double newLat = startLatLng.latitude + (endLatLng.latitude - startLatLng.latitude) * fraction;
-                double newLng = startLatLng.longitude + (endLatLng.longitude - startLatLng.longitude) * fraction;
-                LatLng newPosition = new LatLng(newLat, newLng);
-
-                //Check if user moved camera, if yes, camera won't follow user's location
-                LatLng cameraTargetPosition = mMap.getCameraPosition().target;
-                LatLng indicatorPosition = mLocationIndicator.getPosition();
-
-                double latitudeDiff = cameraTargetPosition.latitude - indicatorPosition.latitude;
-                double longitudeDiff = cameraTargetPosition.longitude - indicatorPosition.longitude;
-
-                //We don't compute square root because this result is enough for checking whether user move the camera or not
-                double squareDistance = latitudeDiff * latitudeDiff + longitudeDiff * longitudeDiff;
-
-                if (squareDistance < FOLLOWING_THRESHOLD)
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(newPosition));
-                mLocationIndicator.setPosition(newPosition);
-            }
-        });
-        animator.start();
-    }
-
     private void enableLocation() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(main, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             Task<Location> task = mClient.getLastLocation();
             task.addOnSuccessListener(new OnSuccessListener<Location>() {
                 @Override
                 public void onSuccess(Location location) {
                     if (location != null) {
                         mCurrentLocation = location;
-                        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                                .findFragmentById(R.id.map);
-                        mapFragment.getMapAsync(MapsActivity.this);
+                        mMapView.getMapAsync(MapsFragment.this);
                     }
                 }
             });
         } else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
             builder.setTitle("Warning!");
             builder.setMessage("You have denied the app to access your permission, this app won't work");
             builder.setCancelable(false);
@@ -262,26 +228,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         request.setInterval(UPDATE_INTERVAL);
         request.setFastestInterval(FASTEST_UPDATE_INTERVAL);
         request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder()
-                .addAllLocationRequests(Collections.singleton(request));
-        SettingsClient settingsClient = LocationServices.getSettingsClient(this);
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
+        builder.addAllLocationRequests(Collections.singleton(request));
+        SettingsClient settingsClient = LocationServices.getSettingsClient(main);
         Task<LocationSettingsResponse> task = settingsClient.checkLocationSettings(builder.build());
 
+        final MarkerAnimator animator = new MarkerAnimator(mLocationIndicator, mMap);
+
         //Listen for location change event
-        task.addOnSuccessListener(this, new OnSuccessListener<LocationSettingsResponse>() {
+        task.addOnSuccessListener(new OnSuccessListener<LocationSettingsResponse>() {
             @Override
             public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-                if (ActivityCompat.checkSelfPermission(MapsActivity.this,
+                if (ActivityCompat.checkSelfPermission(main,
                         Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-
                     mLocationCallBack = new LocationCallback() {
                         @Override
                         public void onLocationResult(LocationResult locationResult) {
                             super.onLocationResult(locationResult);
                             mCurrentLocation = locationResult.getLastLocation();
-
                             if (mCurrentLocation != null) {
-                                animateLocationIndicator();
+                                animator.animate(mCurrentLocation);
                             }
                         }
                     };
@@ -290,11 +256,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 }
             }
         });
+    }
 
+    public void drawRoute(LatLng start, LatLng end) {
+        LatLng startPos = start == null ? new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()) : start;
+        LatLng endPos = end == null ? new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()) : end;
+        String url = Direction.getDirectionUrl(startPos, endPos, main);
+        new DirectionTask(this).execute(url);
     }
 
     private void showAlert() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(MapsActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Warning!");
         builder.setMessage("App must have permission to access you location");
         builder.setCancelable(false);
@@ -314,5 +286,18 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mMapView.onResume();
+    }
+
+    @Override
+    public void onRespond(List<PolylineOptions> polylineOptions) {
+        for (PolylineOptions route : polylineOptions) {
+            mMap.addPolyline(route);
+        }
     }
 }

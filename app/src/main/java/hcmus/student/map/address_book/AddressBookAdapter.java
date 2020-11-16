@@ -1,4 +1,4 @@
-package hcmus.student.map;
+package hcmus.student.map.address_book;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -17,6 +17,10 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Formatter;
 
+import hcmus.student.map.database.Database;
+import hcmus.student.map.database.Place;
+import hcmus.student.map.R;
+
 public class AddressBookAdapter extends BaseAdapter {
     Database mDatabase;
     Context context;
@@ -25,7 +29,7 @@ public class AddressBookAdapter extends BaseAdapter {
     public AddressBookAdapter(Context context) {
         this.context = context;
         this.mDatabase = new Database(context);
-        getUpdate();
+        this.places = new ArrayList<>();
     }
 
     public void getUpdate() {

@@ -1,4 +1,4 @@
-package hcmus.student.map;
+package hcmus.student.map.map;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -17,10 +17,13 @@ import com.google.android.gms.maps.model.Marker;
 import java.util.Formatter;
 import java.util.Locale;
 
+import hcmus.student.map.MainActivity;
+import hcmus.student.map.R;
+
 public class MarkerInfoFragment extends Fragment implements View.OnClickListener {
     private MainActivity activity;
     private LatLng latLng;
-    Button btnAdd, btnClose;
+    Button btnAdd, btnClose, btnDirection;
     TextView txtLat, txtLng;
 
     public static MarkerInfoFragment newInstance(Marker marker) {
@@ -46,6 +49,7 @@ public class MarkerInfoFragment extends Fragment implements View.OnClickListener
         txtLat = view.findViewById(R.id.txtLat);
         txtLng = view.findViewById(R.id.txtLng);
         btnAdd = view.findViewById(R.id.btnAdd);
+        btnDirection = view.findViewById(R.id.btnDirection);
         btnClose = view.findViewById(R.id.btnClose);
 
         StringBuilder sb = new StringBuilder();
@@ -62,6 +66,7 @@ public class MarkerInfoFragment extends Fragment implements View.OnClickListener
         }
 
         btnAdd.setOnClickListener(this);
+        btnDirection.setOnClickListener(this);
         btnClose.setOnClickListener(this);
 
         return view;
@@ -71,6 +76,10 @@ public class MarkerInfoFragment extends Fragment implements View.OnClickListener
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.btnDirection:
+                activity.drawRoute(null, latLng);
+                activity.backToPreviousFragment();
+                break;
             case R.id.btnAdd:
                 activity.openAddContact(latLng);
                 break;

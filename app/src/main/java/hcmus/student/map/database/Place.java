@@ -1,4 +1,4 @@
-package hcmus.student.map;
+package hcmus.student.map.database;
 
 public class Place  {
     private String name;
