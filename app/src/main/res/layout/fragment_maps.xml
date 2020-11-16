@@ -8,6 +8,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <SearchView
+        android:id="@+id/svSearch"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:iconifiedByDefault="false"
+        android:queryHint="Search..."
+        android:background="@drawable/bg_round"
+        android:layout_margin="10dp"
+        android:elevation="5dp">
+        <requestFocus/>
+    </SearchView>
+
     <ImageButton
         android:id="@+id/btnLocation"
         android:layout_width="64dp"
@@ -23,4 +35,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom" />
+
 </FrameLayout>
