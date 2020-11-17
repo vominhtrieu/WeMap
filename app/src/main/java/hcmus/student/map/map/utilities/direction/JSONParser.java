@@ -1,4 +1,4 @@
-package hcmus.student.map.map.utilities;
+package hcmus.student.map.map.utilities.direction;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -26,15 +26,11 @@ public class JSONParser {
                     List<List<LatLng>> steps = new ArrayList<>();
                     for (int k = 0; k < jsonSteps.length(); k++) {
                         JSONObject jsonStep = jsonSteps.getJSONObject(k);
-                        JSONObject jsonStartLocation = jsonStep.getJSONObject("start_location");
-                        JSONObject jsonEndLocation = jsonStep.getJSONObject("end_location");
-
-                        LatLng startLocation = new LatLng(jsonStartLocation.getDouble("lat"), jsonStartLocation.getDouble("lng"));
-                        LatLng endLocation = new LatLng(jsonEndLocation.getDouble("lat"), jsonEndLocation.getDouble("lng"));
-                        ArrayList<LatLng> step = new ArrayList<>();
-                        step.add(startLocation);
-                        step.add(endLocation);
-                        steps.add(step);
+                        String points = jsonStep.getJSONObject("polyline").getString("points");
+                        PolylineString polyline = new PolylineString(points);
+                        //LatLng startLocation = new LatLng(jsonStartLocation.getDouble("lat"), jsonStartLocation.getDouble("lng"));
+                        //LatLng endLocation = new LatLng(jsonEndLocation.getDouble("lat"), jsonEndLocation.getDouble("lng"));
+                        steps.add(polyline.decode());
                     }
                     legs.add(steps);
                 }

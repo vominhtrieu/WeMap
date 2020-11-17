@@ -4,7 +4,6 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONException;
@@ -14,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import hcmus.student.map.map.utilities.FetchUrlTask;
-import hcmus.student.map.map.utilities.JSONParser;
 
 public class DirectionTask extends AsyncTask<String, Integer, List<List<List<List<LatLng>>>>> {
     static final int[] ROUTE_COLORS = {Color.BLUE, Color.RED, Color.BLACK, Color.YELLOW, Color.GRAY};

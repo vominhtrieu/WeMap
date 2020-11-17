@@ -41,21 +41,22 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import hcmus.student.map.MainActivity;
 import hcmus.student.map.R;
+import hcmus.student.map.map.utilities.MarkerAnimator;
+import hcmus.student.map.map.utilities.OrientationSensor;
 import hcmus.student.map.map.utilities.direction.Direction;
 import hcmus.student.map.map.utilities.direction.DirectionResponse;
 import hcmus.student.map.map.utilities.direction.DirectionTask;
-import hcmus.student.map.map.utilities.MarkerAnimator;
-import hcmus.student.map.map.utilities.OrientationSensor;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback, DirectionResponse {
 
@@ -71,6 +72,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     private Marker mLocationIndicator;
     private LocationCallback mLocationCallBack;
     private Marker marker;
+    private ArrayList<Polyline> mPolylines;
     private MapView mMapView;
 
     private MainActivity main;
@@ -105,6 +107,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         SensorManager sensorService = (SensorManager) main.getSystemService(Context.SENSOR_SERVICE);
         mMapView = view.findViewById(R.id.map);
         mMapView.onCreate(savedInstanceState);
+        mPolylines = null;
         //Implement Rotation change here
         OrientationSensor sensor = new OrientationSensor(sensorService) {
             float previousRotation = 0;
@@ -296,8 +299,16 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
 
     @Override
     public void onRespond(List<PolylineOptions> polylineOptions) {
+        if (mPolylines != null) {
+            for (int i = 0; i < mPolylines.size(); i++) {
+                mPolylines.get(i).remove();
+            }
+        }
+
+        mPolylines = new ArrayList<>();
+
         for (PolylineOptions route : polylineOptions) {
-            mMap.addPolyline(route);
+            mPolylines.add(mMap.addPolyline(route));
         }
     }
 }
