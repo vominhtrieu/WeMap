@@ -15,11 +15,8 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.SearchView;
 
@@ -28,9 +25,7 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -51,9 +46,10 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
-import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -75,6 +71,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private MarkerInfoFragment mMarkerInfoFragment;
     private SearchView svSearch;
     private SupportMapFragment mapFragment;
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,26 +104,34 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
 
-
-
         svSearch = (SearchView) findViewById(R.id.svSearch);
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        svSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener(){
+        svSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public boolean onQueryTextSubmit(String query){
+            public boolean onQueryTextSubmit(String query) {
+
                 String location = svSearch.getQuery().toString();
-                List<Address> addressList = null;
-                if(location != null || !location.equals("")){
-                    Geocoder geocoder = new Geocoder(MapsActivity.this);
-                    try{
-                        addressList = geocoder.getFromLocationName(location,1);
-                    }catch (IOException e){
-                        e.printStackTrace();
+
+                List<String> name = new ArrayList<>();
+                name.add("New York");
+                name.add("Mum bai");
+                name.add("California");
+                List<Double> latitude = new ArrayList<>();
+                latitude.add(21.00);
+                latitude.add(-11.2);
+                latitude.add(36.778261);
+                List<Double> longitude = new ArrayList<>();
+                longitude.add(11.2);
+                longitude.add(-9.3333);
+                longitude.add(119.417932);
+
+                for (int i = 0; i < name.size(); i++) {
+                    if (location.equals(name.get(i)) == true) {
+                        LatLng latLng = new LatLng(latitude.get(i), longitude.get(i));
+                        mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
+                        mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+
                     }
-                    Address address = addressList.get(0);
-                    LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                    mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
-                    mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng,10));
                 }
                 return false;
             }
@@ -138,8 +143,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
         mapFragment.getMapAsync(this);
     }
-
-
 
 
     protected void onResume() {
