@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.Camera;
 import android.graphics.drawable.BitmapDrawable;
 import android.hardware.SensorManager;
 import android.location.Location;
@@ -74,8 +73,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     private Marker mLocationIndicator;
     private LocationCallback mLocationCallBack;
     private Marker marker;
-    private ArrayList<Polyline> mPolylines;
+    private ArrayList<Polyline> mRoutes;
     private MapView mMapView;
+    private OrientationSensor mSensor;
+    
 
     private MainActivity main;
     private Context context;
@@ -110,7 +111,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         mMapView = view.findViewById(R.id.map);
         mMapView.onCreate(savedInstanceState);
         //Implement Rotation change here
-        OrientationSensor sensor = new OrientationSensor(sensorService) {
+        mSensor = new OrientationSensor(sensorService) {
             float previousRotation = 0;
 
             @Override
@@ -125,7 +126,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
 
         mClient = LocationServices.getFusedLocationProviderClient(context);
         mLocationCallBack = null;
-        mPolylines = null;
+        mRoutes = null;
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             enableLocation();
@@ -297,21 +298,28 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     public void onResume() {
         super.onResume();
         mMapView.onResume();
+        mSensor.register();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mSensor.unregister();
     }
 
     @Override
     public void onRespond(List<PolylineOptions> polylineOptions) {
-        if (mPolylines != null) {
-            for (int i = 0; i < mPolylines.size(); i++) {
-                mPolylines.get(i).remove();
+        if (mRoutes != null) {
+            for (int i = 0; i < mRoutes.size(); i++) {
+                mRoutes.get(i).remove();
             }
         }
 
-        mPolylines = new ArrayList<>();
+        mRoutes = new ArrayList<>();
 
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         for (PolylineOptions route : polylineOptions) {
-            mPolylines.add(mMap.addPolyline(route));
+            mRoutes.add(mMap.addPolyline(route));
             List<LatLng> points = route.getPoints();
             for (LatLng point : points) {
                 builder.include(point);
