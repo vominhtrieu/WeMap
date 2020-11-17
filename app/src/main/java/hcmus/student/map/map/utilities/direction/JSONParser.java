@@ -28,8 +28,6 @@ public class JSONParser {
                         JSONObject jsonStep = jsonSteps.getJSONObject(k);
                         String points = jsonStep.getJSONObject("polyline").getString("points");
                         PolylineString polyline = new PolylineString(points);
-                        //LatLng startLocation = new LatLng(jsonStartLocation.getDouble("lat"), jsonStartLocation.getDouble("lng"));
-                        //LatLng endLocation = new LatLng(jsonEndLocation.getDouble("lat"), jsonEndLocation.getDouble("lng"));
                         steps.add(polyline.decode());
                     }
                     legs.add(steps);

@@ -2,6 +2,7 @@ package hcmus.student.map.map.utilities.direction;
 
 import android.graphics.Color;
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -27,6 +28,7 @@ public class DirectionTask extends AsyncTask<String, Integer, List<List<List<Lis
     protected List<List<List<List<LatLng>>>> doInBackground(String... strings) {
         FetchUrlTask task = new FetchUrlTask();
         String respond = task.fetch(strings[0]);
+
         List<List<List<List<LatLng>>>> result = null;
         try {
             JSONObject jsonObject = new JSONObject(respond);
@@ -56,7 +58,7 @@ public class DirectionTask extends AsyncTask<String, Integer, List<List<List<Lis
                 }
             }
             polylineOptions.addAll(points);
-            polylineOptions.width(10);
+            polylineOptions.width(8);
             polylineOptions.color(ROUTE_COLORS[i]);
             respond.add(polylineOptions);
         }

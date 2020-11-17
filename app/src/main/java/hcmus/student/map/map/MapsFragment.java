@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Camera;
 import android.graphics.drawable.BitmapDrawable;
 import android.hardware.SensorManager;
 import android.location.Location;
@@ -39,6 +40,7 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
@@ -107,7 +109,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         SensorManager sensorService = (SensorManager) main.getSystemService(Context.SENSOR_SERVICE);
         mMapView = view.findViewById(R.id.map);
         mMapView.onCreate(savedInstanceState);
-        mPolylines = null;
         //Implement Rotation change here
         OrientationSensor sensor = new OrientationSensor(sensorService) {
             float previousRotation = 0;
@@ -124,6 +125,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
 
         mClient = LocationServices.getFusedLocationProviderClient(context);
         mLocationCallBack = null;
+        mPolylines = null;
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             enableLocation();
@@ -307,8 +309,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
 
         mPolylines = new ArrayList<>();
 
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
         for (PolylineOptions route : polylineOptions) {
             mPolylines.add(mMap.addPolyline(route));
+            List<LatLng> points = route.getPoints();
+            for (LatLng point : points) {
+                builder.include(point);
+            }
         }
+        LatLngBounds bounds = builder.build();
+        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds,100), 1000, null);
     }
 }
