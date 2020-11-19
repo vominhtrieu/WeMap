@@ -343,7 +343,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, MapsFr
             marker = null;
         }
         Bitmap bmpMarker = BitmapFactory.decodeResource(getResources(), R.drawable.marker_frame).copy(Bitmap.Config.ARGB_8888, true);
-        bmpMarker = Bitmap.createScaledBitmap(bmpMarker, 100, 120, false);
+        bmpMarker = Bitmap.createScaledBitmap(bmpMarker, 100, 130, false);
         if (avt != null) {
             Bitmap bmpAvatar = BitmapFactory.decodeByteArray(avt, 0, avt.length);
             bmpAvatar = Bitmap.createScaledBitmap(bmpAvatar, 72, 72, false);
