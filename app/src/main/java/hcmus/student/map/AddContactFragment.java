@@ -3,8 +3,16 @@ package hcmus.student.map;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
+import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -98,6 +106,8 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
                         Database db = new Database(getContext());
                         db.insertPlace(edtName.getText().toString(), latLng.latitude, latLng.longitude, selectedImage);
                         activity.backToPreviousFragment();
+                        activity.updateOnscreenMarker(latLng, selectedImage);
+                        Log.d("DEBUG", "onClick: insert  marker");
                     } catch (Exception e) {
                         Toast.makeText(activity, "This place is already in contact book", Toast.LENGTH_SHORT).show();
                     }
@@ -120,7 +130,7 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE_CAMERA && resultCode == RESULT_OK && data != null) {
             Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-            setSelectedImage(bitmap);
+            setSelectedImage(getCircularBitmap(bitmap));
         }
 
         if (requestCode == REQUEST_CODE_FOLDER && resultCode == RESULT_OK && data != null) {
@@ -128,10 +138,27 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
             try {
                 InputStream inputStream = activity.getContentResolver().openInputStream(uri);
                 Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-                setSelectedImage(bitmap);
+                setSelectedImage(getCircularBitmap(bitmap));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    private Bitmap getCircularBitmap(Bitmap bitmap) {
+        int squareBitmapWidth = Math.min(bitmap.getWidth(), bitmap.getHeight());
+        Bitmap resultBitmap = Bitmap.createBitmap (squareBitmapWidth, squareBitmapWidth, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(resultBitmap);
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        Rect rect = new Rect(0, 0, squareBitmapWidth, squareBitmapWidth);
+        RectF rectF = new RectF(rect);
+        canvas.drawOval(rectF, paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        float left = (squareBitmapWidth - bitmap.getWidth()) / 2;
+        float top = (squareBitmapWidth - bitmap.getHeight()) / 2;
+        canvas.drawBitmap(bitmap, left, top, paint);
+        bitmap.recycle();
+        return resultBitmap;
     }
 }
