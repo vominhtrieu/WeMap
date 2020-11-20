@@ -6,12 +6,15 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -53,14 +56,17 @@ import java.util.Collections;
 import java.util.List;
 
 import hcmus.student.map.MainActivity;
+import hcmus.student.map.map.utilities.MapsFragmentCallbacks;
 import hcmus.student.map.R;
+import hcmus.student.map.database.Database;
+import hcmus.student.map.database.Place;
 import hcmus.student.map.map.utilities.MarkerAnimator;
 import hcmus.student.map.map.utilities.OrientationSensor;
 import hcmus.student.map.map.utilities.direction.Direction;
 import hcmus.student.map.map.utilities.direction.DirectionResponse;
 import hcmus.student.map.map.utilities.direction.DirectionTask;
 
-public class MapsFragment extends Fragment implements OnMapReadyCallback, DirectionResponse {
+public class MapsFragment extends Fragment implements OnMapReadyCallback, DirectionResponse, MapsFragmentCallbacks {
 
     private static final int LOCATION_STATUS_CODE = 1;
     private static final int DEFAULT_ZOOM = 15;
@@ -78,7 +84,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     private Marker mRouteStartMarker, mRouteEndMarker;
     private MapView mMapView;
     private OrientationSensor mSensor;
-
+    private Database mDatabase;
 
     private MainActivity main;
     private Context context;
@@ -99,6 +105,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             context = getActivity();
             main = (MainActivity) getActivity();
             mRouteStartMarker = mRouteEndMarker = null;
+            mDatabase = new Database(context);
         } catch (IllegalStateException e) {
             throw new IllegalStateException("MainActivity must implement callbacks");
         }
@@ -187,6 +194,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLocation.getLatitude(),
                 mCurrentLocation.getLongitude()), DEFAULT_ZOOM));
 
+        showAllAddress();
         listenToLocationChange();
     }
 
@@ -255,9 +263,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                         public void onLocationResult(LocationResult locationResult) {
                             super.onLocationResult(locationResult);
                             mCurrentLocation = locationResult.getLastLocation();
-                            if (mCurrentLocation != null) {
-                                animator.animate(mCurrentLocation);
-                            }
+                            if (mCurrentLocation != null) animator.animate(mCurrentLocation);
                         }
                     };
 
@@ -296,6 +302,32 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
 
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    private void showAllAddress() {
+        List<Place> places = mDatabase.getAllPlaces();
+        for (Place place : places) {
+            createAvatarMarker(new LatLng(place.getLatitude(), place.getLongitude()), place.getAvatar());
+        }
+    }
+
+    @Override
+    public void createAvatarMarker(LatLng coordinate, byte[] avt) {
+        if (marker != null) {
+            marker.remove();
+            marker = null;
+        }
+        Bitmap bmpMarker = BitmapFactory.decodeResource(getResources(), R.drawable.marker_frame).copy(Bitmap.Config.ARGB_8888, true);
+        bmpMarker = Bitmap.createScaledBitmap(bmpMarker, 100, 130, false);
+        if (avt != null) {
+            Bitmap bmpAvatar = BitmapFactory.decodeByteArray(avt, 0, avt.length);
+            bmpAvatar = Bitmap.createScaledBitmap(bmpAvatar, 72, 72, false);
+            Canvas canvas = new Canvas(bmpMarker);
+            canvas.drawBitmap(bmpAvatar, 14, 14, null);
+        }
+
+        mMap.addMarker(new MarkerOptions().position(coordinate)
+                .icon(BitmapDescriptorFactory.fromBitmap(bmpMarker)));
     }
 
     @Override

@@ -18,11 +18,12 @@ import hcmus.student.map.map.MarkerInfoFragment;
 import hcmus.student.map.map.ViewPagerAdapter;
 
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity implements MainCallbacks {
 
     private ViewPager2 mViewPager;
     ViewPagerAdapter adapter;
     private TabLayout mTabs;
+    private MapsFragment mMapFragment;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -39,11 +40,14 @@ public class MainActivity extends FragmentActivity {
         mViewPager.setUserInputEnabled(false);
 
         adapter = new ViewPagerAdapter(this);
+        mViewPager.setAdapter(new ViewPagerAdapter(this));
+        mMapFragment = (MapsFragment) adapter.getFragment(0);
         mViewPager.setAdapter(adapter);
         mTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 mViewPager.setCurrentItem(tab.getPosition());
+                mMapFragment = (MapsFragment) adapter.getFragment(0);
             }
 
             @Override
@@ -83,5 +87,10 @@ public class MainActivity extends FragmentActivity {
         fragmentTransaction.replace(R.id.frameBottom, AddContactFragment.newInstance(latLng));
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
+    }
+
+    @Override
+    public void updateOnscreenMarker(LatLng coordinate, byte[] avt) {
+        mMapFragment.createAvatarMarker(coordinate, avt);
     }
 }

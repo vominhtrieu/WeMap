@@ -29,16 +29,14 @@ public class Database extends SQLiteOpenHelper {
         ArrayList<Place> places = new ArrayList<>();
         if (cursor == null || !cursor.moveToFirst())
             return places;
-        while (true)
-        {
+        while (true) {
             Place place = new Place(cursor.getString(0), cursor.getDouble(1),
                     cursor.getDouble(2), cursor.getBlob(3));
 
             places.add(place);
             if (cursor.isLast()) {
                 break;
-            }
-            else {
+            } else {
                 cursor.moveToNext();
             }
         }
