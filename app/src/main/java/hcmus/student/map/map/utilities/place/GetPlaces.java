@@ -10,9 +10,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import hcmus.student.map.map.utilities.DataParser;
-import hcmus.student.map.map.utilities.DownloadUrl;
 import hcmus.student.map.database.Place;
+import hcmus.student.map.map.utilities.FetchUrlTask;
+import hcmus.student.map.map.utilities.direction.JSONParser;
 
 public class GetPlaces extends AsyncTask<Object, String, String> {
 
@@ -26,8 +26,8 @@ public class GetPlaces extends AsyncTask<Object, String, String> {
             Log.d("GetNearbyPlacesData", "doInBackground entered");
             mMap = (GoogleMap) params[0];
             url = (String) params[1];
-            DownloadUrl downloadUrl = new DownloadUrl();
-            googlePlacesData = downloadUrl.readUrl(url);
+            FetchUrlTask downloadUrl = new FetchUrlTask();
+            googlePlacesData = downloadUrl.fetch(url);
             Log.d("GooglePlacesReadTask", "doInBackground Exit");
         } catch (Exception e) {
             Log.d("GooglePlacesReadTask", e.toString());
@@ -39,7 +39,7 @@ public class GetPlaces extends AsyncTask<Object, String, String> {
     protected void onPostExecute(String result) {
 
         List<HashMap<String, String>> nearbyPlacesList = null;
-        DataParser dataParser = new DataParser();
+        JSONParser dataParser = new JSONParser();
         nearbyPlacesList =  dataParser.parse(result);
         ArrayList<Place> list= PlacesList(nearbyPlacesList);
         for (int i=0; i<list.size();i++){
