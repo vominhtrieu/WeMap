@@ -3,10 +3,13 @@ package hcmus.student.map;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -14,10 +17,11 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.material.tabs.TabLayout;
 
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity implements MainCallbacks {
 
     private ViewPager2 mViewPager;
     private TabLayout mTabs;
+    private MapsFragment mMapFragment;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -32,12 +36,15 @@ public class MainActivity extends FragmentActivity {
 
         mViewPager = findViewById(R.id.pager);
         mViewPager.setUserInputEnabled(false);
-
         mViewPager.setAdapter(new ViewPagerAdapter(this));
+        final ViewPagerAdapter adapter = new ViewPagerAdapter(this);
+        mMapFragment = (MapsFragment) adapter.getFragment(0);
+        mViewPager.setAdapter(adapter);
         mTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 mViewPager.setCurrentItem(tab.getPosition());
+                mMapFragment = (MapsFragment) adapter.getFragment(0);
             }
 
             @Override
@@ -72,5 +79,10 @@ public class MainActivity extends FragmentActivity {
         fragmentTransaction.replace(R.id.frameBottom, AddContactFragment.newInstance(latLng));
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
+    }
+
+    @Override
+    public void updateOnscreenMarker(LatLng coordinate, byte[] avt) {
+        mMapFragment.createAvatarMarker(coordinate, avt);
     }
 }

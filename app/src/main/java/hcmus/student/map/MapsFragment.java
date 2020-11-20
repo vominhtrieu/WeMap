@@ -8,6 +8,13 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Picture;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Build;
@@ -20,6 +27,7 @@ import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageButton;
 import android.widget.Toast;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -53,6 +61,11 @@ import com.google.android.gms.tasks.Task;
 import java.util.Collections;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback {
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+public class MapsFragment extends Fragment implements OnMapReadyCallback, MapsFragmentCallbacks {
 
     private static final int LOCATION_STATUS_CODE = 1;
     private static final int DEFAULT_ZOOM = 15;
@@ -69,6 +82,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private LocationCallback mLocationCallBack;
     private Marker marker;
     private MapView mMapView;
+    Database mDatabase;
 
     private MainActivity main;
     private Context context;
@@ -91,15 +105,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         } catch (IllegalStateException e) {
             throw new IllegalStateException("MainActivity must implement callbacks");
         }
-
-        String url = GetUrl.TextSearch("quán ăn ở Bình Định",main);
-        Toast.makeText(context,url, Toast.LENGTH_LONG).show();
-        Object[] DataTransfer = new Object[2];
-        DataTransfer[0] = mMap;
-        DataTransfer[1] = url;
-        GetPlaces getPlacesData = new GetPlaces();
-        getPlacesData.execute(DataTransfer);
-
     }
 
     @Nullable
@@ -181,7 +186,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         //Move camera to user location with default zoom
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLocation.getLatitude(),
                 mCurrentLocation.getLongitude()), DEFAULT_ZOOM));
-
+        
+        showAllAddress();
         listenToLocationChange();
     }
 
@@ -326,6 +332,33 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    private void showAllAddress() {
+        List<Place> places = mDatabase.getAllPlaces();
+        for (Place place : places) {
+            createAvatarMarker(new LatLng(place.getLatitude(), place.getLongitude()), place.getAvatar());
+        }
+    }
+
+    @Override
+    public void createAvatarMarker(LatLng coordinate, byte[] avt) {
+        if (marker != null) {
+            marker.remove();
+            marker = null;
+        }
+        Bitmap bmpMarker = BitmapFactory.decodeResource(getResources(), R.drawable.marker_frame).copy(Bitmap.Config.ARGB_8888, true);
+        bmpMarker = Bitmap.createScaledBitmap(bmpMarker, 100, 130, false);
+        if (avt != null) {
+            Bitmap bmpAvatar = BitmapFactory.decodeByteArray(avt, 0, avt.length);
+            bmpAvatar = Bitmap.createScaledBitmap(bmpAvatar, 72, 72, false);
+            Canvas canvas = new Canvas(bmpMarker);
+            Log.e("DEBUG", "createAvatarMarker: draw avatar");
+            canvas.drawBitmap(bmpAvatar, 14, 14, null);
+        }
+
+        mMap.addMarker(new MarkerOptions().position(coordinate)
+                .icon(BitmapDescriptorFactory.fromBitmap(bmpMarker)));
     }
 
     @Override
