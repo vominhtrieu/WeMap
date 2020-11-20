@@ -2,6 +2,7 @@ package hcmus.student.map;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -9,58 +10,60 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-/**
- * Created by navneet on 23/7/16.
- */
-public abstract class GetPlaces extends AsyncTask<Object, String, String> {
+public class GetPlaces extends AsyncTask<Object, String, String> {
 
     String googlePlacesData;
     GoogleMap mMap;
     String url;
 
-//    @Override
-//    protected String doInBackground(String input) {
-//        try {
-//            Log.d("GetNearbyPlacesData", "doInBackground entered");
-//            PlacesService downloadUrl = new PlacesService();
-//            googlePlacesData = PlacesService.autocomplete(input);
-//            Log.d("GooglePlacesReadTask", "doInBackground Exit");
-//        } catch (Exception e) {
-//            Log.d("GooglePlacesReadTask", e.toString());
-//        }
-//        return googlePlacesData;
-//    }
+    @Override
+    protected String doInBackground(Object... params) {
+        try {
+            Log.d("GetNearbyPlacesData", "doInBackground entered");
+            mMap = (GoogleMap) params[0];
+            url = (String) params[1];
+            DownloadUrl downloadUrl = new DownloadUrl();
+            googlePlacesData = downloadUrl.readUrl(url);
+            Log.d("GooglePlacesReadTask", "doInBackground Exit");
+        } catch (Exception e) {
+            Log.d("GooglePlacesReadTask", e.toString());
+        }
+        return googlePlacesData;
+    }
 
     @Override
     protected void onPostExecute(String result) {
-        Log.d("GooglePlacesReadTask", "onPostExecute Entered");
+
         List<HashMap<String, String>> nearbyPlacesList = null;
         DataParser dataParser = new DataParser();
         nearbyPlacesList =  dataParser.parse(result);
-        ShowNearbyPlaces(nearbyPlacesList);
-        Log.d("GooglePlacesReadTask", "onPostExecute Exit");
+        ArrayList<Place> list= PlacesList(nearbyPlacesList);
+        for (int i=0; i<list.size();i++){
+            Log.d("name: ", list.get(i).getName());
+            Log.d("Latitude: ", String.valueOf(list.get(i).getLatitude()));
+            Log.d("Longtitude: ", String.valueOf(list.get(i).getLongitude()));
+        }
     }
 
-    private void ShowNearbyPlaces(List<HashMap<String, String>> nearbyPlacesList) {
+    private ArrayList<Place> PlacesList (List<HashMap<String, String>> nearbyPlacesList) {
+        ArrayList<Place> places= new ArrayList<>();
+
         for (int i = 0; i < nearbyPlacesList.size(); i++) {
-            Log.d("onPostExecute","Entered into showing locations");
             MarkerOptions markerOptions = new MarkerOptions();
             HashMap<String, String> googlePlace = nearbyPlacesList.get(i);
             double lat = Double.parseDouble(googlePlace.get("lat"));
             double lng = Double.parseDouble(googlePlace.get("lng"));
             String placeName = googlePlace.get("place_name");
             String vicinity = googlePlace.get("vicinity");
-            LatLng latLng = new LatLng(lat, lng);
-            markerOptions.position(latLng);
-            markerOptions.title(placeName + " : " + vicinity);
-            mMap.addMarker(markerOptions);
-            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
-            //move map camera
-            mMap.moveCamera(CameraUpdateFactory.newLatLng(latLng));
-            mMap.animateCamera(CameraUpdateFactory.zoomTo(11));
+//          LatLng latLng = new LatLng(lat, lng);
+            Place place =new Place(placeName,lat,lng,null);
+            places.add(place);
         }
+        return places;
     }
 }

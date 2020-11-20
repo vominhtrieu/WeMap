@@ -322,16 +322,4 @@ public abstract class MapsActivity extends FragmentActivity implements OnMapRead
         dialog.show();
     }
 
-    private void Search()
-    {
-        String DataTransfer=PlacesService.autocomplete("New York");
-        GetPlaces getNearbyPlacesData = new GetPlaces() {
-            @Override
-            protected String doInBackground(Object... objects) {
-                return null;
-            }
-        };
-        getNearbyPlacesData.execute(DataTransfer);
-        Toast.makeText(MapsActivity.this,"Find Place List", Toast.LENGTH_LONG).show();
-    }
 }

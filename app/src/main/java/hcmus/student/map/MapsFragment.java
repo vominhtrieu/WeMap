@@ -13,11 +13,13 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -89,6 +91,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         } catch (IllegalStateException e) {
             throw new IllegalStateException("MainActivity must implement callbacks");
         }
+
+        String url = GetUrl.TextSearch("quán ăn ở Bình Định",main);
+        Toast.makeText(context,url, Toast.LENGTH_LONG).show();
+        Object[] DataTransfer = new Object[2];
+        DataTransfer[0] = mMap;
+        DataTransfer[1] = url;
+        GetPlaces getPlacesData = new GetPlaces();
+        getPlacesData.execute(DataTransfer);
+
     }
 
     @Nullable
