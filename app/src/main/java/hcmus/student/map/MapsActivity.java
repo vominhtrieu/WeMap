@@ -10,22 +10,24 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.hardware.SensorManager;
 import android.location.Location;
+import android.location.LocationListener;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -46,8 +48,12 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public abstract class MapsActivity extends FragmentActivity implements OnMapReadyCallback,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,LocationListener{
 
     private static final int LOCATION_STATUS_CODE = 1;
     private static final int DEFAULT_ZOOM = 15;
@@ -56,6 +62,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private static final long ANIMATION_DURATION = 500;
     private static final double FOLLOWING_THRESHOLD = 0.00000001;
     private static final int EPSILON = 5;
+    private static final int RADIUS=10000;
 
     private GoogleMap mMap;
     private OrientationSensor sensor;
@@ -65,6 +72,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LocationCallback mLocationCallBack;
     private Marker marker;
     private MarkerInfoFragment mMarkerInfoFragment;
+
+
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -169,10 +178,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 mCurrentLocation.getLongitude()), DEFAULT_ZOOM));
 
         listenToLocationChange();
-
-
     }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -315,4 +321,5 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         AlertDialog dialog = builder.create();
         dialog.show();
     }
+
 }

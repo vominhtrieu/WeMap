@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -25,6 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageButton;
+import android.widget.Toast;
 import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
@@ -56,6 +58,9 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
+import java.util.Collections;
+
+public class MapsFragment extends Fragment implements OnMapReadyCallback {
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -97,7 +102,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, MapsFr
         try {
             context = getActivity();
             main = (MainActivity) getActivity();
-            mDatabase = new Database(context);
         } catch (IllegalStateException e) {
             throw new IllegalStateException("MainActivity must implement callbacks");
         }
@@ -182,6 +186,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, MapsFr
         //Move camera to user location with default zoom
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLocation.getLatitude(),
                 mCurrentLocation.getLongitude()), DEFAULT_ZOOM));
+        
         showAllAddress();
         listenToLocationChange();
     }

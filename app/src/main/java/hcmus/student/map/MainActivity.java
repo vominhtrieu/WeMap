@@ -36,6 +36,7 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
 
         mViewPager = findViewById(R.id.pager);
         mViewPager.setUserInputEnabled(false);
+        mViewPager.setAdapter(new ViewPagerAdapter(this));
         final ViewPagerAdapter adapter = new ViewPagerAdapter(this);
         mMapFragment = (MapsFragment) adapter.getFragment(0);
         mViewPager.setAdapter(adapter);
