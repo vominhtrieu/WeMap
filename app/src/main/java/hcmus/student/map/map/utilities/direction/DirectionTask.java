@@ -2,7 +2,6 @@ package hcmus.student.map.map.utilities.direction;
 
 import android.graphics.Color;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -43,6 +42,10 @@ public class DirectionTask extends AsyncTask<String, Integer, List<List<List<Lis
 
     @Override
     protected void onPostExecute(List<List<List<List<LatLng>>>> lists) {
+        if (lists == null) {
+            return;
+        }
+
         ArrayList<PolylineOptions> respond = new ArrayList<>();
         int routeCount = Math.min(lists.size(), 5);
 

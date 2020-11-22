@@ -15,7 +15,7 @@ import com.google.android.material.tabs.TabLayout;
 import hcmus.student.map.map.AddContactFragment;
 import hcmus.student.map.map.MapsFragment;
 import hcmus.student.map.map.MarkerInfoFragment;
-import hcmus.student.map.map.ViewPagerAdapter;
+import hcmus.student.map.map.utilities.ViewPagerAdapter;
 
 
 public class MainActivity extends FragmentActivity implements MainCallbacks {
@@ -34,14 +34,14 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
         mTabs = findViewById(R.id.tabs);
         //Setup icon for each tab
         mTabs.getTabAt(0).setIcon(R.drawable.ic_tab_map);
-        mTabs.getTabAt(1).setIcon(R.drawable.ic_tab_addressbook);
+        mTabs.getTabAt(1).setIcon(R.drawable.ic_tab_direction);
+        mTabs.getTabAt(2).setIcon(R.drawable.ic_tab_addressbook);
 
         mViewPager = findViewById(R.id.pager);
         mViewPager.setUserInputEnabled(false);
 
         adapter = new ViewPagerAdapter(this);
         mViewPager.setAdapter(new ViewPagerAdapter(this));
-        mMapFragment = (MapsFragment) adapter.getFragment(0);
         mViewPager.setAdapter(adapter);
         mTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override

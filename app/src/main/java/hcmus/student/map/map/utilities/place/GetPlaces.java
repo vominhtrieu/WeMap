@@ -23,7 +23,6 @@ public class GetPlaces extends AsyncTask<Object, String, String> {
     @Override
     protected String doInBackground(Object... params) {
         try {
-            Log.d("GetNearbyPlacesData", "doInBackground entered");
             mMap = (GoogleMap) params[0];
             url = (String) params[1];
             FetchUrlTask downloadUrl = new FetchUrlTask();

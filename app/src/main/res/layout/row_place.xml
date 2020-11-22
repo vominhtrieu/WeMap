@@ -11,8 +11,7 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:background="@drawable/icon_image"
-        android:scaleType="fitXY"
-        android:src="@drawable/ic_avatar_boundary" />
+        android:scaleType="fitXY" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -31,7 +30,7 @@
             android:textSize="20sp" />
 
         <TextView
-            android:id="@+id/txt_list_item_lat_lng"
+            android:id="@+id/txt_list_item_address_line"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="14sp" />
@@ -39,8 +38,8 @@
 
     <ImageButton
         android:id="@+id/btn_list_item_locate"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
         android:layout_gravity="center"
         android:background="@drawable/location_indicator_button" />
 </LinearLayout>

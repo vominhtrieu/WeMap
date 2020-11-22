@@ -27,13 +27,20 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/txtPlaceName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
+                android:textSize="18sp" />
+
+            <TextView
                 android:id="@+id/txtLat"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
                 android:text="@string/txt_latitude"
                 android:textColor="#000"
-                android:textSize="20sp" />
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/txtLng"
@@ -41,43 +48,54 @@
                 android:layout_height="wrap_content"
                 android:text="@string/txt_longitude"
                 android:textColor="#000"
-                android:textSize="20sp" />
+                android:textSize="16sp" />
         </LinearLayout>
 
-        <Button
-            android:id="@+id/btnDirection"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="40dp"
-            android:background="@drawable/btn_background"
-            android:drawableStart="@android:drawable/ic_menu_directions"
-            android:drawableLeft="@android:drawable/ic_menu_directions"
-            android:paddingVertical="10dp"
-            android:paddingStart="10dp"
-            android:paddingLeft="10dp"
-            android:paddingEnd="20dp"
-            android:paddingRight="20dp"
-            android:text="@string/btn_direction"
-            android:textColor="#000"
-            android:textSize="20sp" />
+            android:layout_marginTop="20dp"
+            android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/btnAdd"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:background="@drawable/btn_background"
-            android:drawableStart="@android:drawable/ic_input_add"
-            android:drawableLeft="@android:drawable/ic_input_add"
-            android:paddingVertical="10dp"
-            android:paddingStart="10dp"
-            android:paddingLeft="10dp"
-            android:paddingEnd="20dp"
-            android:paddingRight="20dp"
-            android:text="@string/btn_add_contact"
-            android:textColor="#000"
-            android:textSize="20sp" />
+            <Button
+                android:id="@+id/btnDirection"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginEnd="5dp"
+                android:layout_marginRight="5dp"
+                android:background="@drawable/btn_background"
+                android:drawableStart="@android:drawable/ic_menu_directions"
+                android:drawableLeft="@android:drawable/ic_menu_directions"
+                android:paddingStart="5dp"
+                android:paddingLeft="5dp"
+                android:paddingEnd="10dp"
+                android:paddingRight="10dp"
+                android:text="@string/btn_direction"
+                android:textAlignment="textStart"
+                android:textAllCaps="false"
+                android:textColor="#000"
+                android:textSize="16sp" />
 
+            <Button
+                android:id="@+id/btnAdd"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginTop="5dp"
+                android:background="@drawable/btn_background"
+                android:drawableStart="@drawable/ic_baseline_add"
+                android:drawableLeft="@drawable/ic_baseline_add"
+                android:paddingStart="5dp"
+                android:paddingLeft="5dp"
+                android:paddingEnd="5dp"
+                android:paddingRight="10dp"
+                android:text="@string/btn_add_contact"
+                android:textAlignment="textStart"
+                android:textAllCaps="false"
+                android:textColor="#000"
+                android:textSize="16sp" />
+        </LinearLayout>
 
     </LinearLayout>
 </androidx.cardview.widget.CardView>

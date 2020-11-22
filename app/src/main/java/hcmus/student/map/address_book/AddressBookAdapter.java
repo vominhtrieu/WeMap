@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.location.Geocoder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,12 +15,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Formatter;
 
+import hcmus.student.map.R;
 import hcmus.student.map.database.Database;
 import hcmus.student.map.database.Place;
-import hcmus.student.map.R;
 
 public class AddressBookAdapter extends BaseAdapter {
     Database mDatabase;
@@ -58,13 +59,17 @@ public class AddressBookAdapter extends BaseAdapter {
         LayoutInflater inflater = LayoutInflater.from(context);
         convertView = inflater.inflate(R.layout.row_place, null);
         TextView txtListItemName = convertView.findViewById(R.id.txt_list_item_name);
-        TextView txtListItemLatLng = convertView.findViewById(R.id.txt_list_item_lat_lng);
+        TextView txtListItemAddressLine = convertView.findViewById(R.id.txt_list_item_address_line);
         Place place = getItem(position);
 
         txtListItemName.setText(place.getName());
-        StringBuilder sb = new StringBuilder();
-        Formatter formatter = new Formatter(sb);
-        txtListItemLatLng.setText(formatter.format("(%.2f, %.2f)", place.getLatitude(), place.getLongitude()).toString());
+        Geocoder geocoder = new Geocoder(context);
+        try {
+            String addressLine = geocoder.getFromLocation(place.getLatitude(), place.getLongitude(), 1).get(0).getAddressLine(0);
+            txtListItemAddressLine.setText(addressLine);
+        } catch (IOException e) {
+            txtListItemAddressLine.setText("");
+        }
         if (place.getAvatar() != null) {
             Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
             ImageView ivAvatar = convertView.findViewById(R.id.ivAvatar);

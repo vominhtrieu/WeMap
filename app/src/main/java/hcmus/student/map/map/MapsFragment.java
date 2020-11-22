@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.hardware.SensorManager;
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -55,8 +57,7 @@ import java.util.Collections;
 import java.util.List;
 
 import hcmus.student.map.MainActivity;
-import hcmus.student.map.map.utilities.place.GetUrl;
-import hcmus.student.map.map.utilities.MapsFragmentCallbacks;
+import hcmus.student.map.map.utilities.place.PlaceSearch;
 import hcmus.student.map.R;
 import hcmus.student.map.database.Database;
 import hcmus.student.map.database.Place;
@@ -110,13 +111,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         } catch (IllegalStateException e) {
             throw new IllegalStateException("MainActivity must implement callbacks");
         }
-
-        String url= GetUrl.TextSearch("quán ăn ở Phú Yên", main);
-        Object[] DataTransfer=new Object[2];
-        DataTransfer[1]=url;
-        GetPlaces getNearby=new GetPlaces();
-        getNearby.execute(DataTransfer);
-
     }
 
     @Nullable
@@ -357,6 +351,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             for (int i = 0; i < mRoutes.size(); i++) {
                 mRoutes.get(i).remove();
             }
+        }
+
+        if (polylineOptions == null || polylineOptions.size() == 0) {
+            Toast.makeText(context, "Cannot find direction to this location", Toast.LENGTH_SHORT).show();
+            return;
         }
 
         mRoutes = new ArrayList<>();

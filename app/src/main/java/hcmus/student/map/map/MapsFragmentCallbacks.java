@@ -1,4 +1,4 @@
-package hcmus.student.map.map.utilities;
+package hcmus.student.map.map;
 
 import com.google.android.gms.maps.model.LatLng;
 
