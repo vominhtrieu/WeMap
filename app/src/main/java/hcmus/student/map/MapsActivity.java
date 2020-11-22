@@ -104,44 +104,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
 
 
-        svSearch = (SearchView) findViewById(R.id.svSearch);
-        mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        svSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-
-                String location = svSearch.getQuery().toString();
-
-                List<String> name = new ArrayList<>();
-                name.add("New York");
-                name.add("Mum bai");
-                name.add("California");
-                List<Double> latitude = new ArrayList<>();
-                latitude.add(21.00);
-                latitude.add(-11.2);
-                latitude.add(36.778261);
-                List<Double> longitude = new ArrayList<>();
-                longitude.add(11.2);
-                longitude.add(-9.3333);
-                longitude.add(119.417932);
-
-                for (int i = 0; i < name.size(); i++) {
-                    if (location.equals(name.get(i)) == true) {
-                        LatLng latLng = new LatLng(latitude.get(i), longitude.get(i));
-                        mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
-                        mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-
-                    }
-                }
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-        });
-        mapFragment.getMapAsync(this);
     }
 
 
