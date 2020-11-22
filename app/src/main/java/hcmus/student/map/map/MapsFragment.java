@@ -112,10 +112,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         }
 
         String url= GetUrl.TextSearch("quán ăn ở Phú Yên", main);
-        Object[] DataTransfer=new Object[2];
-        DataTransfer[1]=url;
         GetPlaces getNearby=new GetPlaces();
-        getNearby.execute(DataTransfer);
+        getNearby.execute(url);
 
     }
 

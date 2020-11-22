@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import hcmus.student.map.database.Place;
+
 public class JSONParser {
     public List<List<List<List<LatLng>>>> parseRoutes(JSONObject jsonObject) {
         List<List<List<List<LatLng>>>> routes = null;
@@ -42,63 +44,34 @@ public class JSONParser {
         return routes;
     }
 
-    public List<HashMap<String, String>> parse(String jsonData) {
-        JSONArray jsonArray = null;
-        JSONObject jsonObject;
-
+    public List<Place> parse(String jsonData) {
+        JSONArray result;
+        List<Place> placeList = null;
         try {
-            jsonObject = new JSONObject((String) jsonData);
-            jsonArray = jsonObject.getJSONArray("results");
+            JSONObject jsonObject = new JSONObject(jsonData);
+            result = jsonObject.getJSONArray("results");
+
+            int placesCount = result.length();
+            placeList = new ArrayList<>();
+
+            for (int i = 0; i < placesCount; i++) {
+                try {
+                    JSONObject place = result.getJSONObject(i);
+                    String name = place.getString("name");
+                    JSONObject location = place.getJSONObject("geometry").getJSONObject("location");
+                    Double lat = location.getDouble("lat");
+                    Double lng = location.getDouble("lng");
+
+                    placeList.add(new Place(name, lat, lng, null));
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return getPlaces(jsonArray);
+        return placeList;
     }
 
-    private List<HashMap<String, String>> getPlaces(JSONArray jsonArray) {
-        int placesCount = jsonArray.length();
-        List<HashMap<String, String>> placesList = new ArrayList<>();
-        HashMap<String, String> placeMap = null;
-
-        for (int i = 0; i < placesCount; i++) {
-            try {
-                placeMap = getPlace((JSONObject) jsonArray.get(i));
-                placesList.add(placeMap);
-
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
-        }
-        return placesList;
-    }
-
-    private HashMap<String, String> getPlace(JSONObject googlePlaceJson) {
-        HashMap<String, String> googlePlaceMap = new HashMap<String, String>();
-        String placeName = "-NA-";
-        String vicinity = "-NA-";
-        String latitude = "";
-        String longitude = "";
-        String reference = "";
-
-
-        try {
-            if (!googlePlaceJson.isNull("name")) {
-                placeName = googlePlaceJson.getString("name");
-            }
-            if (!googlePlaceJson.isNull("vicinity")) {
-                vicinity = googlePlaceJson.getString("vicinity");
-            }
-            latitude = googlePlaceJson.getJSONObject("geometry").getJSONObject("location").getString("lat");
-            longitude = googlePlaceJson.getJSONObject("geometry").getJSONObject("location").getString("lng");
-            reference = googlePlaceJson.getString("reference");
-            googlePlaceMap.put("place_name", placeName);
-            googlePlaceMap.put("vicinity", vicinity);
-            googlePlaceMap.put("lat", latitude);
-            googlePlaceMap.put("lng", longitude);
-            googlePlaceMap.put("reference", reference);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return googlePlaceMap;
-    }
 }
