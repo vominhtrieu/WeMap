@@ -1,6 +1,5 @@
 package hcmus.student.map;
 
-import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -13,11 +12,18 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.material.tabs.TabLayout;
 
+import hcmus.student.map.map.AddContactFragment;
+import hcmus.student.map.map.MapsFragment;
+import hcmus.student.map.map.MarkerInfoFragment;
+import hcmus.student.map.map.ViewPagerAdapter;
 
-public class MainActivity extends FragmentActivity {
+
+public class MainActivity extends FragmentActivity implements MainCallbacks {
 
     private ViewPager2 mViewPager;
+    ViewPagerAdapter adapter;
     private TabLayout mTabs;
+    private MapsFragment mMapFragment;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -33,11 +39,15 @@ public class MainActivity extends FragmentActivity {
         mViewPager = findViewById(R.id.pager);
         mViewPager.setUserInputEnabled(false);
 
+        adapter = new ViewPagerAdapter(this);
         mViewPager.setAdapter(new ViewPagerAdapter(this));
+        mMapFragment = (MapsFragment) adapter.getFragment(0);
+        mViewPager.setAdapter(adapter);
         mTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 mViewPager.setCurrentItem(tab.getPosition());
+                mMapFragment = (MapsFragment) adapter.getFragment(0);
             }
 
             @Override
@@ -66,11 +76,21 @@ public class MainActivity extends FragmentActivity {
         fragmentTransaction.commit();
     }
 
+    public void drawRoute(LatLng start, LatLng end) {
+        MapsFragment fragment = (MapsFragment) adapter.getFragmentList().get(0);
+        fragment.drawRoute(start, end);
+    }
+
     public void openAddContact(LatLng latLng) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         //fragmentTransaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right, R.anim.slide_in_right, R.anim.slide_out_left);
         fragmentTransaction.replace(R.id.frameBottom, AddContactFragment.newInstance(latLng));
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();
+    }
+
+    @Override
+    public void updateOnscreenMarker(LatLng coordinate, byte[] avt) {
+        mMapFragment.createAvatarMarker(coordinate, avt);
     }
 }

@@ -1,4 +1,4 @@
-package hcmus.student.map;
+package hcmus.student.map.map.utilities;
 
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;

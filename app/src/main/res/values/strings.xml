@@ -10,4 +10,5 @@
     <string name="btn_add">Add</string>
     <string name="btn_cancel">Cancel</string>
     <string name="title_address_book">All Address</string>
+    <string name="btn_direction">Direction</string>
 </resources>

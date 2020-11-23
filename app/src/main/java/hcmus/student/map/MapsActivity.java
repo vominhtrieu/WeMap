@@ -9,8 +9,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.hardware.SensorManager;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -18,7 +16,6 @@ import android.os.Looper;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageButton;
-import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -46,9 +43,9 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
+
+import hcmus.student.map.map.utilities.OrientationSensor;
 
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
@@ -68,9 +65,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Marker mLocationIndicator;
     private LocationCallback mLocationCallBack;
     private Marker marker;
-    private MarkerInfoFragment mMarkerInfoFragment;
-    private SearchView svSearch;
-    private SupportMapFragment mapFragment;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override

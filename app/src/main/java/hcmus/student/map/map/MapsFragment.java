@@ -1,12 +1,13 @@
-package hcmus.student.map;
+package hcmus.student.map.map;
 
 import android.Manifest;
-import android.animation.ValueAnimator;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.hardware.SensorManager;
 import android.location.Location;
@@ -16,10 +17,8 @@ import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.LinearInterpolator;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
-
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Toast;
@@ -32,7 +31,6 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.gms.common.api.ResolvableApiException;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -45,11 +43,14 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 
@@ -57,14 +58,23 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class MapsFragment extends Fragment implements OnMapReadyCallback {
+import hcmus.student.map.MainActivity;
+import hcmus.student.map.R;
+import hcmus.student.map.database.Database;
+import hcmus.student.map.database.Place;
+import hcmus.student.map.map.utilities.MapsFragmentCallbacks;
+import hcmus.student.map.map.utilities.MarkerAnimator;
+import hcmus.student.map.map.utilities.OrientationSensor;
+import hcmus.student.map.map.utilities.direction.Direction;
+import hcmus.student.map.map.utilities.direction.DirectionResponse;
+import hcmus.student.map.map.utilities.direction.DirectionTask;
+
+public class MapsFragment extends Fragment implements OnMapReadyCallback, DirectionResponse, MapsFragmentCallbacks {
 
     private static final int LOCATION_STATUS_CODE = 1;
     private static final int DEFAULT_ZOOM = 15;
     private static final long UPDATE_INTERVAL = 1000;
     private static final long FASTEST_UPDATE_INTERVAL = 1000;
-    private static final long ANIMATION_DURATION = 500;
-    private static final double FOLLOWING_THRESHOLD = 0.00000001;
     private static final int EPSILON = 5;
 
     private GoogleMap mMap;
@@ -73,7 +83,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
     private Marker mLocationIndicator;
     private LocationCallback mLocationCallBack;
     private Marker marker;
+    private ArrayList<Polyline> mRoutes;
+    private Marker mRouteStartMarker, mRouteEndMarker;
     private MapView mMapView;
+    private OrientationSensor mSensor;
+    private Database mDatabase;
 
     private MainActivity main;
     private Context context;
@@ -95,6 +109,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         try {
             context = getActivity();
             main = (MainActivity) getActivity();
+            mRouteStartMarker = mRouteEndMarker = null;
+            mDatabase = new Database(context);
         } catch (IllegalStateException e) {
             throw new IllegalStateException("MainActivity must implement callbacks");
         }
@@ -137,9 +153,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 List<Place> place = db.getAllPlaces();
 
                 ArrayList<String> placesList = new ArrayList<>();
-                for(int i = 0; i<place.size(); i++){
+                for (int i = 0; i < place.size(); i++) {
                     String name = place.get(i).getName().toLowerCase();
-                    if(name.contains(newText)){
+                    if (name.contains(newText)) {
                         placesList.add(place.get(i).getName());
                     }
                 }
@@ -147,7 +163,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                 ArrayAdapter<String> adapter = new ArrayAdapter<String>((MainActivity) getActivity(), android.R.layout.simple_list_item_1, placesList);
                 listPlace.setAdapter(adapter);
 
-                if(searchView.getQuery().toString().equals("")){
+                if (searchView.getQuery().toString().equals("")) {
                     placesList = new ArrayList<>();
                     adapter = new ArrayAdapter<String>((MainActivity) getActivity(), android.R.layout.simple_list_item_1, placesList);
                     listPlace.setAdapter(adapter);
@@ -159,7 +175,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
 
         //Implement Rotation change here
-        OrientationSensor sensor = new OrientationSensor(sensorService) {
+        mSensor = new OrientationSensor(sensorService) {
             float previousRotation = 0;
 
             @Override
@@ -174,6 +190,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
 
         mClient = LocationServices.getFusedLocationProviderClient(context);
         mLocationCallBack = null;
+        mRoutes = null;
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
             enableLocation();
@@ -220,6 +237,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
+                if (marker.getPosition().equals(mLocationIndicator.getPosition()))
+                    return true;
                 main.openMarkerInfo(marker);
                 return true;
             }
@@ -229,6 +248,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLocation.getLatitude(),
                 mCurrentLocation.getLongitude()), DEFAULT_ZOOM));
 
+        showAllAddress();
         listenToLocationChange();
     }
 
@@ -241,45 +261,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                     enableLocation();
                 break;
         }
-    }
-
-    private void animateLocationIndicator() {
-        final ValueAnimator animator = ValueAnimator.ofFloat(0, 1);
-
-        final LatLng startLatLng = mLocationIndicator.getPosition();
-        final Location tempLocation = mCurrentLocation;
-        final LatLng endLatLng = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
-
-        animator.setDuration(ANIMATION_DURATION);
-        animator.setInterpolator(new LinearInterpolator());
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-                if (mCurrentLocation != tempLocation) {
-                    animator.cancel();
-                    return;
-                }
-                float fraction = animation.getAnimatedFraction();
-                double newLat = startLatLng.latitude + (endLatLng.latitude - startLatLng.latitude) * fraction;
-                double newLng = startLatLng.longitude + (endLatLng.longitude - startLatLng.longitude) * fraction;
-                LatLng newPosition = new LatLng(newLat, newLng);
-
-                //Check if user moved camera, if yes, camera won't follow user's location
-                LatLng cameraTargetPosition = mMap.getCameraPosition().target;
-                LatLng indicatorPosition = mLocationIndicator.getPosition();
-
-                double latitudeDiff = cameraTargetPosition.latitude - indicatorPosition.latitude;
-                double longitudeDiff = cameraTargetPosition.longitude - indicatorPosition.longitude;
-
-                //We don't compute square root because this result is enough for checking whether user move the camera or not
-                double squareDistance = latitudeDiff * latitudeDiff + longitudeDiff * longitudeDiff;
-
-                if (squareDistance < FOLLOWING_THRESHOLD)
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(newPosition));
-                mLocationIndicator.setPosition(newPosition);
-            }
-        });
-        animator.start();
     }
 
     private void enableLocation() {
@@ -323,6 +304,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         SettingsClient settingsClient = LocationServices.getSettingsClient(main);
         Task<LocationSettingsResponse> task = settingsClient.checkLocationSettings(builder.build());
 
+        final MarkerAnimator animator = new MarkerAnimator(mLocationIndicator, mMap);
+
         //Listen for location change event
         task.addOnSuccessListener(new OnSuccessListener<LocationSettingsResponse>() {
             @Override
@@ -334,22 +317,22 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
                         public void onLocationResult(LocationResult locationResult) {
                             super.onLocationResult(locationResult);
                             mCurrentLocation = locationResult.getLastLocation();
-                            if (mCurrentLocation != null) {
-                                animateLocationIndicator();
-                            }
+                            if (mCurrentLocation != null) animator.animate(mCurrentLocation);
                         }
                     };
 
                     mClient.requestLocationUpdates(request, mLocationCallBack, Looper.myLooper());
                 }
             }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                ResolvableApiException e1 = (ResolvableApiException) e;
-                e1.getResolution();
-            }
         });
+    }
+
+    public void drawRoute(LatLng start, LatLng end) {
+        LatLng startPos = start == null ? new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()) : start;
+        LatLng endPos = end == null ? new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()) : end;
+
+        String url = Direction.getDirectionUrl(startPos, endPos, main);
+        new DirectionTask(this).execute(url);
     }
 
     private void showAlert() {
@@ -375,9 +358,80 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback {
         dialog.show();
     }
 
+    private void showAllAddress() {
+        List<Place> places = mDatabase.getAllPlaces();
+        for (Place place : places) {
+            createAvatarMarker(new LatLng(place.getLatitude(), place.getLongitude()), place.getAvatar());
+        }
+    }
+
+    @Override
+    public void createAvatarMarker(LatLng coordinate, byte[] avt) {
+        if (marker != null) {
+            marker.remove();
+            marker = null;
+        }
+        Bitmap bmpMarker = BitmapFactory.decodeResource(getResources(), R.drawable.marker_frame).copy(Bitmap.Config.ARGB_8888, true);
+        bmpMarker = Bitmap.createScaledBitmap(bmpMarker, 100, 130, false);
+        if (avt != null) {
+            Bitmap bmpAvatar = BitmapFactory.decodeByteArray(avt, 0, avt.length);
+            bmpAvatar = Bitmap.createScaledBitmap(bmpAvatar, 72, 72, false);
+            Canvas canvas = new Canvas(bmpMarker);
+            canvas.drawBitmap(bmpAvatar, 14, 14, null);
+        }
+
+        mMap.addMarker(new MarkerOptions().position(coordinate)
+                .icon(BitmapDescriptorFactory.fromBitmap(bmpMarker)));
+    }
+
     @Override
     public void onResume() {
         super.onResume();
         mMapView.onResume();
+        mSensor.register();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        mSensor.unregister();
+    }
+
+    @Override
+    public void onRespond(List<PolylineOptions> polylineOptions) {
+        if (mRoutes != null) {
+            for (int i = 0; i < mRoutes.size(); i++) {
+                mRoutes.get(i).remove();
+            }
+        }
+
+        mRoutes = new ArrayList<>();
+
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for (PolylineOptions route : polylineOptions) {
+            mRoutes.add(mMap.addPolyline(route));
+            List<LatLng> points = route.getPoints();
+            for (LatLng point : points) {
+                builder.include(point);
+            }
+        }
+        LatLngBounds bounds = builder.build();
+        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100), 1000, null);
+
+        BitmapDrawable bitmapDrawable = (BitmapDrawable) ResourcesCompat.getDrawable(getResources(), R.drawable.marker_point,
+                context.getTheme());
+        Bitmap bmp = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 48, 48, false);
+        BitmapDescriptor descriptor = BitmapDescriptorFactory.fromBitmap(bmp);
+        if (mRouteStartMarker != null)
+            mRouteStartMarker.remove();
+        if (mRouteEndMarker != null)
+            mRouteEndMarker.remove();
+
+        mRouteStartMarker = mMap.addMarker(new MarkerOptions()
+                .position(polylineOptions.get(0).getPoints().get(0))
+                .icon(descriptor).anchor(0.5f, 0.5f));
+        mRouteEndMarker = mMap.addMarker(new MarkerOptions()
+                .position(polylineOptions.get(0).getPoints().get(polylineOptions.get(0).getPoints().size() - 1))
+                .icon(descriptor).anchor(0.5f, 0.5f));
     }
 }

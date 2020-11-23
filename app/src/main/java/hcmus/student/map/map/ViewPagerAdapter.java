@@ -1,4 +1,4 @@
-package hcmus.student.map;
+package hcmus.student.map.map;
 
 import android.os.Build;
 
@@ -10,6 +10,8 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import java.util.ArrayList;
 
+import hcmus.student.map.address_book.AddressBookFragment;
+
 public class ViewPagerAdapter extends FragmentStateAdapter {
 
     ArrayList<Fragment> fragmentList;
@@ -20,6 +22,10 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
         fragmentList = new ArrayList<>();
         fragmentList.add(MapsFragment.newInstance());
         fragmentList.add(AddressBookFragment.newInstance());
+    }
+
+    public ArrayList<Fragment> getFragmentList() {
+        return fragmentList;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -35,6 +41,10 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
     @Override
     public int getItemCount() {
         return fragmentList.size();
+    }
+
+    public Fragment getFragment(int position) {
+        return fragmentList.get(position);
     }
 }
 

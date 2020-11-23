@@ -1,4 +1,4 @@
-package hcmus.student.map;
+package hcmus.student.map.address_book;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -9,6 +9,9 @@ import android.widget.ListView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import hcmus.student.map.MainActivity;
+import hcmus.student.map.R;
 
 public class AddressBookFragment extends Fragment {
     private MainActivity activity;

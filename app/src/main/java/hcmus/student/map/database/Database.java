@@ -1,16 +1,14 @@
-package hcmus.student.map;
+package hcmus.student.map.database;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
-import android.util.Log;
 
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Database extends SQLiteOpenHelper {
     static final String DATABASE_NAME = "Contact List";
@@ -31,16 +29,14 @@ public class Database extends SQLiteOpenHelper {
         ArrayList<Place> places = new ArrayList<>();
         if (cursor == null || !cursor.moveToFirst())
             return places;
-        while (true)
-        {
+        while (true) {
             Place place = new Place(cursor.getString(0), cursor.getDouble(1),
                     cursor.getDouble(2), cursor.getBlob(3));
 
             places.add(place);
             if (cursor.isLast()) {
                 break;
-            }
-            else {
+            } else {
                 cursor.moveToNext();
             }
         }
