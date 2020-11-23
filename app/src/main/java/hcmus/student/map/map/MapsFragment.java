@@ -59,6 +59,8 @@ import java.util.Collections;
 import java.util.List;
 
 import hcmus.student.map.MainActivity;
+import hcmus.student.map.map.utilities.place.GetUrl;
+import hcmus.student.map.map.utilities.MapsFragmentCallbacks;
 import hcmus.student.map.R;
 import hcmus.student.map.database.Database;
 import hcmus.student.map.database.Place;
@@ -68,6 +70,7 @@ import hcmus.student.map.map.utilities.OrientationSensor;
 import hcmus.student.map.map.utilities.direction.Direction;
 import hcmus.student.map.map.utilities.direction.DirectionResponse;
 import hcmus.student.map.map.utilities.direction.DirectionTask;
+import hcmus.student.map.map.utilities.place.GetPlaces;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback, DirectionResponse, MapsFragmentCallbacks {
 
@@ -114,6 +117,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         } catch (IllegalStateException e) {
             throw new IllegalStateException("MainActivity must implement callbacks");
         }
+
+        String url= GetUrl.TextSearch("quán ăn ở Phú Yên", main);
+        GetPlaces getNearby=new GetPlaces();
+        getNearby.execute(url);
+
     }
 
     @Nullable

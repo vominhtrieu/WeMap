@@ -3,10 +3,14 @@ package hcmus.student.map.map.utilities.direction;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import hcmus.student.map.database.Place;
 
 public class JSONParser {
     public List<List<List<List<LatLng>>>> parseRoutes(JSONObject jsonObject) {
@@ -39,4 +43,35 @@ public class JSONParser {
         }
         return routes;
     }
+
+    public List<Place> parse(String jsonData) {
+        JSONArray result;
+        List<Place> placeList = null;
+        try {
+            JSONObject jsonObject = new JSONObject(jsonData);
+            result = jsonObject.getJSONArray("results");
+
+            int placesCount = result.length();
+            placeList = new ArrayList<>();
+
+            for (int i = 0; i < placesCount; i++) {
+                try {
+                    JSONObject place = result.getJSONObject(i);
+                    String name = place.getString("name");
+                    JSONObject location = place.getJSONObject("geometry").getJSONObject("location");
+                    Double lat = location.getDouble("lat");
+                    Double lng = location.getDouble("lng");
+
+                    placeList.add(new Place(name, lat, lng, null));
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return placeList;
+    }
+
 }
