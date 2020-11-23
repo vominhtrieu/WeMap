@@ -72,4 +72,5 @@ public class AddressBookAdapter extends BaseAdapter {
         }
         return convertView;
     }
+
 }
