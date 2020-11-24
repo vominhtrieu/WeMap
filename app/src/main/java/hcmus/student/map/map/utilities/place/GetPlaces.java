@@ -19,6 +19,11 @@ public class GetPlaces extends AsyncTask<Object, String, String> {
     String googlePlacesData;
     GoogleMap mMap;
     String url;
+    PlaceRespondCallback delegate;
+
+    public GetPlaces(PlaceRespondCallback delegate) {
+        this.delegate = delegate;
+    }
 
     @Override
     protected String doInBackground(Object... params) {
@@ -36,20 +41,21 @@ public class GetPlaces extends AsyncTask<Object, String, String> {
 
     @Override
     protected void onPostExecute(String result) {
-
         List<HashMap<String, String>> nearbyPlacesList = null;
         JSONParser dataParser = new JSONParser();
-        nearbyPlacesList =  dataParser.parse(result);
-        ArrayList<Place> list= PlacesList(nearbyPlacesList);
-        for (int i=0; i<list.size();i++){
+        nearbyPlacesList = dataParser.parse(result);
+        ArrayList<Place> list = PlacesList(nearbyPlacesList);
+        for (int i = 0; i < list.size(); i++) {
             Log.d("name: ", list.get(i).getName());
             Log.d("Latitude: ", String.valueOf(list.get(i).getLatitude()));
             Log.d("Longtitude: ", String.valueOf(list.get(i).getLongitude()));
         }
+
+        delegate.onRespond(list);
     }
 
-    private ArrayList<Place> PlacesList (List<HashMap<String, String>> nearbyPlacesList) {
-        ArrayList<Place> places= new ArrayList<>();
+    private ArrayList<Place> PlacesList(List<HashMap<String, String>> nearbyPlacesList) {
+        ArrayList<Place> places = new ArrayList<>();
 
         for (int i = 0; i < nearbyPlacesList.size(); i++) {
             MarkerOptions markerOptions = new MarkerOptions();
@@ -59,7 +65,7 @@ public class GetPlaces extends AsyncTask<Object, String, String> {
             String placeName = googlePlace.get("place_name");
             String vicinity = googlePlace.get("vicinity");
 //          LatLng latLng = new LatLng(lat, lng);
-            Place place =new Place(placeName,lat,lng,null);
+            Place place = new Place(placeName, lat, lng, null);
             places.add(place);
         }
         return places;

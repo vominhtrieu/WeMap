@@ -1,5 +1,7 @@
 package hcmus.student.map.map.utilities.direction;
 
+import android.util.Log;
+
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
@@ -22,8 +24,8 @@ public class JSONParser {
 
                 List<List<List<LatLng>>> legs = new ArrayList<>();
 
-                for (int j = 0; j < jsonRoutes.length(); j++) {
-                    JSONArray jsonSteps = jsonLegs.getJSONObject(i).getJSONArray("steps");
+                for (int j = 0; j < jsonLegs.length(); j++) {
+                    JSONArray jsonSteps = jsonLegs.getJSONObject(j).getJSONArray("steps");
 
                     List<List<LatLng>> steps = new ArrayList<>();
                     for (int k = 0; k < jsonSteps.length(); k++) {

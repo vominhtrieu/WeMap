@@ -14,7 +14,6 @@
         android:layout_height="64dp"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="5dp"
-        android:layout_marginRight="5dp"
         android:layout_marginBottom="20dp"
         android:background="@drawable/location_indicator_button" />
 
@@ -23,4 +22,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom" />
+
+    <FrameLayout
+        android:id="@+id/frameTop"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top">
+        <fragment
+            class="hcmus.student.map.map.search.SearchFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </FrameLayout>
 </FrameLayout>

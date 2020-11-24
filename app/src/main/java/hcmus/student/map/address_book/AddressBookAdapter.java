@@ -17,6 +17,7 @@ import androidx.annotation.Nullable;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import hcmus.student.map.R;
 import hcmus.student.map.database.Database;
@@ -25,7 +26,7 @@ import hcmus.student.map.database.Place;
 public class AddressBookAdapter extends BaseAdapter {
     Database mDatabase;
     Context context;
-    ArrayList<Place> places;
+    List<Place> places;
 
     public AddressBookAdapter(Context context) {
         this.context = context;
@@ -56,10 +57,13 @@ public class AddressBookAdapter extends BaseAdapter {
     @NonNull
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        LayoutInflater inflater = LayoutInflater.from(context);
-        convertView = inflater.inflate(R.layout.row_place, null);
-        TextView txtListItemName = convertView.findViewById(R.id.txt_list_item_name);
-        TextView txtListItemAddressLine = convertView.findViewById(R.id.txt_list_item_address_line);
+        if (convertView == null) {
+            LayoutInflater inflater = LayoutInflater.from(context);
+            convertView = inflater.inflate(R.layout.row_place, null, false);
+        }
+
+        TextView txtListItemName = convertView.findViewById(R.id.txtListItemName);
+        TextView txtListItemAddressLine = convertView.findViewById(R.id.txtListItemAddressLine);
         Place place = getItem(position);
 
         txtListItemName.setText(place.getName());
@@ -77,4 +81,5 @@ public class AddressBookAdapter extends BaseAdapter {
         }
         return convertView;
     }
+
 }

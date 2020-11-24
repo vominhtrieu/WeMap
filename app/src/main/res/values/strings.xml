@@ -13,4 +13,5 @@
     <string name="btn_direction">Direction</string>
     <string name="hint_origin_edt">Origin</string>
     <string name="hint_destination_edt">Destination</string>
+    <string name="txtUnknownLocation">Unknown location</string>
 </resources>

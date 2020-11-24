@@ -23,14 +23,14 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/txt_list_item_name"
+            android:id="@+id/txtListItemName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@android:color/black"
             android:textSize="20sp" />
 
         <TextView
-            android:id="@+id/txt_list_item_address_line"
+            android:id="@+id/txtListItemAddressLine"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="14sp" />

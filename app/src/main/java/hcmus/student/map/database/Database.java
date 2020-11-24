@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteStatement;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Database extends SQLiteOpenHelper {
     static final String DATABASE_NAME = "Contact List";
@@ -23,9 +24,7 @@ public class Database extends SQLiteOpenHelper {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
-    public ArrayList<Place> getAllPlaces() {
-        SQLiteDatabase database = getWritableDatabase();
-        Cursor cursor = database.query(TABLE_NAME, null, null, null, null, null, KEY_NAME);
+    private List<Place> cursorToPlaces(Cursor cursor) {
         ArrayList<Place> places = new ArrayList<>();
         if (cursor == null || !cursor.moveToFirst())
             return places;
@@ -41,6 +40,19 @@ public class Database extends SQLiteOpenHelper {
             }
         }
         return places;
+    }
+
+    public List<Place> searchForPlaces(String data) {
+        SQLiteDatabase database = getReadableDatabase();
+        Cursor cursor = database.query(TABLE_NAME, null, KEY_NAME + " LIKE '%" + data + "%'",
+                        null, null, null, KEY_NAME);
+        return cursorToPlaces(cursor);
+    }
+
+    public List<Place> getAllPlaces() {
+        SQLiteDatabase database = getReadableDatabase();
+        Cursor cursor = database.query(TABLE_NAME, null, null, null, null, null, KEY_NAME);
+        return cursorToPlaces(cursor);
     }
 
     public void insertPlace(String name, Double longitude, Double latitude, byte[] avatar) {

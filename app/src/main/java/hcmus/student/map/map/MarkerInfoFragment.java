@@ -56,18 +56,18 @@ public class MarkerInfoFragment extends Fragment implements View.OnClickListener
 
         StringBuilder sb = new StringBuilder();
         Formatter formatter = new Formatter(sb, Locale.US);
+        Bundle args = getArguments();
         try {
-            Bundle args = getArguments();
             Geocoder geocoder = new Geocoder(getContext());
             txtPlaceName.setText(
                     geocoder.getFromLocation(args.getDouble("lat"), args.getDouble("lng"), 1).get(0).getAddressLine(0));
-            latLng = new LatLng(args.getDouble("lat"), args.getDouble("lng"));
-            txtLat.setText(formatter.format("Latitude: %.2f", latLng.latitude).toString());
-            sb.setLength(0);
-            txtLng.setText(formatter.format("Longitude: %.2f", latLng.longitude).toString());
         } catch (Exception e) {
-            e.printStackTrace();
+            txtPlaceName.setText(R.string.txtUnknownLocation);
         }
+        latLng = new LatLng(args.getDouble("lat"), args.getDouble("lng"));
+        txtLat.setText(formatter.format("Latitude: %.2f", latLng.latitude).toString());
+        sb.setLength(0);
+        txtLng.setText(formatter.format("Longitude: %.2f", latLng.longitude).toString());
 
         btnAdd.setOnClickListener(this);
         btnDirection.setOnClickListener(this);

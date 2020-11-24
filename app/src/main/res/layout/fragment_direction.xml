@@ -12,8 +12,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:hint="@string/hint_origin_edt"
-            android:textColorHint="@android:color/white"
-            android:backgroundTint="@android:color/white"/>
+            android:textColorHint="@android:color/white"/>
         <EditText
             android:layout_width="match_parent"
             android:layout_height="match_parent"

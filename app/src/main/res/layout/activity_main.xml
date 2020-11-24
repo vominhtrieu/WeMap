@@ -13,26 +13,32 @@
         android:layout_height="0dp"
         android:layout_weight="0.9" />
 
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tabs"
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:tabIndicatorColor="#ff0000"
-        app:tabIndicatorGravity="top"
-        app:tabIndicatorHeight="3dp"
-        app:tabMode="fixed">
+        app:cardElevation="5dp">
 
-        <com.google.android.material.tabs.TabItem
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabs"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content"
+            app:tabIndicatorColor="#ff0000"
+            app:tabIndicatorGravity="top"
+            app:tabIndicatorHeight="3dp"
+            app:tabMode="fixed">
 
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
 
-        <com.google.android.material.tabs.TabItem
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </com.google.android.material.tabs.TabLayout>
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </com.google.android.material.tabs.TabLayout>
+    </androidx.cardview.widget.CardView>
 
 </LinearLayout>
