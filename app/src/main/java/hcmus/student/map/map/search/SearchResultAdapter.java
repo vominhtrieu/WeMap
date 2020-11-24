@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,16 +21,19 @@ import hcmus.student.map.database.Database;
 import hcmus.student.map.database.Place;
 import hcmus.student.map.map.utilities.place.GetPlaces;
 import hcmus.student.map.map.utilities.place.PlaceRespondCallback;
+import hcmus.student.map.map.utilities.place.PlaceSearch;
 
 public class SearchResultAdapter extends BaseAdapter implements PlaceRespondCallback {
     Context context;
     List<Place> places;
     Database db;
+    String currentRequest;
 
     public SearchResultAdapter(Context context) {
         this.context = context;
         this.places = new ArrayList<>();
         this.db = new Database(context);
+        currentRequest = null;
     }
 
     public void search(String query) {
@@ -37,7 +41,11 @@ public class SearchResultAdapter extends BaseAdapter implements PlaceRespondCall
         if (query.length() > 0) {
             places.addAll(db.searchForPlaces(query));
             GetPlaces getPlaces = new GetPlaces(this);
-            getPlaces.execute(query);
+            currentRequest = PlaceSearch.getUrl(query, (Activity) context);
+            getPlaces.execute(currentRequest);
+        }
+        else {
+            currentRequest = null;
         }
         notifyDataSetChanged();
     }
@@ -67,15 +75,21 @@ public class SearchResultAdapter extends BaseAdapter implements PlaceRespondCall
         TextView txtPlaceName = convertView.findViewById(R.id.txtPlaceName);
 
         Place place = places.get(position);
-        Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
-        ivAvatar.setBackground(new BitmapDrawable(context.getResources(), bmp));
-        ivAvatar.setImageBitmap(bmp);
+        if (place.getAvatar() != null) {
+            Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
+            ivAvatar.setBackground(new BitmapDrawable(context.getResources(), bmp));
+            ivAvatar.setImageBitmap(bmp);
+        }
         txtPlaceName.setText(place.getName());
         return convertView;
     }
 
     @Override
-    public void onRespond(List<Place> placeList) {
+    public void onRespond(String url, List<Place> placeList) {
+        if (!currentRequest.equals(url))
+            return;
+        if (placeList == null)
+            return;
         places.addAll(placeList);
         notifyDataSetChanged();
     }
