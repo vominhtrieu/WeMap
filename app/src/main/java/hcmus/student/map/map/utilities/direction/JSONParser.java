@@ -61,10 +61,10 @@ public class JSONParser {
                     JSONObject place = result.getJSONObject(i);
                     String name = place.getString("name");
                     JSONObject location = place.getJSONObject("geometry").getJSONObject("location");
-                    Double lat = location.getDouble("lat");
-                    Double lng = location.getDouble("lng");
+                    double lat = location.getDouble("lat");
+                    double lng = location.getDouble("lng");
 
-                    placeList.add(new Place(name, lat, lng, null));
+                    placeList.add(new Place(name, new LatLng(lat, lng), null));
 
                 } catch (JSONException e) {
                     e.printStackTrace();

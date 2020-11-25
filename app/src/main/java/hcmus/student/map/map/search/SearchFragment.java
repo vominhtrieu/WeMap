@@ -3,7 +3,7 @@ package hcmus.student.map.map.search;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Handler;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,23 +18,22 @@ import androidx.fragment.app.Fragment;
 import hcmus.student.map.R;
 
 public class SearchFragment extends Fragment implements SearchView.OnQueryTextListener {
-    final static int DELAY_TYPING = 500;
     Context context;
     SearchResultAdapter adapter;
-    String query;
-    Handler handler;
-    Runnable userStopTypingChecker;
-    long lastTimeTyping;
+    SearchClickCallback delegate;
 
-    public static SearchFragment newInstance() {
-        return new SearchFragment();
+    public static SearchFragment newInstance(SearchClickCallback delegate) {
+        Bundle args = new Bundle();
+        args.putParcelable("delegate", (Parcelable) delegate);
+        SearchFragment fragment = new SearchFragment();
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.context = getContext();
-        this.lastTimeTyping = 0;
     }
 
     @Nullable
@@ -44,18 +43,9 @@ public class SearchFragment extends Fragment implements SearchView.OnQueryTextLi
 
         final SearchView searchView = view.findViewById(R.id.svSearch);
         ListView lvSearchResult = view.findViewById(R.id.lvSearchResult);
-        adapter = new SearchResultAdapter(context);
+        adapter = new SearchResultAdapter(context, delegate);
         lvSearchResult.setAdapter(adapter);
         searchView.setOnQueryTextListener(this);
-        handler = new Handler();
-        userStopTypingChecker = new Runnable() {
-            @Override
-            public void run() {
-                if (System.currentTimeMillis() - lastTimeTyping > DELAY_TYPING) {
-                    adapter.search(query);
-                }
-            }
-        };
 
         return view;
     }
@@ -68,11 +58,7 @@ public class SearchFragment extends Fragment implements SearchView.OnQueryTextLi
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     public boolean onQueryTextChange(String newText) {
-        lastTimeTyping = System.currentTimeMillis();
-        query = newText.toLowerCase();
-        // Prevent user send too much API request
-        handler.removeCallbacks(userStopTypingChecker);
-        handler.postDelayed(userStopTypingChecker, DELAY_TYPING);
+        adapter.search(newText);
         return true;
     }
 }

@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteStatement;
 
 import androidx.annotation.Nullable;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,8 +31,8 @@ public class Database extends SQLiteOpenHelper {
         if (cursor == null || !cursor.moveToFirst())
             return places;
         while (true) {
-            Place place = new Place(cursor.getString(0), cursor.getDouble(1),
-                    cursor.getDouble(2), cursor.getBlob(3));
+            Place place = new Place(cursor.getString(0),
+                    new LatLng(cursor.getDouble(1), cursor.getDouble(2)), cursor.getBlob(3));
 
             places.add(place);
             if (cursor.isLast()) {
@@ -45,7 +47,7 @@ public class Database extends SQLiteOpenHelper {
     public List<Place> searchForPlaces(String data) {
         SQLiteDatabase database = getReadableDatabase();
         Cursor cursor = database.query(TABLE_NAME, null, KEY_NAME + " LIKE '%" + data + "%'",
-                        null, null, null, KEY_NAME);
+                null, null, null, KEY_NAME);
         return cursorToPlaces(cursor);
     }
 
@@ -55,15 +57,15 @@ public class Database extends SQLiteOpenHelper {
         return cursorToPlaces(cursor);
     }
 
-    public void insertPlace(String name, Double longitude, Double latitude, byte[] avatar) {
+    public void insertPlace(String name, LatLng location, byte[] avatar) {
         SQLiteDatabase database = getWritableDatabase();
         String sql = "INSERT INTO " + TABLE_NAME + " VALUES(?,?,?,?)";
         SQLiteStatement statement = database.compileStatement(sql);
         statement.clearBindings();
 
         statement.bindString(1, name);
-        statement.bindDouble(2, latitude);
-        statement.bindDouble(3, longitude);
+        statement.bindDouble(2, location.latitude);
+        statement.bindDouble(3, location.longitude);
         if (avatar != null)
             statement.bindBlob(4, avatar);
 

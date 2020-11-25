@@ -2,7 +2,6 @@ package hcmus.student.map.map.utilities.direction;
 
 import android.graphics.Color;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -67,6 +66,6 @@ public class DirectionTask extends AsyncTask<String, Integer, List<List<List<Lis
             respond.add(polylineOptions);
         }
 
-        delegate.onRespond(respond);
+        delegate.onRouteRespond(respond);
     }
 }

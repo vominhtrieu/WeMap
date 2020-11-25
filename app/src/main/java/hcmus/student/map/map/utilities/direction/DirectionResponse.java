@@ -5,5 +5,5 @@ import com.google.android.gms.maps.model.PolylineOptions;
 import java.util.List;
 
 public interface DirectionResponse {
-    void onRespond(List<PolylineOptions> polygonOptions);
+    void onRouteRespond(List<PolylineOptions> polygonOptions);
 }

@@ -15,6 +15,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -69,7 +71,8 @@ public class AddressBookAdapter extends BaseAdapter {
         txtListItemName.setText(place.getName());
         Geocoder geocoder = new Geocoder(context);
         try {
-            String addressLine = geocoder.getFromLocation(place.getLatitude(), place.getLongitude(), 1).get(0).getAddressLine(0);
+            LatLng location = place.getLocation();
+            String addressLine = geocoder.getFromLocation(location.latitude, location.longitude, 1).get(0).getAddressLine(0);
             txtListItemAddressLine.setText(addressLine);
         } catch (IOException e) {
             txtListItemAddressLine.setText("");

@@ -11,7 +11,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -107,7 +106,7 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
                 } else {
                     try {
                         Database db = new Database(getContext());
-                        db.insertPlace(edtName.getText().toString(), latLng.latitude, latLng.longitude, selectedImage);
+                        db.insertPlace(edtName.getText().toString(), new LatLng(latLng.latitude, latLng.longitude), selectedImage);
                         activity.backToPreviousFragment();
                         activity.updateOnscreenMarker(latLng, selectedImage);
                     } catch (Exception e) {

@@ -1,21 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="5dp"
+    app:cardElevation="5dp"
+    app:cardUseCompatPadding="true">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="5dp"
-        android:background="@android:color/holo_blue_dark">
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:hint="@string/hint_origin_edt"
-            android:textColorHint="@android:color/white"/>
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:hint="@string/hint_destination_edt" />
+        android:orientation="horizontal"
+        android:padding="10dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/location_indicator_button" />
+
+                <EditText
+                    android:id="@+id/edtOrigin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@android:color/white"
+                    android:hint="@string/hint_origin_edt"
+                    android:textColor="@android:color/black" />
+
+            </LinearLayout>
+
+            <ListView
+                android:id="@+id/lvFirstSearchResult"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="@null"
+                android:maxHeight="60dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <ImageButton
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    android:layout_gravity="center_vertical"
+                    android:background="@drawable/location_indicator_button" />
+
+                <EditText
+                    android:id="@+id/edtDest"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@android:color/white"
+                    android:hint="@string/hint_destination_edt"
+                    android:textColor="@android:color/black" />
+            </LinearLayout>
+
+            <ListView
+                android:id="@+id/lvSecondSearchResult"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="@null"
+                android:maxHeight="60dp" />
+        </LinearLayout>
+
+        <Button
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:paddingTop="20dp"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:background="@drawable/ic_baseline_swap_vertical"
+            android:textAlignment="center"
+            android:gravity="center_horizontal" />
     </LinearLayout>
-</LinearLayout>
+
+
+    <com.google.android.gms.maps.MapView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+</androidx.cardview.widget.CardView>

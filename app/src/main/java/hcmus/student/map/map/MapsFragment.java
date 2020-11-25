@@ -1,10 +1,6 @@
 package hcmus.student.map.map;
 
-import android.Manifest;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -13,7 +9,6 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,19 +18,11 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResponse;
-import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -48,45 +35,41 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import hcmus.student.map.MainActivity;
 import hcmus.student.map.R;
 import hcmus.student.map.database.Database;
 import hcmus.student.map.database.Place;
+import hcmus.student.map.map.direction.DirectionFragment;
+import hcmus.student.map.map.utilities.LocationChangeCallback;
 import hcmus.student.map.map.utilities.MarkerAnimator;
 import hcmus.student.map.map.utilities.OrientationSensor;
 import hcmus.student.map.map.utilities.direction.Direction;
 import hcmus.student.map.map.utilities.direction.DirectionResponse;
 import hcmus.student.map.map.utilities.direction.DirectionTask;
 
-public class MapsFragment extends Fragment implements OnMapReadyCallback, DirectionResponse, MapsFragmentCallbacks {
+public class MapsFragment extends Fragment implements OnMapReadyCallback, DirectionResponse, MapsFragmentCallbacks, LocationChangeCallback {
 
-    private static final int LOCATION_STATUS_CODE = 1;
     private static final int DEFAULT_ZOOM = 15;
-    private static final long UPDATE_INTERVAL = 1000;
-    private static final long FASTEST_UPDATE_INTERVAL = 1000;
     private static final int EPSILON = 5;
 
     private GoogleMap mMap;
     private Location mCurrentLocation;
-    private FusedLocationProviderClient mClient;
     private Marker mLocationIndicator;
-    private LocationCallback mLocationCallBack;
     private Marker marker;
     private ArrayList<Polyline> mRoutes;
     private Marker mRouteStartMarker, mRouteEndMarker;
     private MapView mMapView;
     private OrientationSensor mSensor;
     private Database mDatabase;
-
+    private MarkerAnimator animator;
     private MainActivity main;
     private Context context;
+    private DirectionFragment directionFragment;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
 
@@ -119,8 +102,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         SensorManager sensorService = (SensorManager) main.getSystemService(Context.SENSOR_SERVICE);
         mMapView = view.findViewById(R.id.map);
         mMapView.onCreate(savedInstanceState);
-
-
         //Implement Rotation change here
         mSensor = new OrientationSensor(sensorService) {
             float previousRotation = 0;
@@ -134,18 +115,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                 }
             }
         };
-
-        mClient = LocationServices.getFusedLocationProviderClient(context);
-        mLocationCallBack = null;
-        mRoutes = null;
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            enableLocation();
-        } else if (shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION)) {
-            showAlert();
-        } else {
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_STATUS_CODE);
-        }
+        main.registerLocationChange(this);
+        mMapView.getMapAsync(this);
         return view;
     }
 
@@ -163,14 +134,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                 ));
             }
         });
-
-        //Display location indicator
-        BitmapDrawable bitmapDrawable = (BitmapDrawable) ResourcesCompat.getDrawable(getResources(), R.drawable.location_indicator,
-                context.getTheme());
-        Bitmap bitmap = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 72, 72, false);
-        bitmapDrawable.setAntiAlias(true);
-        mLocationIndicator = mMap.addMarker(new MarkerOptions().position(new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude())).flat(true)
-                .icon(BitmapDescriptorFactory.fromBitmap(bitmap)).anchor(0.5f, 0.5f));
 
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
@@ -192,127 +155,86 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             }
         });
 
-        //Move camera to user location with default zoom
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLocation.getLatitude(),
-                mCurrentLocation.getLongitude()), DEFAULT_ZOOM));
-
         showAllAddress();
-        listenToLocationChange();
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case LOCATION_STATUS_CODE:
-                if (grantResults.length > 0)
-                    enableLocation();
-                break;
+    public void onLocationChange(Location location) {
+        if (mMap == null)
+            return;
+        //Display location indicator
+        if (mCurrentLocation == null) {
+            BitmapDrawable bitmapDrawable = (BitmapDrawable) ResourcesCompat.getDrawable(getResources(), R.drawable.location_indicator,
+                    context.getTheme());
+            Bitmap bitmap = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 72, 72, false);
+            bitmapDrawable.setAntiAlias(true);
+            mLocationIndicator = mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude())).flat(true)
+                    .icon(BitmapDescriptorFactory.fromBitmap(bitmap)).anchor(0.5f, 0.5f));
+            animator = new MarkerAnimator(mLocationIndicator, mMap);        //Move camera to user location with default zoom
+            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),
+                    location.getLongitude()), DEFAULT_ZOOM));
         }
+        mCurrentLocation = location;
+        animator.animate(location);
     }
 
-    private void enableLocation() {
-        if (ActivityCompat.checkSelfPermission(main, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Task<Location> task = mClient.getLastLocation();
-            task.addOnSuccessListener(new OnSuccessListener<Location>() {
-                @Override
-                public void onSuccess(Location location) {
-                    if (location != null) {
-                        mCurrentLocation = location;
-                        mMapView.getMapAsync(MapsFragment.this);
-                    }
-                }
-            });
-        } else {
-            AlertDialog.Builder builder = new AlertDialog.Builder(context);
-            builder.setTitle("Warning!");
-            builder.setMessage("You have denied the app to access your permission, this app won't work");
-            builder.setCancelable(false);
-            builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-                @RequiresApi(api = Build.VERSION_CODES.M)
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                }
-            });
-
-            AlertDialog dialog = builder.create();
-            dialog.show();
-        }
-    }
-
-    private void listenToLocationChange() {
-        //Request change location setting
-        final LocationRequest request = LocationRequest.create();
-        request.setInterval(UPDATE_INTERVAL);
-        request.setFastestInterval(FASTEST_UPDATE_INTERVAL);
-        request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
-        builder.addAllLocationRequests(Collections.singleton(request));
-        SettingsClient settingsClient = LocationServices.getSettingsClient(main);
-        Task<LocationSettingsResponse> task = settingsClient.checkLocationSettings(builder.build());
-
-        final MarkerAnimator animator = new MarkerAnimator(mLocationIndicator, mMap);
-
-        //Listen for location change event
-        task.addOnSuccessListener(new OnSuccessListener<LocationSettingsResponse>() {
-            @Override
-            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-                if (ActivityCompat.checkSelfPermission(main,
-                        Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    mLocationCallBack = new LocationCallback() {
-                        @Override
-                        public void onLocationResult(LocationResult locationResult) {
-                            super.onLocationResult(locationResult);
-                            Location temp = locationResult.getLastLocation();
-                            if (temp == null) return;
-                            mCurrentLocation = temp;
-                            animator.animate(mCurrentLocation);
-                        }
-                    };
-
-                    mClient.requestLocationUpdates(request, mLocationCallBack, Looper.myLooper());
-                }
+    @Override
+    public void closeDirection() {
+        getChildFragmentManager().popBackStack();
+        if (mRoutes != null) {
+            for (int i = 0; i < mRoutes.size(); i++) {
+                mRoutes.get(i).remove();
             }
-        });
+        }
+
+        if (mRouteStartMarker != null)
+            mRouteStartMarker.remove();
+        if (mRouteEndMarker != null)
+            mRouteEndMarker.remove();
+
+        directionFragment = null;
     }
 
     public void drawRoute(LatLng start, LatLng end) {
         LatLng startPos = start == null ? new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()) : start;
         LatLng endPos = end == null ? new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()) : end;
+        if (directionFragment == null)
+            showDirectionFragment(null, endPos);
+        else {
+            try {
+                directionFragment.onRouteChange(start, end);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         String url = Direction.getDirectionUrl(startPos, endPos, main);
         new DirectionTask(this).execute(url);
     }
 
-    private void showAlert() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Warning!");
-        builder.setMessage("App must have permission to access you location");
-        builder.setCancelable(false);
-        builder.setPositiveButton("Yes, I know", new DialogInterface.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.M)
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_STATUS_CODE);
-            }
-        });
-        builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
-    }
-
     private void showAllAddress() {
         List<Place> places = mDatabase.getAllPlaces();
         for (Place place : places) {
-            createAvatarMarker(new LatLng(place.getLatitude(), place.getLongitude()), place.getAvatar());
+            createAvatarMarker(place.getLocation(), place.getAvatar());
         }
+    }
+
+    public void showDirectionFragment(LatLng origin, LatLng dest) {
+        directionFragment = DirectionFragment.newInstance(origin, dest);
+
+        FragmentManager manager = getChildFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.replace(R.id.frameTop, directionFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+    @Override
+    public void openSearchResultMarker(LatLng coordinate) {
+        if (marker != null)
+            marker.remove();
+        marker = mMap.addMarker(new MarkerOptions().position(coordinate));
+        mMap.animateCamera(CameraUpdateFactory.newLatLng(coordinate));
     }
 
     @Override
@@ -348,7 +270,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     }
 
     @Override
-    public void onRespond(List<PolylineOptions> polylineOptions) {
+    public void onRouteRespond(List<PolylineOptions> polylineOptions) {
         if (mRoutes != null) {
             for (int i = 0; i < mRoutes.size(); i++) {
                 mRoutes.get(i).remove();
@@ -371,7 +293,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             }
         }
         LatLngBounds bounds = builder.build();
-        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100), 1000, null);
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200), 1000, null);
 
         BitmapDrawable bitmapDrawable = (BitmapDrawable) ResourcesCompat.getDrawable(getResources(), R.drawable.marker_point,
                 context.getTheme());
