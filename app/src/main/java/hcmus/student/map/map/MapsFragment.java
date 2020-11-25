@@ -344,7 +344,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     }
 
     @Override
-    public void onRespond(List<PolylineOptions> polylineOptions) {
+    public void onRespond(List<PolylineOptions> polylineOptions, List<String> durations) {
         if (mRoutes != null) {
             for (int i = 0; i < mRoutes.size(); i++) {
                 mRoutes.get(i).remove();
@@ -354,13 +354,23 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         mRoutes = new ArrayList<>();
 
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        for (PolylineOptions route : polylineOptions) {
+//        for (PolylineOptions route : polylineOptions) {
+//            mRoutes.add(mMap.addPolyline(route));
+//            List<LatLng> points = route.getPoints();
+//            for (LatLng point : points) {
+//                builder.include(point);
+//            }
+//        }
+        for (int i = 0; i < polylineOptions.size(); i++) {
+            PolylineOptions route = polylineOptions.get(i);
             mRoutes.add(mMap.addPolyline(route));
             List<LatLng> points = route.getPoints();
             for (LatLng point : points) {
                 builder.include(point);
             }
+            main.openRouteInfo(durations.get(i));
         }
+
         LatLngBounds bounds = builder.build();
         mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100), 1000, null);
 

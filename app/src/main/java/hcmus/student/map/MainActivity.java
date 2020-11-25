@@ -15,6 +15,7 @@ import com.google.android.material.tabs.TabLayout;
 import hcmus.student.map.map.AddContactFragment;
 import hcmus.student.map.map.MapsFragment;
 import hcmus.student.map.map.MarkerInfoFragment;
+import hcmus.student.map.map.RouteInfoFragment;
 import hcmus.student.map.map.ViewPagerAdapter;
 
 
@@ -86,6 +87,12 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
         //fragmentTransaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right, R.anim.slide_in_right, R.anim.slide_out_left);
         fragmentTransaction.replace(R.id.frameBottom, AddContactFragment.newInstance(latLng));
         fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
+
+    public void openRouteInfo(String routeDuration) {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.frameBottom, RouteInfoFragment.newInstance(routeDuration));
         fragmentTransaction.commit();
     }
 

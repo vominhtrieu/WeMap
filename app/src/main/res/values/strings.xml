@@ -11,4 +11,6 @@
     <string name="btn_cancel">Cancel</string>
     <string name="title_address_book">All Address</string>
     <string name="btn_direction">Direction</string>
+    <string name="routeinfo_duration">Duration:</string>
+    <!-- TODO: Remove or change this placeholder text -->
 </resources>
