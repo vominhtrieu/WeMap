@@ -8,6 +8,33 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <SearchView
+            android:id="@+id/svSearch"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+            android:background="@drawable/bg_round"
+            android:elevation="5dp"
+            android:iconifiedByDefault="false"
+            android:queryHint="Search...">
+
+            <requestFocus />
+        </SearchView>
+
+        <ListView
+            android:id="@+id/listPlace"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/cardview_light_background"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"/>
+    </LinearLayout>
+
     <ImageButton
         android:id="@+id/btnLocation"
         android:layout_width="64dp"
@@ -23,4 +50,5 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom" />
+
 </FrameLayout>

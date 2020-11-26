@@ -14,11 +14,14 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
+import android.widget.ListView;
+import android.widget.SearchView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -56,15 +59,18 @@ import java.util.Collections;
 import java.util.List;
 
 import hcmus.student.map.MainActivity;
+import hcmus.student.map.map.utilities.place.PlaceSearch;
 import hcmus.student.map.map.utilities.MapsFragmentCallbacks;
 import hcmus.student.map.R;
 import hcmus.student.map.database.Database;
 import hcmus.student.map.database.Place;
+import hcmus.student.map.map.utilities.MapsFragmentCallbacks;
 import hcmus.student.map.map.utilities.MarkerAnimator;
 import hcmus.student.map.map.utilities.OrientationSensor;
 import hcmus.student.map.map.utilities.direction.Direction;
 import hcmus.student.map.map.utilities.direction.DirectionResponse;
 import hcmus.student.map.map.utilities.direction.DirectionTask;
+import hcmus.student.map.map.utilities.place.GetPlaces;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback, DirectionResponse, MapsFragmentCallbacks {
 
@@ -88,6 +94,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
 
     private MainActivity main;
     private Context context;
+    private SearchView searchView;
+    private ListView listPlace;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
 
@@ -109,6 +117,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         } catch (IllegalStateException e) {
             throw new IllegalStateException("MainActivity must implement callbacks");
         }
+
+        String url= PlaceSearch.TextSearch("quán ăn ở Phú Yên", main);
+        GetPlaces getNearby=new GetPlaces();
+        getNearby.execute(url);
+
     }
 
     @Nullable
@@ -120,6 +133,55 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         SensorManager sensorService = (SensorManager) main.getSystemService(Context.SENSOR_SERVICE);
         mMapView = view.findViewById(R.id.map);
         mMapView.onCreate(savedInstanceState);
+
+        listPlace = view.findViewById(R.id.listPlace);
+        searchView = view.findViewById(R.id.svSearch);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                String location = searchView.getQuery().toString();
+
+                Database db = new Database(context);
+                List<Place> places = db.getAllPlaces();
+                for (int i = 0; i < places.size(); i++) {
+                    if (location.equals(places.get(i).getName())) {
+                        Toast.makeText((MainActivity) getActivity(), "Success", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText((MainActivity) getActivity(), "Not succsess", Toast.LENGTH_SHORT).show();
+                    }
+
+                }
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                newText = newText.toLowerCase();
+                Database db = new Database(context);
+                List<Place> place = db.getAllPlaces();
+
+                ArrayList<String> placesList = new ArrayList<>();
+                for (int i = 0; i < place.size(); i++) {
+                    String name = place.get(i).getName().toLowerCase();
+                    if (name.contains(newText)) {
+                        placesList.add(place.get(i).getName());
+                    }
+                }
+
+                ArrayAdapter<String> adapter = new ArrayAdapter<String>((MainActivity) getActivity(), android.R.layout.simple_list_item_1, placesList);
+                listPlace.setAdapter(adapter);
+
+                if (searchView.getQuery().toString().equals("")) {
+                    placesList = new ArrayList<>();
+                    adapter = new ArrayAdapter<String>((MainActivity) getActivity(), android.R.layout.simple_list_item_1, placesList);
+                    listPlace.setAdapter(adapter);
+                }
+
+                return true;
+            }
+        });
+
+
         //Implement Rotation change here
         mSensor = new OrientationSensor(sensorService) {
             float previousRotation = 0;
