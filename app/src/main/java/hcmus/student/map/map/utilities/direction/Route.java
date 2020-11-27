@@ -6,20 +6,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Route {
+    List<List<List<LatLng>>> route;
+    String duration;
+
     public Route() {
         route = new ArrayList<>();
     }
 
-    List<List<List<LatLng>>> route;
-    String duration;
-
-    public void setRoute(List<List<List<LatLng>>> route) {
+    public Route(List<List<List<LatLng>>> route, String duration) {
         this.route = route;
-    }
-
-    public void setDuration(String duration) {
         this.duration = duration;
     }
+
 
     public List<List<List<LatLng>>> getRoute() {
         return route;

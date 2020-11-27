@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -255,9 +256,11 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
         fragmentTransaction.commit();
     }
 
-    public void openRouteInfo(String routeDuration) {
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public void openRouteInfo(String routeDuration, int routeColor) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frameBottom, RouteInfoFragment.newInstance(routeDuration));
+        fragmentTransaction.replace(R.id.frameBottom, RouteInfoFragment.newInstance(routeDuration, routeColor));
         fragmentTransaction.commit();
     }
 

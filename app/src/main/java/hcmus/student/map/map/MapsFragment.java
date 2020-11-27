@@ -56,12 +56,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
 
     private static final int DEFAULT_ZOOM = 15;
     private static final int EPSILON = 5;
+    private static final int NORMAL_ROUTE_WIDTH = 8;
+    private static final int SELECTED_ROUTE_WIDTH = 12;
 
     private GoogleMap mMap;
     private Location mCurrentLocation;
     private Marker mLocationIndicator;
     private Marker marker;
     private ArrayList<Polyline> mRoutes;
+    private List<String> mDurations;
     private Marker mRouteStartMarker, mRouteEndMarker;
     private MapView mMapView;
     private OrientationSensor mSensor;
@@ -152,6 +155,20 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                 main.openMarkerInfo(marker);
                 mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
                 return true;
+            }
+        });
+
+        mMap.setOnPolylineClickListener(new GoogleMap.OnPolylineClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onPolylineClick(Polyline polyline) {
+                for (Polyline route : mRoutes) {
+                    route.setZIndex(0);
+                    route.setWidth(NORMAL_ROUTE_WIDTH);
+                }
+                polyline.setWidth(SELECTED_ROUTE_WIDTH);
+                polyline.setZIndex(1);
+                main.openRouteInfo(polyline.getTag().toString(), polyline.getColor());
             }
         });
 
@@ -283,23 +300,20 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         }
 
         mRoutes = new ArrayList<>();
+        mDurations = durations;
 
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
-//        for (PolylineOptions route : polylineOptions) {
-//            mRoutes.add(mMap.addPolyline(route));
-//            List<LatLng> points = route.getPoints();
-//            for (LatLng point : points) {
-//                builder.include(point);
-//            }
-//        }
         for (int i = 0; i < polylineOptions.size(); i++) {
             PolylineOptions route = polylineOptions.get(i);
-            mRoutes.add(mMap.addPolyline(route));
+            Polyline polyline = mMap.addPolyline((route));
+            polyline.setClickable(true);
+            polyline.setTag(durations.get(i));
+            polyline.setZIndex(0);
+            mRoutes.add(polyline);
             List<LatLng> points = route.getPoints();
             for (LatLng point : points) {
                 builder.include(point);
             }
-            main.openRouteInfo(durations.get(i));
         }
 
         LatLngBounds bounds = builder.build();

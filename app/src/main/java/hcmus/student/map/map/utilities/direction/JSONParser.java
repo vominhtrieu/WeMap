@@ -23,7 +23,6 @@ public class JSONParser {
 
             routes = new ArrayList<>();
             for (int i = 0; i < jsonRoutes.length(); i++) {
-                Route route = new Route();
                 duration = 0;
                 JSONArray jsonLegs = jsonRoutes.getJSONObject(i).getJSONArray("legs");
 
@@ -43,9 +42,7 @@ public class JSONParser {
                     }
                     legs.add(steps);
                 }
-                route.setRoute(legs);
-                route.setDuration(convertSecondsToTimeString(duration));
-                routes.add(route);
+                routes.add(new Route(legs, convertSecondsToTimeString(duration)));
             }
         } catch (Exception e) {
             e.printStackTrace();
