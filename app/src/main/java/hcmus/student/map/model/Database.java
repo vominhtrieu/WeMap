@@ -1,4 +1,4 @@
-package hcmus.student.map.database;
+package hcmus.student.map.model;
 
 import android.content.Context;
 import android.database.Cursor;

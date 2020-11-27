@@ -24,7 +24,7 @@ import java.io.IOException;
 
 import hcmus.student.map.MainActivity;
 import hcmus.student.map.R;
-import hcmus.student.map.database.Place;
+import hcmus.student.map.model.Place;
 import hcmus.student.map.map.search.SearchClickCallback;
 import hcmus.student.map.map.search.SearchResultAdapter;
 

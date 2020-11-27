@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -30,6 +31,7 @@ import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.SettingsClient;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
@@ -63,9 +65,6 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
         setContentView(R.layout.activity_main);
 
         TabLayout mTabs = findViewById(R.id.tabs);
-        //Setup icon for each tab
-        mTabs.getTabAt(0).setIcon(R.drawable.ic_tab_map);
-        mTabs.getTabAt(1).setIcon(R.drawable.ic_tab_addressbook);
 
         mViewPager = findViewById(R.id.pager);
         mViewPager.setUserInputEnabled(false);
@@ -120,7 +119,7 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
         builder.addAllLocationRequests(Collections.singleton(request));
         SettingsClient settingsClient = LocationServices.getSettingsClient(this);
-        Task<LocationSettingsResponse> task = settingsClient.checkLocationSettings(builder.build());
+        final Task<LocationSettingsResponse> task = settingsClient.checkLocationSettings(builder.build());
 
         //Listen for location change event
         task.addOnSuccessListener(new OnSuccessListener<LocationSettingsResponse>() {
@@ -143,6 +142,11 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
                     mClient.requestLocationUpdates(request, mLocationCallBack, Looper.myLooper());
                 }
             }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                listenToLocationChange();
+            }
         });
     }
 
@@ -154,17 +158,7 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
 
     private void enableLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Task<Location> task = mClient.getLastLocation();
-            task.addOnSuccessListener(new OnSuccessListener<Location>() {
-                @Override
-                public void onSuccess(Location location) {
-                    if (location != null) {
-                        mCurrentLocation = location;
-                        notifyLocationChange();
-                        listenToLocationChange();
-                    }
-                }
-            });
+            listenToLocationChange();
         } else {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Warning!");
@@ -258,8 +252,7 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
     public void onBackPressed() {
         if (mViewPager.getCurrentItem() == 0 && adapter.getFragment(0).getChildFragmentManager().getBackStackEntryCount() > 0) {
             ((MapsFragment) adapter.getFragment(0)).closeDirection();
-        }
-        else {
+        } else {
             super.onBackPressed();
         }
     }

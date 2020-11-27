@@ -42,8 +42,6 @@ import java.util.List;
 
 import hcmus.student.map.MainActivity;
 import hcmus.student.map.R;
-import hcmus.student.map.database.Database;
-import hcmus.student.map.database.Place;
 import hcmus.student.map.map.direction.DirectionFragment;
 import hcmus.student.map.map.utilities.LocationChangeCallback;
 import hcmus.student.map.map.utilities.MarkerAnimator;
@@ -51,6 +49,8 @@ import hcmus.student.map.map.utilities.OrientationSensor;
 import hcmus.student.map.map.utilities.direction.Direction;
 import hcmus.student.map.map.utilities.direction.DirectionResponse;
 import hcmus.student.map.map.utilities.direction.DirectionTask;
+import hcmus.student.map.model.Database;
+import hcmus.student.map.model.Place;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback, DirectionResponse, MapsFragmentCallbacks, LocationChangeCallback {
 
@@ -128,6 +128,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         btnLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (mCurrentLocation == null) {
+                    Toast.makeText(context, R.string.txtNullLocation, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
                 mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                         new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()),
                         mMap.getCameraPosition().zoom >= DEFAULT_ZOOM ? mMap.getCameraPosition().zoom : DEFAULT_ZOOM
@@ -140,6 +145,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             public void onMapLongClick(LatLng latLng) {
                 if (marker != null) marker.remove();
                 marker = mMap.addMarker(new MarkerOptions().position(latLng));
+                marker.setZIndex(5);
                 mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
             }
         });
@@ -170,6 +176,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             bitmapDrawable.setAntiAlias(true);
             mLocationIndicator = mMap.addMarker(new MarkerOptions().position(new LatLng(location.getLatitude(), location.getLongitude())).flat(true)
                     .icon(BitmapDescriptorFactory.fromBitmap(bitmap)).anchor(0.5f, 0.5f));
+
+            mLocationIndicator.setZIndex(3);
+
             animator = new MarkerAnimator(mLocationIndicator, mMap);        //Move camera to user location with default zoom
             mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),
                     location.getLongitude()), DEFAULT_ZOOM));
@@ -239,10 +248,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
 
     @Override
     public void createAvatarMarker(LatLng coordinate, byte[] avt) {
-        if (marker != null) {
-            marker.remove();
-            marker = null;
-        }
         Bitmap bmpMarker = BitmapFactory.decodeResource(getResources(), R.drawable.marker_frame).copy(Bitmap.Config.ARGB_8888, true);
         bmpMarker = Bitmap.createScaledBitmap(bmpMarker, 100, 115, false);
         if (avt != null) {
@@ -253,7 +258,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         }
 
         mMap.addMarker(new MarkerOptions().position(coordinate)
-                .icon(BitmapDescriptorFactory.fromBitmap(bmpMarker)));
+                .icon(BitmapDescriptorFactory.fromBitmap(bmpMarker))).setZIndex(3);
     }
 
     @Override

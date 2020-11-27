@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import hcmus.student.map.R;
-import hcmus.student.map.database.Database;
-import hcmus.student.map.database.Place;
+import hcmus.student.map.model.Database;
+import hcmus.student.map.model.Place;
 
 public class AddressBookAdapter extends BaseAdapter {
     Database mDatabase;

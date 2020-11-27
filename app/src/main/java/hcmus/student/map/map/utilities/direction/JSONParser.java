@@ -1,7 +1,5 @@
 package hcmus.student.map.map.utilities.direction;
 
-import android.util.Log;
-
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
@@ -9,10 +7,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import hcmus.student.map.database.Place;
+import hcmus.student.map.model.Place;
 
 public class JSONParser {
     public List<List<List<List<LatLng>>>> parseRoutes(JSONObject jsonObject) {
