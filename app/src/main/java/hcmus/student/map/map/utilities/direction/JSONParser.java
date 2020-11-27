@@ -6,13 +6,13 @@ import android.content.Context;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
-import hcmus.student.map.MainActivity;
-import hcmus.student.map.R;
+import hcmus.student.map.database.Place;
 
 public class JSONParser {
     public List<Route> parseRoutes(JSONObject jsonObject) {
@@ -29,9 +29,9 @@ public class JSONParser {
 
                 List<List<List<LatLng>>> legs = new ArrayList<>();
 
-                for (int j = 0; j < jsonRoutes.length(); j++) {
-                    JSONArray jsonSteps = jsonLegs.getJSONObject(i).getJSONArray("steps");
-                    JSONObject jsonDuration = jsonLegs.getJSONObject(i).getJSONObject("duration");
+                for (int j = 0; j < jsonLegs.length(); j++) {
+                    JSONArray jsonSteps = jsonLegs.getJSONObject(j).getJSONArray("steps");
+                    JSONObject jsonDuration = jsonLegs.getJSONObject(j).getJSONObject("duration");
                     duration += jsonDuration.getInt("value");
 
                     List<List<LatLng>> steps = new ArrayList<>();
@@ -63,5 +63,35 @@ public class JSONParser {
         String strDay = days > 1 ? (days + " days ") : (days > 0 ? (days + " day ") : "");
 
         return strDay + strHour + strMinute;
+    }
+
+    public List<Place> parsePlace(String jsonData) {
+        JSONArray result;
+        List<Place> placeList = null;
+        try {
+            JSONObject jsonObject = new JSONObject(jsonData);
+            result = jsonObject.getJSONArray("results");
+
+            int placesCount = result.length();
+            placeList = new ArrayList<>();
+
+            for (int i = 0; i < placesCount; i++) {
+                try {
+                    JSONObject place = result.getJSONObject(i);
+                    String name = place.getString("name");
+                    JSONObject location = place.getJSONObject("geometry").getJSONObject("location");
+                    double lat = location.getDouble("lat");
+                    double lng = location.getDouble("lng");
+
+                    placeList.add(new Place(name, new LatLng(lat, lng), null));
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return placeList;
     }
 }
