@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -44,7 +43,6 @@ import hcmus.student.map.map.AddContactFragment;
 import hcmus.student.map.map.MapsFragment;
 import hcmus.student.map.map.MarkerInfoFragment;
 import hcmus.student.map.map.utilities.LocationChangeCallback;
-import hcmus.student.map.map.utilities.ViewPagerAdapter;
 
 
 public class MainActivity extends FragmentActivity implements MainCallbacks {

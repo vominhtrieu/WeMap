@@ -248,6 +248,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
 
     @Override
     public void createAvatarMarker(LatLng coordinate, byte[] avt) {
+        if (marker != null) {
+            marker.remove();
+            marker = null;
+        }
         Bitmap bmpMarker = BitmapFactory.decodeResource(getResources(), R.drawable.marker_frame).copy(Bitmap.Config.ARGB_8888, true);
         bmpMarker = Bitmap.createScaledBitmap(bmpMarker, 100, 115, false);
         if (avt != null) {

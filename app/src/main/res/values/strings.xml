@@ -15,4 +15,5 @@
     <string name="txtUnknownLocation">Unknown location</string>
     <string name="txtCurrentLocation">Current location</string>
     <string name="txtNullLocation">Cannot acquire location</string>
+    <string name="txtLoadingAddressLine">Loading address line</string>
 </resources>

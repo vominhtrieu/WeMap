@@ -12,7 +12,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import hcmus.student.map.map.utilities.FetchUrlTask;
+import hcmus.student.map.utitlies.FetchUrlTask;
 
 public class DirectionTask extends AsyncTask<String, Integer, List<List<List<List<LatLng>>>>> {
     static final int[] ROUTE_COLORS = {Color.BLUE, Color.RED, Color.BLACK, Color.YELLOW, Color.GRAY};

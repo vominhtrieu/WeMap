@@ -17,13 +17,14 @@ import androidx.annotation.Nullable;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import hcmus.student.map.R;
 import hcmus.student.map.model.Database;
 import hcmus.student.map.model.Place;
+import hcmus.student.map.utitlies.AddressLine;
+import hcmus.student.map.utitlies.OnAddressLineResponse;
 
 public class AddressBookAdapter extends BaseAdapter {
     Database mDatabase;
@@ -65,18 +66,25 @@ public class AddressBookAdapter extends BaseAdapter {
         }
 
         TextView txtListItemName = convertView.findViewById(R.id.txtListItemName);
-        TextView txtListItemAddressLine = convertView.findViewById(R.id.txtListItemAddressLine);
+        final TextView txtListItemAddressLine = convertView.findViewById(R.id.txtListItemAddressLine);
+        txtListItemAddressLine.setText(R.string.txtLoadingAddressLine);
         Place place = getItem(position);
 
         txtListItemName.setText(place.getName());
-        Geocoder geocoder = new Geocoder(context);
-        try {
-            LatLng location = place.getLocation();
-            String addressLine = geocoder.getFromLocation(location.latitude, location.longitude, 1).get(0).getAddressLine(0);
-            txtListItemAddressLine.setText(addressLine);
-        } catch (IOException e) {
-            txtListItemAddressLine.setText("");
-        }
+        LatLng location = place.getLocation();
+
+        AddressLine addressLine = new AddressLine(new Geocoder(context), new OnAddressLineResponse() {
+            @Override
+            public void onAddressLineResponse(String addressLine) {
+                if (addressLine != null) {
+                    txtListItemAddressLine.setText(addressLine);
+                } else {
+                    txtListItemAddressLine.setText(R.string.txtNullLocation);
+                }
+            }
+        });
+        addressLine.execute(location);
+
         if (place.getAvatar() != null) {
             Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
             ImageView ivAvatar = convertView.findViewById(R.id.ivAvatar);

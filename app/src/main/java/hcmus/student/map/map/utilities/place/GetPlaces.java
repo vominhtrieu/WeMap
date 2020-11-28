@@ -5,7 +5,7 @@ import android.os.AsyncTask;
 import java.util.List;
 
 import hcmus.student.map.model.Place;
-import hcmus.student.map.map.utilities.FetchUrlTask;
+import hcmus.student.map.utitlies.FetchUrlTask;
 import hcmus.student.map.map.utilities.direction.JSONParser;
 
 

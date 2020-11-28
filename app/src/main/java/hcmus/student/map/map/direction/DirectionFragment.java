@@ -101,7 +101,6 @@ public class DirectionFragment extends Fragment implements DirectionFragmentCall
             LatLng originLocation = args.getParcelable("origin");
             LatLng destLocation = args.getParcelable("dest");
             Geocoder geocoder = new Geocoder(context);
-            Location location = activity.getLocation();
             try {
 
                 if (originLocation != null)

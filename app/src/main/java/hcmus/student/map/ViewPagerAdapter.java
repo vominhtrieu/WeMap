@@ -1,4 +1,4 @@
-package hcmus.student.map.map.utilities;
+package hcmus.student.map;
 
 import android.os.Build;
 
@@ -12,6 +12,7 @@ import java.util.ArrayList;
 
 import hcmus.student.map.address_book.AddressBookFragment;
 import hcmus.student.map.map.MapsFragment;
+import hcmus.student.map.weather.WeatherFragment;
 
 public class ViewPagerAdapter extends FragmentStateAdapter {
 
@@ -22,18 +23,15 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
         super(fragmentActivity);
         fragmentList = new ArrayList<>();
         fragmentList.add(MapsFragment.newInstance());
+        fragmentList.add(WeatherFragment.newInstance());
         fragmentList.add(AddressBookFragment.newInstance());
-    }
-
-    public ArrayList<Fragment> getFragmentList() {
-        return fragmentList;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        if (position >= 0 && position <= 1) {
+        if (position >= 0 && position < fragmentList.size()) {
             return fragmentList.get(position);
         }
         return null;
@@ -45,7 +43,10 @@ public class ViewPagerAdapter extends FragmentStateAdapter {
     }
 
     public Fragment getFragment(int position) {
-        return fragmentList.get(position);
+        if (position >= 0 && position < fragmentList.size()) {
+            return fragmentList.get(position);
+        }
+        return null;
     }
 }
 
