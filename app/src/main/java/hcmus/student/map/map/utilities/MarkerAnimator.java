@@ -25,7 +25,6 @@ public class MarkerAnimator {
         final ValueAnimator animator = ValueAnimator.ofFloat(0, 1);
 
         final LatLng startLatLng = mLocationIndicator.getPosition();
-        final Location tempLocation = currentLocation;
         final LatLng endLatLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
 
         animator.setDuration(ANIMATION_DURATION);
@@ -33,10 +32,6 @@ public class MarkerAnimator {
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
-                if (currentLocation != tempLocation) {
-                    animator.cancel();
-                    return;
-                }
                 float fraction = animation.getAnimatedFraction();
                 double newLat = startLatLng.latitude + (endLatLng.latitude - startLatLng.latitude) * fraction;
                 double newLng = startLatLng.longitude + (endLatLng.longitude - startLatLng.longitude) * fraction;

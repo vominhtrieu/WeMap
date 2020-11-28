@@ -42,11 +42,16 @@ public class DirectionTask extends AsyncTask<String, Integer, List<Route>> {
 
     @Override
     protected void onPostExecute(List<Route> lists) {
+        if (lists == null) {
+            return;
+        }
+
         ArrayList<PolylineOptions> respondPolylines = new ArrayList<>();
         ArrayList<String> durations = new ArrayList<>();
+
         int routeCount = Math.min(lists.size(), 5);
 
-        for (int i = 0; i < routeCount; i++) {
+        for (int i = routeCount - 1; i >= 0; i--) {
             PolylineOptions polylineOptions = new PolylineOptions();
             ArrayList<LatLng> points = new ArrayList<>();
 
@@ -64,6 +69,6 @@ public class DirectionTask extends AsyncTask<String, Integer, List<Route>> {
             durations.add(lists.get(i).getDuration());
         }
 
-        delegate.onRespond(respondPolylines, durations);
+        delegate.onRouteRespond(respondPolylines, durations);
     }
 }

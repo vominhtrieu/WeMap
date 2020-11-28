@@ -1,15 +1,15 @@
 package hcmus.student.map.database;
 
-public class Place  {
+import com.google.android.gms.maps.model.LatLng;
+
+public class Place {
     private String name;
-    private Double longitude;
-    private Double latitude;
+    private LatLng location;
     private byte[] avatar;
 
-    public Place(String name, Double longitude, Double latitude, byte[] avatar) {
+    public Place(String name, LatLng location, byte[] avatar) {
         this.name = name;
-        this.longitude = longitude;
-        this.latitude = latitude;
+        this.location = location;
         this.avatar = avatar;
     }
 
@@ -17,12 +17,8 @@ public class Place  {
         return name;
     }
 
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public Double getLatitude() {
-        return latitude;
+    public LatLng getLocation() {
+        return location;
     }
 
     public byte[] getAvatar() {

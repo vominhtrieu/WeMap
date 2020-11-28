@@ -12,5 +12,8 @@
     <string name="title_address_book">All Address</string>
     <string name="btn_direction">Direction</string>
     <string name="routeinfo_duration">Duration:</string>
-    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hint_origin_edt">Origin</string>
+    <string name="hint_destination_edt">Destination</string>
+    <string name="txtUnknownLocation">Unknown location</string>
+    <string name="txtCurrentLocation">Current location</string>
 </resources>

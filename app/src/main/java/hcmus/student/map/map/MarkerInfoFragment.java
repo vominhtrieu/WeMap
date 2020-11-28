@@ -1,5 +1,6 @@
 package hcmus.student.map.map;
 
+import android.location.Geocoder;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,6 +47,7 @@ public class MarkerInfoFragment extends Fragment implements View.OnClickListener
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_marker_info, null);
 
+        TextView txtPlaceName = view.findViewById(R.id.txtPlaceName);
         txtLat = view.findViewById(R.id.txtLat);
         txtLng = view.findViewById(R.id.txtLng);
         btnAdd = view.findViewById(R.id.btnAdd);
@@ -54,16 +56,18 @@ public class MarkerInfoFragment extends Fragment implements View.OnClickListener
 
         StringBuilder sb = new StringBuilder();
         Formatter formatter = new Formatter(sb, Locale.US);
+        Bundle args = getArguments();
         try {
-            Bundle args = getArguments();
-            latLng = new LatLng(args.getDouble("lat"), args.getDouble("lng"));
-
-            txtLat.setText(formatter.format("Latitude: %.2f", latLng.latitude).toString());
-            sb.setLength(0);
-            txtLng.setText(formatter.format("Longitude: %.2f", latLng.longitude).toString());
+            Geocoder geocoder = new Geocoder(getContext());
+            txtPlaceName.setText(
+                    geocoder.getFromLocation(args.getDouble("lat"), args.getDouble("lng"), 1).get(0).getAddressLine(0));
         } catch (Exception e) {
-            e.printStackTrace();
+            txtPlaceName.setText(R.string.txtUnknownLocation);
         }
+        latLng = new LatLng(args.getDouble("lat"), args.getDouble("lng"));
+        txtLat.setText(formatter.format("Latitude: %.2f", latLng.latitude).toString());
+        sb.setLength(0);
+        txtLng.setText(formatter.format("Longitude: %.2f", latLng.longitude).toString());
 
         btnAdd.setOnClickListener(this);
         btnDirection.setOnClickListener(this);

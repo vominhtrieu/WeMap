@@ -20,15 +20,14 @@ public class JSONParser {
 
             routes = new ArrayList<>();
             for (int i = 0; i < jsonRoutes.length(); i++) {
-                Route route = new Route();
                 duration = 0;
                 JSONArray jsonLegs = jsonRoutes.getJSONObject(i).getJSONArray("legs");
 
                 List<List<List<LatLng>>> legs = new ArrayList<>();
 
-                for (int j = 0; j < jsonRoutes.length(); j++) {
-                    JSONArray jsonSteps = jsonLegs.getJSONObject(i).getJSONArray("steps");
-                    JSONObject jsonDuration = jsonLegs.getJSONObject(i).getJSONObject("duration");
+                for (int j = 0; j < jsonLegs.length(); j++) {
+                    JSONArray jsonSteps = jsonLegs.getJSONObject(j).getJSONArray("steps");
+                    JSONObject jsonDuration = jsonLegs.getJSONObject(j).getJSONObject("duration");
                     duration += jsonDuration.getInt("value");
 
                     List<List<LatLng>> steps = new ArrayList<>();
@@ -40,9 +39,7 @@ public class JSONParser {
                     }
                     legs.add(steps);
                 }
-                route.setRoute(legs);
-                route.setDuration(convertSecondsToTimeString(duration));
-                routes.add(route);
+                routes.add(new Route(legs, convertSecondsToTimeString(duration)));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -62,7 +59,7 @@ public class JSONParser {
         return strDay + strHour + strMinute;
     }
 
-    public List<Place> parse(String jsonData) {
+    public List<Place> parsePlace(String jsonData) {
         JSONArray result;
         List<Place> placeList = null;
         try {
@@ -77,10 +74,10 @@ public class JSONParser {
                     JSONObject place = result.getJSONObject(i);
                     String name = place.getString("name");
                     JSONObject location = place.getJSONObject("geometry").getJSONObject("location");
-                    Double lat = location.getDouble("lat");
-                    Double lng = location.getDouble("lng");
+                    double lat = location.getDouble("lat");
+                    double lng = location.getDouble("lng");
 
-                    placeList.add(new Place(name, lat, lng, null));
+                    placeList.add(new Place(name, new LatLng(lat, lng), null));
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -91,5 +88,4 @@ public class JSONParser {
         }
         return placeList;
     }
-
 }
