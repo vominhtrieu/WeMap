@@ -8,21 +8,22 @@ public class DetailWeatherParser {
         JSONObject jsonObject = new JSONObject(data);
         JSONObject main = jsonObject.getJSONObject("main");
 
-        JSONObject weather = jsonObject.getJSONObject("weather");
+        JSONObject weather = jsonObject.getJSONArray("weather").getJSONObject(0);
 
         String icon = weather.getString("icon");
         String description = weather.getString("description");
 
-        Double temp = main.getDouble("temp") - 273.15;
-        Double humidity = main.getDouble("humidity");
+        double temp = main.getDouble("temp") - 273.15;
+        double humidity = main.getDouble("humidity");
 
-        JSONObject rainObject = jsonObject.getJSONObject("rain");
-        Double rain;
-        if (rainObject != null)
+        double rain;
+        try {
             rain = jsonObject.getJSONObject("rain").getDouble("1h");
-        else
+        }
+        catch (Exception e) {
             rain = 0.0;
-        Double wind = jsonObject.getJSONObject("wind").getDouble("speed");
+        }
+        double wind = jsonObject.getJSONObject("wind").getDouble("speed");
 
         return new DetailWeather(icon, description, temp, rain, wind, humidity);
     }

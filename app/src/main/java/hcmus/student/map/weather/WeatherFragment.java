@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -27,7 +28,11 @@ public class WeatherFragment extends Fragment implements OnAddressLineResponse, 
     private MainActivity activity;
     private TextView txtPlaceName;
     private TextView txtDescription;
+    private ImageView ivWeatherStatus;
     private TextView txtTemperature;
+    private TextView txtRain;
+    private TextView txtWind;
+    private TextView txtHumidity;
 
     public static WeatherFragment newInstance() {
         Bundle args = new Bundle();
@@ -47,8 +52,12 @@ public class WeatherFragment extends Fragment implements OnAddressLineResponse, 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_weather, null, false);
         txtPlaceName = view.findViewById(R.id.txtPlaceName);
+        ivWeatherStatus = view.findViewById(R.id.ivWeatherStatus);
         txtTemperature = view.findViewById(R.id.txtTemperature);
         txtDescription = view.findViewById(R.id.txtDescription);
+        txtRain = view.findViewById(R.id.txtRain);
+        txtWind = view.findViewById(R.id.txtWind);
+        txtHumidity = view.findViewById(R.id.txtHumidity);
 
         txtPlaceName.setText(R.string.txtLoadingAddressLine);
         AddressLine addressLine = new AddressLine(new Geocoder(getContext()), this);
@@ -72,8 +81,14 @@ public class WeatherFragment extends Fragment implements OnAddressLineResponse, 
     @Override
     public void onDetailWeatherResponse(DetailWeather detailWeather) {
         if (detailWeather != null) {
+            if (detailWeather.getIcon() != null) {
+                ivWeatherStatus.setImageBitmap(detailWeather.getIcon());
+            }
             txtTemperature.setText(String.format("%s°", detailWeather.getTemperature()));
             txtDescription.setText(detailWeather.getDescription());
+            txtRain.setText(String.format("%smm", detailWeather.getRain()));
+            txtWind.setText(String.format("%smph", detailWeather.getWind()));
+            txtHumidity.setText(String.format("%s%%", detailWeather.getHumidity()));
         }
     }
 }
