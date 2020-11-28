@@ -14,6 +14,7 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -59,12 +61,12 @@ import java.util.Collections;
 import java.util.List;
 
 import hcmus.student.map.MainActivity;
-import hcmus.student.map.map.utilities.place.GetUrl;
+import hcmus.student.map.map.utilities.SpeedMonitor;
+import hcmus.student.map.map.utilities.place.PlaceSearch;
 import hcmus.student.map.map.utilities.MapsFragmentCallbacks;
 import hcmus.student.map.R;
 import hcmus.student.map.database.Database;
 import hcmus.student.map.database.Place;
-import hcmus.student.map.map.utilities.MapsFragmentCallbacks;
 import hcmus.student.map.map.utilities.MarkerAnimator;
 import hcmus.student.map.map.utilities.OrientationSensor;
 import hcmus.student.map.map.utilities.direction.Direction;
@@ -96,6 +98,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     private Context context;
     private SearchView searchView;
     private ListView listPlace;
+    SpeedMonitor speedMonitor;
+    TextView txtSpeed;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
 
@@ -108,17 +112,19 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         try {
             context = getActivity();
             main = (MainActivity) getActivity();
             mRouteStartMarker = mRouteEndMarker = null;
             mDatabase = new Database(context);
+            speedMonitor = new SpeedMonitor(context);
         } catch (IllegalStateException e) {
             throw new IllegalStateException("MainActivity must implement callbacks");
         }
 
-        String url= GetUrl.TextSearch("quán ăn ở Phú Yên", main);
+        String url= PlaceSearch.TextSearch("HCMUS", main);
         GetPlaces getNearby=new GetPlaces();
         getNearby.execute(url);
 
@@ -136,6 +142,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
 
         listPlace = view.findViewById(R.id.listPlace);
         searchView = view.findViewById(R.id.svSearch);
+        txtSpeed =view.findViewById(R.id.txtSpeed);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -278,6 +285,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                 @Override
                 public void onSuccess(Location location) {
                     if (location != null) {
+
                         mCurrentLocation = location;
                         mMapView.getMapAsync(MapsFragment.this);
                     }
@@ -325,7 +333,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                         public void onLocationResult(LocationResult locationResult) {
                             super.onLocationResult(locationResult);
                             mCurrentLocation = locationResult.getLastLocation();
-                            if (mCurrentLocation != null) animator.animate(mCurrentLocation);
+                            if (mCurrentLocation != null){
+
+                                txtSpeed.setText(Double.toString(speedMonitor.getSpeed(mCurrentLocation))+"km/h");
+                                animator.animate(mCurrentLocation);
+                            }
                         }
                     };
 
@@ -369,7 +381,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     private void showAllAddress() {
         List<Place> places = mDatabase.getAllPlaces();
         for (Place place : places) {
-            createAvatarMarker(new LatLng(place.getLatitude(), place.getLongitude()), place.getAvatar());
+            if(place.getLatitude() != null) {
+                createAvatarMarker(new LatLng(place.getLatitude(), place.getLongitude()), place.getAvatar());
+            }
         }
     }
 
@@ -443,3 +457,4 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                 .icon(descriptor).anchor(0.5f, 0.5f));
     }
 }
+

@@ -3,12 +3,15 @@ package hcmus.student.map.address_book;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -61,15 +64,34 @@ public class AddressBookAdapter extends BaseAdapter {
         TextView txtListItemLatLng = convertView.findViewById(R.id.txt_list_item_lat_lng);
         Place place = getItem(position);
 
+
         txtListItemName.setText(place.getName());
         StringBuilder sb = new StringBuilder();
         Formatter formatter = new Formatter(sb);
-        txtListItemLatLng.setText(formatter.format("(%.2f, %.2f)", place.getLatitude(), place.getLongitude()).toString());
+//        txtListItemLatLng.setText(formatter.format("(%.2f, %.2f)", place.getLatitude(), place.getLongitude()).toString());
+        if(place.getLatitude()==null)
+        {
+            txtListItemLatLng.setText("");
+            txtListItemName.setTypeface(txtListItemName.getTypeface(), Typeface.BOLD);
+
+            txtListItemName.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT));
+
+        }
+        else
+            txtListItemLatLng.setText(formatter.format("(%.2f, %.2f)", place.getLatitude(), place.getLongitude()).toString());
         if (place.getAvatar() != null) {
             Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
             ImageView ivAvatar = convertView.findViewById(R.id.ivAvatar);
             ivAvatar.setBackground(new BitmapDrawable(context.getResources(), bmp));
         }
+        else
+        {
+            ImageView ivAvatar = convertView.findViewById(R.id.ivAvatar);
+            ivAvatar.setVisibility(View.GONE);
+            ImageButton imageButton = convertView.findViewById(R.id.btn_list_item_locate);
+            imageButton.setVisibility(View.GONE);
+        }
+
         return convertView;
     }
 

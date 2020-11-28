@@ -282,6 +282,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             mCurrentLocation = locationResult.getLastLocation();
 
                             if (mCurrentLocation != null) {
+
                                 animateLocationIndicator();
                             }
                         }
