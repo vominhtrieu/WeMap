@@ -26,20 +26,20 @@ import hcmus.student.map.database.Database;
 import hcmus.student.map.database.Place;
 import hcmus.student.map.R;
 
-public class AddressBookAdapter extends BaseAdapter {
+public class AddressFavoriteAdapter extends BaseAdapter {
     Database mDatabase;
     Context context;
     List<Place> places;
 
 
-    public AddressBookAdapter(Context context) {
+    public AddressFavoriteAdapter(Context context) {
         this.context = context;
         this.mDatabase = new Database(context);
         this.places = new ArrayList<>();
     }
 
     public void getUpdate() {
-        places = mDatabase.getPlacesNormal();
+        places = mDatabase.getPlacesFavorite();
         notifyDataSetChanged();
     }
 

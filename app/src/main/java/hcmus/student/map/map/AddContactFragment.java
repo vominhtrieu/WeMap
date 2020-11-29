@@ -110,6 +110,7 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
                         activity.backToPreviousFragment();
                         activity.updateOnscreenMarker(latLng, selectedImage);
                     } catch (Exception e) {
+                        e.printStackTrace();
                         Toast.makeText(activity, "This place is already in contact book", Toast.LENGTH_SHORT).show();
                     }
                 }
