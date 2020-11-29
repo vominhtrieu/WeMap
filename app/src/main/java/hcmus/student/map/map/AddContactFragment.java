@@ -32,7 +32,7 @@ import java.io.InputStream;
 
 import hcmus.student.map.MainActivity;
 import hcmus.student.map.R;
-import hcmus.student.map.database.Database;
+import hcmus.student.map.model.Database;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -110,6 +110,7 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
                         activity.backToPreviousFragment();
                         activity.updateOnscreenMarker(latLng, selectedImage);
                     } catch (Exception e) {
+                        e.printStackTrace();
                         Toast.makeText(activity, "This place is already in contact book", Toast.LENGTH_SHORT).show();
                     }
                 }
