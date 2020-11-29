@@ -21,6 +21,7 @@ public class GetWeatherDetailTask extends AsyncTask<String, Void, DetailWeather>
         try {
             return parser.parse(data);
         } catch (JSONException e) {
+            e.printStackTrace();
             return null;
         }
     }

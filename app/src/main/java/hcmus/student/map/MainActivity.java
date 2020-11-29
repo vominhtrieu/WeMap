@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.os.Looper;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -62,7 +63,7 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        TabLayout mTabs = findViewById(R.id.tabs);
+        final TabLayout mTabs = findViewById(R.id.tabs);
 
         mViewPager = findViewById(R.id.pager);
         mViewPager.setUserInputEnabled(false);
@@ -73,6 +74,11 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
         mTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
+                if (tab.getPosition() == 1 && mCurrentLocation == null) {
+                    Toast.makeText(MainActivity.this, "Detecting location, cannot get your weather status", Toast.LENGTH_SHORT).show();
+                    mTabs.selectTab(mTabs.getTabAt(0));
+                    return;
+                }
                 mViewPager.setCurrentItem(tab.getPosition());
                 mMapFragment = (MapsFragment) adapter.getFragment(0);
             }
