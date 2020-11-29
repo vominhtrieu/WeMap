@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,9 +21,9 @@ import java.util.ArrayList;
 import java.util.Formatter;
 import java.util.List;
 
-import hcmus.student.map.database.Database;
-import hcmus.student.map.database.Place;
 import hcmus.student.map.R;
+import hcmus.student.map.model.Database;
+import hcmus.student.map.model.Place;
 
 public class AddressFavoriteAdapter extends BaseAdapter {
     Database mDatabase;
@@ -63,8 +62,8 @@ public class AddressFavoriteAdapter extends BaseAdapter {
     public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(context);
         convertView = inflater.inflate(R.layout.row_place, null);
-        TextView txtListItemName = convertView.findViewById(R.id.txt_list_item_name);
-        TextView txtListItemLatLng = convertView.findViewById(R.id.txt_list_item_lat_lng);
+        TextView txtListItemName = convertView.findViewById(R.id.txtName);
+        TextView txtListItemLatLng = convertView.findViewById(R.id.txtAddressLine);
         final Place place = getItem(position);
 
         txtListItemName.setText(place.getName());
@@ -76,7 +75,6 @@ public class AddressFavoriteAdapter extends BaseAdapter {
             Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
             ImageView ivAvatar = convertView.findViewById(R.id.ivAvatar);
             ivAvatar.setBackground(new BitmapDrawable(context.getResources(), bmp));
-
         }
 
         final Button btnFavorite = convertView.findViewById(R.id.btnFavorite);

@@ -1,4 +1,4 @@
-package hcmus.student.map.database;
+package hcmus.student.map.model;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -32,6 +32,14 @@ public class Place {
 
     public byte[] getAvatar() {
         return avatar;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setAvatar(byte[] avatar) {
+        this.avatar = avatar;
     }
 
     public String getFavorite() {

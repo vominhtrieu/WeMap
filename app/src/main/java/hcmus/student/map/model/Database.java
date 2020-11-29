@@ -1,4 +1,4 @@
-package hcmus.student.map.database;
+package hcmus.student.map.model;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -59,6 +59,20 @@ public class Database extends SQLiteOpenHelper {
         SQLiteDatabase database = getReadableDatabase();
         Cursor cursor = database.query(TABLE_NAME, null, null, null, null, null, KEY_NAME);
         return cursorToPlaces(cursor);
+    }
+
+    public void deletePlace(Place place) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(TABLE_NAME, KEY_LATITUDE + "=" + place.getLocation().latitude + " AND " + KEY_LONGITUDE + "=" + place.getLocation().longitude, null);
+    }
+
+    public void editPlace(Place place) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(KEY_AVATAR, place.getAvatar());
+        values.put(KEY_NAME, place.getName());
+        db.update(TABLE_NAME, values, KEY_LATITUDE + "=" + place.getLocation().latitude + " AND " + KEY_LONGITUDE + "=" + place.getLocation().longitude, null);
+        db.close();
     }
 
     public void insertPlace(String name, LatLng location, byte[] avatar) {

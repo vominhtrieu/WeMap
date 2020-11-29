@@ -9,7 +9,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import hcmus.student.map.database.Place;
+import hcmus.student.map.model.Place;
 
 public class JSONParser {
     public List<Route> parseRoutes(JSONObject jsonObject) {

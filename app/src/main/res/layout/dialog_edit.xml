@@ -22,12 +22,12 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/txt_place_name"
+                android:text="New place's name"
                 android:textColor="#000"
                 android:textSize="20sp" />
 
             <EditText
-                android:id="@+id/edtName"
+                android:id="@+id/edtNewName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textColor="#000"
@@ -94,27 +94,27 @@
             android:layout_marginTop="10dp">
 
             <Button
-                android:id="@+id/btnAddContact"
+                android:id="@+id/btnOK"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
                 android:layout_marginRight="10dp"
                 android:layout_weight="1"
                 android:background="@drawable/btn_background"
-                android:text="@string/btn_add_contact"
+                android:text="OK"
                 android:textAllCaps="false"
                 android:textColor="#000"
                 android:textSize="20sp" />
 
             <Button
-                android:id="@+id/btnCancelContact"
+                android:id="@+id/btnCancel"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:layout_marginLeft="10dp"
                 android:layout_weight="1"
                 android:background="@drawable/btn_background"
-                android:text="@string/btn_cancel"
+                android:text="CANCEL"
                 android:textAllCaps="false"
                 android:textColor="#000"
                 android:textSize="20sp" />

@@ -24,7 +24,7 @@ import java.io.IOException;
 
 import hcmus.student.map.MainActivity;
 import hcmus.student.map.R;
-import hcmus.student.map.database.Place;
+import hcmus.student.map.model.Place;
 import hcmus.student.map.map.search.SearchClickCallback;
 import hcmus.student.map.map.search.SearchResultAdapter;
 
@@ -66,6 +66,7 @@ public class DirectionFragment extends Fragment implements DirectionFragmentCall
             @Override
             public void onSearchClickCallback(Place place) {
                 activity.drawRoute(origin.getLocation(), dest.getLocation());
+
             }
         });
 
@@ -101,7 +102,6 @@ public class DirectionFragment extends Fragment implements DirectionFragmentCall
             LatLng originLocation = args.getParcelable("origin");
             LatLng destLocation = args.getParcelable("dest");
             Geocoder geocoder = new Geocoder(context);
-            Location location = activity.getLocation();
             try {
 
                 if (originLocation != null)

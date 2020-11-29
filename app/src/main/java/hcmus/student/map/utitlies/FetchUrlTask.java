@@ -1,6 +1,4 @@
-package hcmus.student.map.map.utilities;
-
-import android.graphics.Color;
+package hcmus.student.map.utitlies;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,8 +6,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.net.ssl.HttpsURLConnection;
 

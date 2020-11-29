@@ -18,4 +18,5 @@ public interface MainCallbacks {
     void backToPreviousFragment();
 
     void updateOnscreenMarker(LatLng coordinate, byte[] avt);
+    void locatePlace(LatLng location);
 }

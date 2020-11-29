@@ -32,7 +32,7 @@ import java.io.InputStream;
 
 import hcmus.student.map.MainActivity;
 import hcmus.student.map.R;
-import hcmus.student.map.database.Database;
+import hcmus.student.map.model.Database;
 
 import static android.app.Activity.RESULT_OK;
 

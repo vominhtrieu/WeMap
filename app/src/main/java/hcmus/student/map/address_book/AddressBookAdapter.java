@@ -1,15 +1,20 @@
 package hcmus.student.map.address_book;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
-import android.util.Log;
+import android.location.Geocoder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,12 +24,14 @@ import androidx.annotation.Nullable;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
-import java.util.Formatter;
 import java.util.List;
 
-import hcmus.student.map.database.Database;
-import hcmus.student.map.database.Place;
+import hcmus.student.map.MainActivity;
 import hcmus.student.map.R;
+import hcmus.student.map.model.Database;
+import hcmus.student.map.model.Place;
+import hcmus.student.map.utitlies.AddressLine;
+import hcmus.student.map.utitlies.OnAddressLineResponse;
 
 public class AddressBookAdapter extends BaseAdapter {
     Database mDatabase;
@@ -61,25 +68,107 @@ public class AddressBookAdapter extends BaseAdapter {
     @NonNull
     @Override
     public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        LayoutInflater inflater = LayoutInflater.from(context);
-        convertView = inflater.inflate(R.layout.row_place, null);
-        TextView txtListItemName = convertView.findViewById(R.id.txt_list_item_name);
-        TextView txtListItemLatLng = convertView.findViewById(R.id.txt_list_item_lat_lng);
-        final Place place = getItem(position);
+        if (convertView == null) {
+            LayoutInflater inflater = LayoutInflater.from(context);
+            convertView = inflater.inflate(R.layout.row_place, null, false);
+        }
 
-        txtListItemName.setText(place.getName());
-        StringBuilder sb = new StringBuilder();
-        Formatter formatter = new Formatter(sb);
+        final TextView txtName = convertView.findViewById(R.id.txtName);
+        final TextView txtAddressLine = convertView.findViewById(R.id.txtAddressLine);
+        final Button btnFavorite = convertView.findViewById(R.id.btnFavorite);
+
+        txtAddressLine.setText(R.string.txtLoadingAddressLine);
+        final Place place = getItem(position);
         LatLng location = place.getLocation();
-        txtListItemLatLng.setText(formatter.format("(%.2f, %.2f)", location.latitude, location.longitude).toString());
+
+        AddressLine addressLine = new AddressLine(new Geocoder(context), new OnAddressLineResponse() {
+            @Override
+            public void onAddressLineResponse(String addressLine) {
+                if (addressLine != null) {
+                    txtAddressLine.setText(addressLine);
+                } else {
+                    txtAddressLine.setText(R.string.txtNullLocation);
+                }
+            }
+        });
+
+
+        addressLine.execute(location);
+        txtName.setText(place.getName());
+
         if (place.getAvatar() != null) {
             Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
             ImageView ivAvatar = convertView.findViewById(R.id.ivAvatar);
             ivAvatar.setBackground(new BitmapDrawable(context.getResources(), bmp));
 
         }
+        ImageButton btnDelete = convertView.findViewById(R.id.btnDelete);
+        ImageButton btnEdit = convertView.findViewById(R.id.btnEdit);
 
-        final Button btnFavorite = convertView.findViewById(R.id.btnFavorite);
+        btnDelete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+                alertDialogBuilder.setMessage("Are you sure,You wanted to delete an address?");
+
+                alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface arg0, int arg1) {
+                        mDatabase.deletePlace(place);
+                        places.remove(position);
+                        notifyDataSetChanged();
+                    }
+                });
+
+                alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                    }
+                });
+                alertDialogBuilder.show();
+            }
+        });
+
+        btnEdit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Dialog dialog = new Dialog(context);
+                dialog.setContentView(R.layout.dialog_edit);
+                final EditText edtNewName = dialog.findViewById(R.id.edtNewName);
+
+                Button btnOK = dialog.findViewById(R.id.btnOK);
+                Button btnCancel = dialog.findViewById(R.id.btnCancel);
+
+                btnOK.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        place.setName(edtNewName.getText().toString());
+                        mDatabase.editPlace(place);
+                        notifyDataSetChanged();
+                        dialog.dismiss();
+                    }
+                });
+
+                btnCancel.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dialog.dismiss();
+                    }
+                });
+
+                dialog.show();
+
+            }
+        });
+
+
+        ImageButton btnLocate = convertView.findViewById(R.id.btn_list_item_locate);
+        btnLocate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ((MainActivity) context).locatePlace(place.getLocation());
+            }
+        });
 
         if (place.getFavorite().equals("1"))
             btnFavorite.setBackgroundResource(R.drawable.ic_baseline_favorite_red);
@@ -100,6 +189,7 @@ public class AddressBookAdapter extends BaseAdapter {
                 }
             }
         });
+
         return convertView;
     }
 }

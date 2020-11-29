@@ -1,12 +1,11 @@
 package hcmus.student.map.map.utilities.place;
 
 import android.os.AsyncTask;
-import android.util.Log;
 
 import java.util.List;
 
-import hcmus.student.map.database.Place;
-import hcmus.student.map.map.utilities.FetchUrlTask;
+import hcmus.student.map.model.Place;
+import hcmus.student.map.utitlies.FetchUrlTask;
 import hcmus.student.map.map.utilities.direction.JSONParser;
 
 

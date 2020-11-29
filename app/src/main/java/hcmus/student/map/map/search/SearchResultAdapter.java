@@ -18,8 +18,8 @@ import java.util.List;
 
 import hcmus.student.map.MainActivity;
 import hcmus.student.map.R;
-import hcmus.student.map.database.Database;
-import hcmus.student.map.database.Place;
+import hcmus.student.map.model.Database;
+import hcmus.student.map.model.Place;
 import hcmus.student.map.map.utilities.place.GetPlaces;
 import hcmus.student.map.map.utilities.place.PlaceRespondCallback;
 import hcmus.student.map.map.utilities.place.PlaceSearch;

@@ -22,18 +22,25 @@
             android:id="@+id/tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:tabIndicatorColor="#ff0000"
+            app:tabIndicatorColor="#0070FF"
             app:tabIndicatorGravity="top"
             app:tabIndicatorHeight="3dp"
             app:tabMode="fixed">
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:icon="@drawable/ic_tab_map" />
 
             <com.google.android.material.tabs.TabItem
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:icon="@drawable/ic_tab_weather" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:icon="@drawable/ic_tab_address_book" />
         </com.google.android.material.tabs.TabLayout>
     </androidx.cardview.widget.CardView>
 
