@@ -16,6 +16,7 @@ import hcmus.student.map.R;
 public class AddressBookFragment extends Fragment {
     private MainActivity activity;
     AddressBookAdapter adapter;
+    AddressFavoriteAdapter adapter1;
 
     public static AddressBookFragment newInstance() {
         AddressBookFragment fragment = new AddressBookFragment();
@@ -37,6 +38,10 @@ public class AddressBookFragment extends Fragment {
         ListView lvAddress = v.findViewById(R.id.lvAddress);
         adapter = new AddressBookAdapter(activity);
         lvAddress.setAdapter(adapter);
+
+        ListView lvFavorite = v.findViewById(R.id.lvFavorite);
+        adapter1 = new AddressFavoriteAdapter(activity);
+        lvFavorite.setAdapter(adapter1);
         return v;
     }
 
@@ -44,5 +49,6 @@ public class AddressBookFragment extends Fragment {
     public void onResume() {
         super.onResume();
         adapter.getUpdate();
+        adapter1.getUpdate();
     }
 }

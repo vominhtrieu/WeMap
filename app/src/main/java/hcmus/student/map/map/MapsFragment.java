@@ -11,7 +11,6 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,12 +59,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
 
     private static final int DEFAULT_ZOOM = 15;
     private static final int EPSILON = 5;
+    private static final int NORMAL_ROUTE_WIDTH = 8;
+    private static final int SELECTED_ROUTE_WIDTH = 12;
 
     private GoogleMap mMap;
     private Location mCurrentLocation;
     private Marker mLocationIndicator;
     private Marker marker;
     private ArrayList<Polyline> mRoutes;
+    private List<String> mDurations;
     private Marker mRouteStartMarker, mRouteEndMarker;
     private MapView mMapView;
     private OrientationSensor mSensor;
@@ -74,8 +76,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     private MainActivity main;
     private Context context;
     private DirectionFragment directionFragment;
-    private int i=0;
-    private boolean check=true;
+    private int i = 0;
+    private boolean check = true;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
 
@@ -136,14 +138,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             public void onClick(View v) {
                 i++;
 
-                Handler handler=new Handler();
+                Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @SuppressLint("MissingPermission")
                     @Override
                     public void run() {
-                        if (i==1 && check==true)
-                        {
-                            Toast.makeText(main,"Move camera current location",Toast.LENGTH_SHORT).show();
+                        if (i == 1 && check == true) {
+                            Toast.makeText(main, "Move camera current location", Toast.LENGTH_SHORT).show();
                             if (mCurrentLocation == null) {
                                 Toast.makeText(context, R.string.txtNullLocation, Toast.LENGTH_SHORT).show();
                                 return;
@@ -153,12 +154,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                                     new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()),
                                     mMap.getCameraPosition().zoom >= DEFAULT_ZOOM ? mMap.getCameraPosition().zoom : DEFAULT_ZOOM
                             ));
-                        }
-                        else if (i==2)
-                        {
-                            if (check)
-                            {
-                                check=false;
+                        } else if (i == 2) {
+                            if (check) {
+                                check = false;
                                 if (mCurrentLocation == null) {
                                     Toast.makeText(context, R.string.txtNullLocation, Toast.LENGTH_SHORT).show();
                                     return;
@@ -169,17 +167,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                                         mMap.getCameraPosition().zoom >= DEFAULT_ZOOM ? mMap.getCameraPosition().zoom : DEFAULT_ZOOM
                                 ));
                                 mMap.getUiSettings().setScrollGesturesEnabled(false);
-                                Toast.makeText(main,"Move camera when user find way",Toast.LENGTH_SHORT).show();
-                            }
-                            else
-                            {
+                                Toast.makeText(main, "Move camera when user find way", Toast.LENGTH_SHORT).show();
+                            } else {
                                 mMap.getUiSettings().setScrollGesturesEnabled(true);
-                                check=true;
+                                check = true;
                             }
                         }
-                        i=0;
+                        i = 0;
                     }
-                },500);
+                }, 500);
             }
         });
 
@@ -201,6 +197,20 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                 main.openMarkerInfo(marker);
                 mMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
                 return true;
+            }
+        });
+
+        mMap.setOnPolylineClickListener(new GoogleMap.OnPolylineClickListener() {
+            @RequiresApi(api = Build.VERSION_CODES.O)
+            @Override
+            public void onPolylineClick(Polyline polyline) {
+                for (Polyline route : mRoutes) {
+                    route.setZIndex(0);
+                    route.setWidth(NORMAL_ROUTE_WIDTH);
+                }
+                polyline.setWidth(SELECTED_ROUTE_WIDTH);
+                polyline.setZIndex(1);
+                main.openRouteInfo(polyline.getTag().toString(), polyline.getColor());
             }
         });
 
@@ -285,7 +295,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     public void moveCamera(LatLng location) {
 
 //        mMap.setMyLocationEnabled(true);
-        LatLng markerLoc=new LatLng(location.latitude, location.longitude);
+        LatLng markerLoc = new LatLng(location.latitude, location.longitude);
         final CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(markerLoc)
                 .zoom(13)
@@ -340,7 +350,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     }
 
     @Override
-    public void onRouteRespond(List<PolylineOptions> polylineOptions) {
+    public void onRouteRespond(List<PolylineOptions> polylineOptions, List<String> durations) {
         if (mRoutes != null) {
             for (int i = 0; i < mRoutes.size(); i++) {
                 mRoutes.get(i).remove();
@@ -353,15 +363,22 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         }
 
         mRoutes = new ArrayList<>();
+        mDurations = durations;
 
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        for (PolylineOptions route : polylineOptions) {
-            mRoutes.add(mMap.addPolyline(route));
+        for (int i = 0; i < polylineOptions.size(); i++) {
+            PolylineOptions route = polylineOptions.get(i);
+            Polyline polyline = mMap.addPolyline((route));
+            polyline.setClickable(true);
+            polyline.setTag(durations.get(i));
+            polyline.setZIndex(0);
+            mRoutes.add(polyline);
             List<LatLng> points = route.getPoints();
             for (LatLng point : points) {
                 builder.include(point);
             }
         }
+
         LatLngBounds bounds = builder.build();
 
         mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200), 1000, null);

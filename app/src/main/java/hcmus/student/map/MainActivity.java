@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
@@ -44,6 +45,7 @@ import java.util.List;
 import hcmus.student.map.map.AddContactFragment;
 import hcmus.student.map.map.MapsFragment;
 import hcmus.student.map.map.MarkerInfoFragment;
+import hcmus.student.map.map.RouteInfoFragment;
 import hcmus.student.map.map.utilities.LocationChangeCallback;
 
 
@@ -257,6 +259,14 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
         fragmentTransaction.commit();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    @Override
+    public void openRouteInfo(String routeDuration, int routeColor) {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(R.id.frameBottom, RouteInfoFragment.newInstance(routeDuration, routeColor));
+        fragmentTransaction.commit();
+    }
+
     @Override
     public void onBackPressed() {
         if (mViewPager.getCurrentItem() == 0 && adapter.getFragment(0).getChildFragmentManager().getBackStackEntryCount() > 0) {
@@ -268,6 +278,6 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
 
     @Override
     public void updateOnscreenMarker(LatLng coordinate, byte[] avt) {
-        mMapFragment.createAvatarMarker(coordinate, avt);
+        ((MapsFragment)adapter.getFragment(0)).createAvatarMarker(coordinate, avt);
     }
 }

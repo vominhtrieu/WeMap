@@ -11,7 +11,8 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:background="@drawable/icon_image"
-        android:scaleType="fitXY" />
+        android:scaleType="fitXY"
+        android:src="@drawable/ic_avatar_boundary" />
 
     <LinearLayout
         android:layout_width="0dp"
@@ -23,40 +24,51 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/txtListItemName"
+            android:id="@+id/txtName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@android:color/black"
             android:textSize="20sp" />
 
         <TextView
-            android:id="@+id/txtListItemAddressLine"
+            android:id="@+id/txtAddressLine"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="14sp" />
+
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center_horizontal|center_vertical">
+        android:gravity="center_horizontal|center_vertical"
+        android:orientation="vertical">
+
         <ImageButton
             android:id="@+id/btnDelete"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:background="@drawable/ic_trash"
-            android:layout_marginBottom="10dp"/>
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/ic_trash" />
+
         <ImageButton
             android:id="@+id/btnEdit"
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:background="@drawable/ic_edit"/>
+            android:background="@drawable/ic_edit" />
     </LinearLayout>
+
+    <Button
+        android:id="@+id/btnFavorite"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_gravity="center_vertical"
+        android:background="@drawable/ic_baseline_favorite" />
+
     <ImageButton
         android:id="@+id/btn_list_item_locate"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
         android:layout_gravity="center"
         android:background="@drawable/location_indicator_button" />
 </LinearLayout>

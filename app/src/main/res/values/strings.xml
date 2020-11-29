@@ -10,6 +10,7 @@
     <string name="btn_cancel">Cancel</string>
     <string name="title_address_book">All Address</string>
     <string name="btn_direction">Direction</string>
+    <string name="routeinfo_duration">Duration:</string>
     <string name="hint_origin_edt">Origin</string>
     <string name="hint_destination_edt">Destination</string>
     <string name="txtUnknownLocation">Unknown location</string>
