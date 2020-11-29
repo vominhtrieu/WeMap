@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Formatter;
 
 import hcmus.student.map.database.Database;
@@ -34,10 +38,59 @@ public class AddressBookAdapter extends BaseAdapter {
         this.mDatabase = new Database(context);
         this.places = new ArrayList<>();
     }
+    Comparator<Place> compareById = new Comparator<Place>() {
+        @Override
+        public int compare(Place o1, Place o2) {
+            return o1.getName().compareToIgnoreCase(o2.getName());
+        }
+
+
+    };
+    public void sortPlaces(ArrayList<Place>places)
+    {
+
+        Collections.sort(places,compareById);
+
+        for (int i = 0; i <places.size() ; i++) {
+            Log.e("name:", "sortPlaces: "+places.get(i).getName());
+
+        }
+
+    }
+    public ArrayList<Place> groupContacts(ArrayList<Place>places)
+    {
+
+        if(places.size()==0)
+            return null;
+        ArrayList<Place>tmp = new ArrayList<>();
+
+        sortPlaces(places);
+        char c = Character.toUpperCase(places.get(0).getName().charAt(0));
+        Place place = new Place(Character.toString(c),null, null,null);
+        tmp.add(place);
+
+        for(int i=0;i<places.size();i++)
+        {
+            if(Character.toUpperCase(places.get(i).getName().charAt(0))!=c)
+            {
+                c = Character.toUpperCase(places.get(i).getName().charAt(0));
+
+                place = new Place(Character.toString(c),null, null,null);
+                tmp.add(place);
+
+            }
+
+            tmp.add(places.get(i));
+        }
+
+        return tmp;
+    }
 
     public void getUpdate() {
         places = mDatabase.getAllPlaces();
+        places = groupContacts(places);
         notifyDataSetChanged();
+
     }
 
     @Override

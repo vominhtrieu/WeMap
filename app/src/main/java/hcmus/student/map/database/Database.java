@@ -28,6 +28,7 @@ public class Database extends SQLiteOpenHelper {
         Cursor cursor = database.query(TABLE_NAME, null, null, null, null, null, KEY_NAME);
         ArrayList<Place> places = new ArrayList<>();
         ArrayList<Place>tmp = new ArrayList<>();
+
         if (cursor == null || !cursor.moveToFirst())
             return places;
         while (true) {
@@ -36,20 +37,6 @@ public class Database extends SQLiteOpenHelper {
                     cursor.getDouble(2), cursor.getBlob(3));
 
             places.add(place);
-            int size = places.size();
-            for(int i = 0; i < size;i++)
-            {
-                if(places.get(i).getName().compareTo(place.getName())>0)
-                {
-                    for(int j = size-1; j > i; j--)
-                    {
-                        places.set(j,places.get(j-1));
-                    }
-                    places.set(i,place);
-                    break;
-                }
-
-            }
 
             if (cursor.isLast()) {
                 break;
@@ -59,26 +46,27 @@ public class Database extends SQLiteOpenHelper {
 
         }
 
-        char c = places.get(0).getName().charAt(0);
-        Place place = new Place(Character.toString(Character.toUpperCase(c)),null, null,null);
-        tmp.add(place);
+//        char c = places.get(0).getName().charAt(0);
+//        Place place = new Place(Character.toString(Character.toUpperCase(c)),null, null,null);
+//        tmp.add(place);
+//
+//        for(int i=0;i<places.size();i++)
+//        {
+//            if(places.get(i).getName().charAt(0)!=c)
+//            {
+//                c = places.get(i).getName().charAt(0);
+//
+//                place = new Place(Character.toString(Character.toUpperCase(c)),null, null,null);
+//                tmp.add(place);
+//
+//            }
+//
+//            tmp.add(places.get(i));
+//
+//        }
+//       return tmp;
 
-        for(int i=0;i<places.size();i++)
-        {
-            if(places.get(i).getName().charAt(0)!=c)
-            {
-                c = places.get(i).getName().charAt(0);
-
-                place = new Place(Character.toString(Character.toUpperCase(c)),null, null,null);
-                tmp.add(place);
-
-            }
-
-            tmp.add(places.get(i));
-
-        }
-       return tmp;
-
+       return places;
 
     }
 
