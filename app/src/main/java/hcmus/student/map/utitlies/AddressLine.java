@@ -22,7 +22,7 @@ public class AddressLine extends AsyncTask<LatLng, Void, String> {
         LatLng location = locations[0];
         try {
             return geocoder.getFromLocation(location.latitude, location.longitude, 1).get(0).getAddressLine(0);
-        } catch (IOException e) {
+        } catch (Exception e) {
             return null;
         }
     }
