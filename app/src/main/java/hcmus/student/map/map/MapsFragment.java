@@ -5,10 +5,12 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +37,7 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -63,8 +66,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     private Location mCurrentLocation;
     private Marker mLocationIndicator;
     private Marker marker;
+    private List<Marker> mContactMarkers;
     private ArrayList<Polyline> mRoutes;
-    private List<String> mDurations;
     private Marker mRouteStartMarker, mRouteEndMarker;
     private MapView mMapView;
     private OrientationSensor mSensor;
@@ -73,6 +76,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     private MainActivity main;
     private Context context;
     private DirectionFragment directionFragment;
+
+    private boolean isContactShown = false;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
 
@@ -91,6 +96,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             main = (MainActivity) getActivity();
             mRouteStartMarker = mRouteEndMarker = null;
             mDatabase = new Database(context);
+            mContactMarkers = new ArrayList<>();
         } catch (IllegalStateException e) {
             throw new IllegalStateException("MainActivity must implement callbacks");
         }
@@ -127,6 +133,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         ImageButton btnLocation = getView().findViewById(R.id.btnLocation);
+        final FloatingActionButton btnContact = getView().findViewById(R.id.btnContact);
 
         btnLocation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -135,6 +142,21 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                         new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()),
                         mMap.getCameraPosition().zoom >= DEFAULT_ZOOM ? mMap.getCameraPosition().zoom : DEFAULT_ZOOM
                 ));
+            }
+        });
+
+        btnContact.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isContactShown) {
+                    hideAllAddress();
+                    btnContact.setImageDrawable(ResourcesCompat.getDrawable(getResources() ,R.drawable.ic_btn_show_contact, null));
+                    isContactShown = false;
+                } else {
+                    showAllAddress();
+                    btnContact.setImageDrawable(ResourcesCompat.getDrawable(getResources() ,R.drawable.ic_btn_hide_contact, null));
+                    isContactShown = true;
+                }
             }
         });
 
@@ -171,8 +193,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                 main.openRouteInfo(polyline.getTag().toString(), polyline.getColor());
             }
         });
-
-        showAllAddress();
     }
 
     @Override
@@ -236,6 +256,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         }
     }
 
+    private void hideAllAddress() {
+        for (Marker marker : mContactMarkers) {
+            marker.remove();
+        }
+    }
+
     public void showDirectionFragment(LatLng origin, LatLng dest) {
         directionFragment = DirectionFragment.newInstance(origin, dest);
 
@@ -269,8 +295,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             canvas.drawBitmap(bmpAvatar, 5, 5, null);
         }
 
-        mMap.addMarker(new MarkerOptions().position(coordinate)
-                .icon(BitmapDescriptorFactory.fromBitmap(bmpMarker)));
+        mContactMarkers.add(mMap.addMarker(new MarkerOptions().position(coordinate)
+                .icon(BitmapDescriptorFactory.fromBitmap(bmpMarker))));
     }
 
     @Override
@@ -300,7 +326,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         }
 
         mRoutes = new ArrayList<>();
-        mDurations = durations;
 
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         for (int i = 0; i < polylineOptions.size(); i++) {
