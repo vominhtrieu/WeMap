@@ -276,6 +276,6 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
 
     @Override
     public void updateOnscreenMarker(LatLng coordinate, byte[] avt) {
-        mMapFragment.createAvatarMarker(coordinate, avt);
+        ((MapsFragment)adapter.getFragment(0)).createAvatarMarker(coordinate, avt);
     }
 }
