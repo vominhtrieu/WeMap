@@ -1,5 +1,6 @@
 package hcmus.student.map.map;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,6 +10,8 @@ import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +32,7 @@ import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -70,6 +74,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     private MainActivity main;
     private Context context;
     private DirectionFragment directionFragment;
+    private int i=0;
+    private boolean check=true;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
 
@@ -128,15 +134,52 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         btnLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mCurrentLocation == null) {
-                    Toast.makeText(context, R.string.txtNullLocation, Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                i++;
 
-                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                        new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()),
-                        mMap.getCameraPosition().zoom >= DEFAULT_ZOOM ? mMap.getCameraPosition().zoom : DEFAULT_ZOOM
-                ));
+                Handler handler=new Handler();
+                handler.postDelayed(new Runnable() {
+                    @SuppressLint("MissingPermission")
+                    @Override
+                    public void run() {
+                        if (i==1 && check==true)
+                        {
+                            Toast.makeText(main,"Move camera current location",Toast.LENGTH_SHORT).show();
+                            if (mCurrentLocation == null) {
+                                Toast.makeText(context, R.string.txtNullLocation, Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                                    new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()),
+                                    mMap.getCameraPosition().zoom >= DEFAULT_ZOOM ? mMap.getCameraPosition().zoom : DEFAULT_ZOOM
+                            ));
+                        }
+                        else if (i==2)
+                        {
+                            if (check)
+                            {
+                                check=false;
+                                if (mCurrentLocation == null) {
+                                    Toast.makeText(context, R.string.txtNullLocation, Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+
+                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+                                        new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()),
+                                        mMap.getCameraPosition().zoom >= DEFAULT_ZOOM ? mMap.getCameraPosition().zoom : DEFAULT_ZOOM
+                                ));
+                                mMap.getUiSettings().setScrollGesturesEnabled(false);
+                                Toast.makeText(main,"Move camera when user find way",Toast.LENGTH_SHORT).show();
+                            }
+                            else
+                            {
+                                mMap.getUiSettings().setScrollGesturesEnabled(true);
+                                check=true;
+                            }
+                        }
+                        i=0;
+                    }
+                },500);
             }
         });
 
@@ -236,6 +279,24 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         transaction.replace(R.id.frameTop, directionFragment);
         transaction.addToBackStack(null);
         transaction.commit();
+    }
+
+    @Override
+    public void moveCamera(LatLng location) {
+
+//        mMap.setMyLocationEnabled(true);
+        LatLng markerLoc=new LatLng(location.latitude, location.longitude);
+        final CameraPosition cameraPosition = new CameraPosition.Builder()
+                .target(markerLoc)
+                .zoom(13)
+                .bearing(90)
+                .tilt(30)
+                .build();
+        mMap.addMarker(new MarkerOptions().position(new LatLng(location.latitude, location.longitude)).title("Marker"));
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
     }
 
     @Override

@@ -28,6 +28,8 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.location.LocationSettingsResponse;
 import com.google.android.gms.location.SettingsClient;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -98,6 +100,8 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_STATUS_CODE);
         }
     }
+
+
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -218,6 +222,13 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
     public void drawRoute(LatLng start, LatLng end) {
         MapsFragment fragment = (MapsFragment) adapter.getFragment(0);
         fragment.drawRoute(start, end);
+    }
+
+    @Override
+    public void locatePlace(LatLng location) {
+        mViewPager.setCurrentItem(0);
+        MapsFragment fragment = (MapsFragment) adapter.getFragment(0);
+        fragment.moveCamera(location);
     }
 
     @Override

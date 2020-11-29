@@ -66,6 +66,7 @@ public class DirectionFragment extends Fragment implements DirectionFragmentCall
             @Override
             public void onSearchClickCallback(Place place) {
                 activity.drawRoute(origin.getLocation(), dest.getLocation());
+
             }
         });
 

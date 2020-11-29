@@ -24,4 +24,15 @@ public class Place {
     public byte[] getAvatar() {
         return avatar;
     }
+
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+
+
+    public void setAvatar(byte[] avatar) {
+        this.avatar = avatar;
+    }
 }
