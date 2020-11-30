@@ -3,25 +3,27 @@
     android:layout_width="72dp"
     android:layout_height="match_parent"
     android:layout_gravity="center"
-    android:gravity="center"
     android:orientation="vertical">
 
     <TextView
         android:id="@+id/txtDayOfWeek"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:textAllCaps="true"
         android:textColor="@android:color/white" />
 
     <ImageView
         android:id="@+id/ivWeatherStatus"
         android:layout_width="64dp"
-        android:layout_height="64dp" />
+        android:layout_height="64dp"
+        android:layout_gravity="center" />
 
     <TextView
         android:id="@+id/txtMinTemp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:layout_marginEnd="2dp"
         android:layout_marginRight="2dp"
         android:textColor="@color/colorLowTemp"
@@ -31,6 +33,7 @@
         android:id="@+id/txtMaxTemp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:textColor="@color/colorHighTemp"
         android:textSize="14sp" />
 

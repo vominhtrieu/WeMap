@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:id="@+id/mapRoot">
 
-    <com.google.android.gms.maps.MapView
-        android:id="@+id/map"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <com.google.android.gms.maps.MapView
+            android:id="@+id/map"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -21,11 +27,12 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="20dp"
-            android:scaleType="center"
-            app:fabCustomSize="64dp"
-            app:borderWidth="0dp"
             android:backgroundTint="@android:color/white"
-            android:src="@drawable/ic_btn_show_contact" />
+            android:scaleType="center"
+            android:src="@drawable/ic_btn_show_contact"
+            app:borderWidth="0dp"
+            app:fabCustomSize="64dp" />
+
         <ImageButton
             android:id="@+id/btnLocation"
             android:layout_width="64dp"
@@ -39,13 +46,18 @@
         android:id="@+id/frameBottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
         android:layout_gravity="bottom" />
 
     <FrameLayout
         android:id="@+id/frameTop"
+        android:clickable="true"
+        android:focusable="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top">
+
         <fragment
             class="hcmus.student.map.map.search.SearchFragment"
             android:layout_width="match_parent"

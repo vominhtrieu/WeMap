@@ -7,7 +7,10 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -45,6 +48,7 @@ public class WeatherFragment extends Fragment implements OnAddressLineResponse, 
 
     private View container;
     private Context context;
+    private LinearLayout weatherForecastContainer;
 
     public static WeatherFragment newInstance() {
         Bundle args = new Bundle();
@@ -63,7 +67,7 @@ public class WeatherFragment extends Fragment implements OnAddressLineResponse, 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_weather, null, false);
+        View view = inflater.inflate(R.layout.fragment_weather, container, false);
         this.container = view.findViewById(R.id.container);
         this.container.setVisibility(View.INVISIBLE);
         txtPlaceName = view.findViewById(R.id.txtPlaceName);
@@ -73,16 +77,43 @@ public class WeatherFragment extends Fragment implements OnAddressLineResponse, 
         txtRain = view.findViewById(R.id.txtRain);
         txtWind = view.findViewById(R.id.txtWind);
         txtHumidity = view.findViewById(R.id.txtHumidity);
+        weatherForecastContainer = view.findViewById(R.id.weatherForecastContainer);
 
         //Recycle View
         rvWeather = view.findViewById(R.id.rvWeather);
-        LinearLayoutManager manager = new LinearLayoutManager(getContext());
+        final LinearLayoutManager manager = new LinearLayoutManager(getContext());
         manager.setOrientation(LinearLayoutManager.HORIZONTAL);
         rvWeather.setLayoutManager(manager);
         rvWeather.setItemAnimator(new DefaultItemAnimator());
         adapter = new WeatherAdapter(getContext());
         rvWeather.setAdapter(adapter);
         rvWeather.setHasFixedSize(false);
+
+        ImageButton btnLeft = view.findViewById(R.id.btnLeft);
+        ImageButton btnRight = view.findViewById(R.id.btnRight);
+
+        btnLeft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int firstVisibleItemIndex = manager.findFirstCompletelyVisibleItemPosition();
+                if (firstVisibleItemIndex > 0) {
+                    manager.smoothScrollToPosition(rvWeather,null,firstVisibleItemIndex-1);
+                }
+            }
+        });
+
+        btnRight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int totalItemCount = rvWeather.getAdapter().getItemCount();
+                if (totalItemCount <= 0) return;
+                int lastVisibleItemIndex = manager.findLastVisibleItemPosition();
+
+                if (lastVisibleItemIndex >= totalItemCount) return;
+                manager.smoothScrollToPosition(rvWeather, null, lastVisibleItemIndex + 1);
+            }
+
+        });
 
         txtPlaceName.setText(R.string.txt_loading_address_line);
         AddressLine addressLine = new AddressLine(new Geocoder(getContext()), this);
@@ -114,6 +145,7 @@ public class WeatherFragment extends Fragment implements OnAddressLineResponse, 
             txtRain.setText(String.format(Locale.US, "%.1fmm", detailWeather.getRain()));
             txtWind.setText(String.format(Locale.US, "%.1fmph", detailWeather.getWindSpeed()));
             txtHumidity.setText(String.format(Locale.US, "%.1f%%", detailWeather.getHumidity()));
+            weatherForecastContainer.setVisibility(View.VISIBLE);
             adapter.update(detailWeather.getDailyWeathers());
         }
     }
