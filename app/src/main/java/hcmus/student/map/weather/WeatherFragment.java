@@ -107,10 +107,8 @@ public class WeatherFragment extends Fragment implements OnAddressLineResponse, 
     public void onDetailWeatherResponse(DetailWeather detailWeather) {
         if (detailWeather != null) {
             container.setVisibility(View.VISIBLE);
-            if (detailWeather.getIcon() != null) {
-                int imageId = context.getResources().getIdentifier("ic_weather_" + detailWeather.getIcon(), "drawable", context.getPackageName());
-                ivWeatherStatus.setImageResource(imageId);
-            }
+            int imageId = context.getResources().getIdentifier("ic_weather_" + detailWeather.getIcon(), "drawable", context.getPackageName());
+            ivWeatherStatus.setImageResource(imageId);
             txtTemperature.setText(String.format(Locale.US, "%.1f°", detailWeather.getTemperature()));
             txtDescription.setText(detailWeather.getDescription());
             txtRain.setText(String.format(Locale.US, "%.1fmm", detailWeather.getRain()));

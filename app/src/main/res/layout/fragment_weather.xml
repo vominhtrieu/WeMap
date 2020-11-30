@@ -132,8 +132,13 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:gravity="center"
+        android:orientation="horizontal"
         android:layout_marginTop="20dp">
-
+        <ImageButton
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center|end"
+            android:background="@drawable/ic_baseline_left"/>
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvWeather"
             android:layout_width="288dp"
@@ -141,6 +146,11 @@
             android:orientation="horizontal"
             android:overScrollMode="never"
             android:layout_gravity="center" />
+        <ImageButton
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center|start"
+            android:background="@drawable/ic_baseline_right"/>
     </LinearLayout>
 
 </FrameLayout>
