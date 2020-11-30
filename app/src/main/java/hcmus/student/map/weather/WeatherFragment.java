@@ -84,7 +84,7 @@ public class WeatherFragment extends Fragment implements OnAddressLineResponse, 
         rvWeather.setAdapter(adapter);
         rvWeather.setHasFixedSize(false);
 
-        txtPlaceName.setText(R.string.txtLoadingAddressLine);
+        txtPlaceName.setText(R.string.txt_loading_address_line);
         AddressLine addressLine = new AddressLine(new Geocoder(getContext()), this);
         Location location = activity.getLocation();
         addressLine.execute(new LatLng(location.getLatitude(), location.getLongitude()));

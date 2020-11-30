@@ -77,7 +77,7 @@ public class AddressBookAdapter extends BaseAdapter {
         final TextView txtAddressLine = convertView.findViewById(R.id.txtAddressLine);
         final Button btnFavorite = convertView.findViewById(R.id.btnFavorite);
 
-        txtAddressLine.setText(R.string.txtLoadingAddressLine);
+        txtAddressLine.setText(R.string.txt_loading_address_line);
         final Place place = getItem(position);
         LatLng location = place.getLocation();
 

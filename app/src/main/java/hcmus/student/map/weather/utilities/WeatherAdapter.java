@@ -1,6 +1,7 @@
 package hcmus.student.map.weather.utilities;
 
 import android.content.Context;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,7 +68,14 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherV
 
         calendar.add(Calendar.DATE, -position);
 
-        String dayOfWeek = new SimpleDateFormat("EE", Locale.ENGLISH).format(date.getTime());
+        Locale locale;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            locale = context.getResources().getConfiguration().getLocales().get(0);
+        } else {
+            locale = context.getResources().getConfiguration().locale;
+        }
+
+        String dayOfWeek = new SimpleDateFormat("EE", locale).format(date.getTime());
 
         holder.txtDayOfWeek.setText(dayOfWeek);
         int imageId = context.getResources().getIdentifier("ic_weather_" + dailyWeather.getIcon(), "drawable", context.getPackageName());
