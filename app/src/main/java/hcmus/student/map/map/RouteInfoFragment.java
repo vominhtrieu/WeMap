@@ -1,6 +1,5 @@
 package hcmus.student.map.map;
 
-import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -10,7 +9,6 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import hcmus.student.map.MainActivity;
@@ -52,7 +50,7 @@ public class RouteInfoFragment extends Fragment {
         txtDuration = view.findViewById(R.id.txtDuration);
         vRouteIndicator = view.findViewById(R.id.vRouteIndicator);
         Bundle args = getArguments();
-        String routeDuration = activity.getText(R.string.routeinfo_duration) + " " + args.getString("duration");
+        String routeDuration = activity.getText(R.string.route_info_duration) + " " + args.getString("duration");
         int routeColor = args.getInt("color");
         txtDuration.setText(routeDuration);
         vRouteIndicator.setBackgroundColor(routeColor);

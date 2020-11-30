@@ -1,12 +1,9 @@
 package hcmus.student.map.utitlies;
 
-import android.content.Context;
 import android.location.Geocoder;
 import android.os.AsyncTask;
 
 import com.google.android.gms.maps.model.LatLng;
-
-import java.io.IOException;
 
 public class AddressLine extends AsyncTask<LatLng, Void, String> {
     Geocoder geocoder;
