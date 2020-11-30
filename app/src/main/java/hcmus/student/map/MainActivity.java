@@ -7,11 +7,14 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Location;
+import android.location.LocationListener;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Looper;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -19,10 +22,12 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationAvailability;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -58,7 +63,6 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
     private ViewPager2 mViewPager;
     private ViewPagerAdapter adapter;
     private Location mCurrentLocation;
-    private MapsFragment mMapFragment;
     private List<LocationChangeCallback> delegates;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -84,7 +88,6 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
                     return;
                 }
                 mViewPager.setCurrentItem(tab.getPosition());
-                mMapFragment = (MapsFragment) adapter.getFragment(0);
             }
 
             @Override
@@ -97,6 +100,7 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
         });
 
         mClient = LocationServices.getFusedLocationProviderClient(this);
+
         delegates = new ArrayList<>();
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -108,8 +112,6 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_STATUS_CODE);
         }
     }
-
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -168,7 +170,13 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
 
     private void enableLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            listenToLocationChange();
+            Task<LocationAvailability> task = mClient.getLocationAvailability();
+            task.addOnSuccessListener(new OnSuccessListener<LocationAvailability>() {
+                @Override
+                public void onSuccess(LocationAvailability locationAvailability) {
+                    listenToLocationChange();
+                }
+            });
         } else {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Warning!");
@@ -219,9 +227,10 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
     }
 
     public void openMarkerInfo(Marker marker) {
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
-        fragmentTransaction.add(R.id.frameBottom, MarkerInfoFragment.newInstance(marker));
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);;
+        fragmentTransaction.replace(R.id.frameBottom, MarkerInfoFragment.newInstance(marker));
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
         fragmentTransaction.commit();
