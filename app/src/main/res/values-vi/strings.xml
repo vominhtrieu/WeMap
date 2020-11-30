@@ -1,2 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="app_name">Bản đồ</string>
+    <string name="title_activity_maps">Bản đồ</string>
+    <string name="txt_latitude">Kinh độ:</string>
+    <string name="txt_longitude">Vĩ độ:</string>
+    <string name="btn_add_contact">Thêm</string>
+    <string name="txt_place_name">Tên địa điểm</string>
+    <string name="instruction_photo_select">Chọn một bức hình làm ảnh đại diện(Tuỳ chọn)</string>
+    <string name="btn_add">Thêm</string>
+    <string name="btn_cancel">Hủy</string>
+    <string name="title_address_book">Tất Cả Địa Điểm</string>
+    <string name="btn_direction">Chỉ đường</string>
+    <string name="hint_origin_edt">Điều bắt đầu</string>
+    <string name="txtUnknownLocation">Vị trí không xác định</string>
+    <string name="txtCurrentLocation">Vị trí hiện tại</string>
+    <string name="txtNullLocation">Không thể xác định vị trí</string>
+    <string name="txt_loading_address_line">Đang tải địa chỉ</string>
+    <string name="txtDetectingLocation">Đang xác định vị trí, không thể đổi tab</string>
+    <string name="hint_destination_edt">Điểm đích</string>
+    <string name="route_info_duration">Thời gian:</string>
+    <string name="txt_search">Tìm kiếm...</string>
+</resources>

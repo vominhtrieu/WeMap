@@ -78,8 +78,8 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
         mTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                if (tab.getPosition() == 1 && mCurrentLocation == null) {
-                    Toast.makeText(MainActivity.this, "Detecting location, cannot get your weather status", Toast.LENGTH_SHORT).show();
+                if (tab.getPosition() > 0 && mCurrentLocation == null) {
+                    Toast.makeText(MainActivity.this, R.string.txtDetectingLocation, Toast.LENGTH_SHORT).show();
                     mTabs.selectTab(mTabs.getTabAt(0));
                     return;
                 }

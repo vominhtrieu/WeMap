@@ -77,11 +77,11 @@ public class WeatherFragment extends Fragment implements OnAddressLineResponse, 
         manager.setOrientation(LinearLayoutManager.HORIZONTAL);
         rvWeather.setLayoutManager(manager);
         rvWeather.setItemAnimator(new DefaultItemAnimator());
-        adapter = new WeatherAdapter();
+        adapter = new WeatherAdapter(getContext());
         rvWeather.setAdapter(adapter);
         rvWeather.setHasFixedSize(false);
 
-        txtPlaceName.setText(R.string.txtLoadingAddressLine);
+        txtPlaceName.setText(R.string.txt_loading_address_line);
         AddressLine addressLine = new AddressLine(new Geocoder(getContext()), this);
         Location location = activity.getLocation();
         addressLine.execute(new LatLng(location.getLatitude(), location.getLongitude()));
