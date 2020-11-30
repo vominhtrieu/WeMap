@@ -1,5 +1,6 @@
 package hcmus.student.map.weather;
 
+import android.content.Context;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
@@ -43,6 +44,7 @@ public class WeatherFragment extends Fragment implements OnAddressLineResponse, 
     private WeatherAdapter adapter;
 
     private View container;
+    private Context context;
 
     public static WeatherFragment newInstance() {
         Bundle args = new Bundle();
@@ -55,6 +57,7 @@ public class WeatherFragment extends Fragment implements OnAddressLineResponse, 
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = (MainActivity) getActivity();
+        context = getContext();
     }
 
     @Nullable
@@ -77,7 +80,7 @@ public class WeatherFragment extends Fragment implements OnAddressLineResponse, 
         manager.setOrientation(LinearLayoutManager.HORIZONTAL);
         rvWeather.setLayoutManager(manager);
         rvWeather.setItemAnimator(new DefaultItemAnimator());
-        adapter = new WeatherAdapter();
+        adapter = new WeatherAdapter(getContext());
         rvWeather.setAdapter(adapter);
         rvWeather.setHasFixedSize(false);
 
@@ -87,7 +90,7 @@ public class WeatherFragment extends Fragment implements OnAddressLineResponse, 
         addressLine.execute(new LatLng(location.getLatitude(), location.getLongitude()));
 
         GetWeatherDetailTask getWeatherDetailTask = new GetWeatherDetailTask(this);
-        String url = GetWeather.getUrl(getContext(), new LatLng(location.getLatitude(), location.getLongitude()));
+        String url = GetWeather.getUrl(context, new LatLng(location.getLatitude(), location.getLongitude()));
         getWeatherDetailTask.execute(url);
         return view;
     }
@@ -105,7 +108,8 @@ public class WeatherFragment extends Fragment implements OnAddressLineResponse, 
         if (detailWeather != null) {
             container.setVisibility(View.VISIBLE);
             if (detailWeather.getIcon() != null) {
-                ivWeatherStatus.setImageBitmap(detailWeather.getIcon());
+                int imageId = context.getResources().getIdentifier("ic_weather_" + detailWeather.getIcon(), "drawable", context.getPackageName());
+                ivWeatherStatus.setImageResource(imageId);
             }
             txtTemperature.setText(String.format(Locale.US, "%.1f°", detailWeather.getTemperature()));
             txtDescription.setText(detailWeather.getDescription());
