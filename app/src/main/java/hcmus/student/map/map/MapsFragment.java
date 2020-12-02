@@ -17,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -52,6 +53,7 @@ import hcmus.student.map.map.direction.DirectionFragment;
 import hcmus.student.map.map.utilities.LocationChangeCallback;
 import hcmus.student.map.map.utilities.MarkerAnimator;
 import hcmus.student.map.map.utilities.OrientationSensor;
+import hcmus.student.map.map.utilities.SpeedMonitor;
 import hcmus.student.map.map.utilities.direction.Direction;
 import hcmus.student.map.map.utilities.direction.DirectionResponse;
 import hcmus.student.map.map.utilities.direction.DirectionTask;
@@ -83,6 +85,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     private boolean check = true;
 
     private boolean isContactShown = false;
+    SpeedMonitor speedMonitor;
+    TextView txtSpeed;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
 
@@ -102,6 +106,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             mRouteStartMarker = mRouteEndMarker = null;
             mDatabase = new Database(context);
             mContactMarkers = new ArrayList<>();
+            speedMonitor = new SpeedMonitor(context);
         } catch (IllegalStateException e) {
             throw new IllegalStateException("MainActivity must implement callbacks");
         }
@@ -116,6 +121,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         SensorManager sensorService = (SensorManager) main.getSystemService(Context.SENSOR_SERVICE);
         mMapView = view.findViewById(R.id.map);
         mMapView.onCreate(savedInstanceState);
+        txtSpeed =view.findViewById(R.id.txtSpeed);
         //Implement Rotation change here
         mSensor = new OrientationSensor(sensorService) {
             float previousRotation = 0;
@@ -257,6 +263,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                     location.getLongitude()), DEFAULT_ZOOM));
         }
         mCurrentLocation = location;
+//        txtSpeed.setText(Double.toString(speedMonitor.getSpeed(mCurrentLocation))+"km/h");
+//        speedMonitor.getSpeed(mCurrentLocation);
+        txtSpeed.setText(Double.toString(speedMonitor.getSpeed(mCurrentLocation))+"km/h");
         animator.animate(location);
     }
 

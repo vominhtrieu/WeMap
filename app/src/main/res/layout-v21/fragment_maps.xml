@@ -21,15 +21,25 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="20dp"
-            android:scaleType="center"
-            app:fabCustomSize="64dp"
-            app:borderWidth="0dp"
             android:backgroundTint="@android:color/white"
-            android:src="@drawable/ic_btn_show_contact" />
+            android:scaleType="center"
+            android:src="@drawable/ic_btn_show_contact"
+            app:borderWidth="0dp"
+            app:fabCustomSize="64dp" />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:id="@+id/txtSpeed"
+            android:background="#ccffffff"
+            android:textColor="@android:color/black"
+            android:padding="2dp"
+            android:gravity="center_horizontal"/>
+
         <ImageButton
             android:id="@+id/btnLocation"
             android:layout_width="64dp"
-            android:layout_height="64dp"
+            android:layout_height="36dp"
             android:layout_marginEnd="5dp"
             android:layout_marginBottom="20dp"
             android:background="@drawable/location_indicator_button" />

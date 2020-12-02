@@ -48,6 +48,7 @@ import hcmus.student.map.map.MapsFragment;
 import hcmus.student.map.map.MarkerInfoFragment;
 import hcmus.student.map.map.RouteInfoFragment;
 import hcmus.student.map.map.utilities.LocationChangeCallback;
+import hcmus.student.map.map.utilities.SpeedMonitor;
 
 
 public class MainActivity extends FragmentActivity implements MainCallbacks {
@@ -60,6 +61,7 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
     private Location mCurrentLocation;
     private MapsFragment mMapFragment;
     private List<LocationChangeCallback> delegates;
+
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -145,7 +147,9 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
                             if (temp == null) return;
 
                             mCurrentLocation = temp;
+
                             notifyLocationChange();
+
                         }
                     };
 
