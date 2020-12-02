@@ -61,7 +61,7 @@ public class Database extends SQLiteOpenHelper {
         return cursorToPlaces(cursor);
     }
 
-    public void deletePlace(Place place) {
+    public void deletePlace(ArrayList<Place> placesNormal, Place place) {
         SQLiteDatabase db = getWritableDatabase();
         db.delete(TABLE_NAME, KEY_LATITUDE + "=" + place.getLocation().latitude + " AND " + KEY_LONGITUDE + "=" + place.getLocation().longitude, null);
     }
@@ -156,6 +156,7 @@ public class Database extends SQLiteOpenHelper {
         }
         return places;
     }
+
 
 
     @Override
