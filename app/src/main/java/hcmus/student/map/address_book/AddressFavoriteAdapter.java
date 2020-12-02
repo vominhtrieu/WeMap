@@ -28,28 +28,33 @@ import hcmus.student.map.model.Place;
 public class AddressFavoriteAdapter extends BaseAdapter {
     Database mDatabase;
     Context context;
-    List<Place> places;
+    List<Place> placesFav;
+    AddressBookAdapter updateAdapter;
 
 
     public AddressFavoriteAdapter(Context context) {
         this.context = context;
+        placesFav = new ArrayList<>();
         this.mDatabase = new Database(context);
-        this.places = new ArrayList<>();
+    }
+
+    public void setUpdateAdapter(AddressBookAdapter updateAdapter) {
+        this.updateAdapter = updateAdapter;
     }
 
     public void getUpdate() {
-        places = mDatabase.getPlacesFavorite();
+        placesFav = mDatabase.getPlacesFavorite();
         notifyDataSetChanged();
     }
 
     @Override
     public int getCount() {
-        return places.size();
+        return placesFav.size();
     }
 
     @Override
     public Place getItem(int position) {
-        return places.get(position);
+        return placesFav.get(position);
     }
 
     @Override
@@ -78,23 +83,18 @@ public class AddressFavoriteAdapter extends BaseAdapter {
         }
 
         final Button btnFavorite = convertView.findViewById(R.id.btnFavorite);
+        btnFavorite.setBackgroundResource(R.drawable.ic_baseline_favorite_red);
 
-        if (place.getFavorite().equals("1"))
-            btnFavorite.setBackgroundResource(R.drawable.ic_baseline_favorite_red);
         btnFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
-                if (place.getFavorite().equals("0")) {
-                    place.setFavorite("1");
-                    LatLng location = place.getLocation();
-                    mDatabase.addFavorite(location.latitude, location.longitude);
-                    btnFavorite.setBackgroundResource(R.drawable.ic_baseline_favorite_red);
-                } else {
-                    place.setFavorite("0");
+                if (place.getFavorite().equals("1")) {
                     LatLng location = place.getLocation();
                     mDatabase.removeFavorite(location.latitude, location.longitude);
                     btnFavorite.setBackgroundResource(R.drawable.ic_baseline_favorite);
+                    getUpdate();
+                    updateAdapter.getUpdate();
                 }
             }
         });
