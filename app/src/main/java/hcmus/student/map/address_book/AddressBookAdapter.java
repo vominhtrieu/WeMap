@@ -6,8 +6,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Geocoder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -24,6 +27,8 @@ import androidx.annotation.Nullable;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import hcmus.student.map.MainActivity;
@@ -44,9 +49,66 @@ public class AddressBookAdapter extends BaseAdapter {
         this.mDatabase = new Database(context);
         this.places = new ArrayList<>();
     }
+    Comparator<Place> compareById = new Comparator<Place>() {
+        @Override
+        public int compare(Place o1, Place o2) {
+            return o1.getName().compareToIgnoreCase(o2.getName());
+        }
+
+
+    };
+    public void upDateContacts(List<Place>places)
+    {
+
+        for (int i = 0; i <places.size(); i++) {
+
+           if(places.get(i).getLocation()==null)
+           {
+               places.remove(i);
+               i--;
+           }
+
+        }
+    }
+    public void sortPlaces(List<Place>places)
+    {
+
+        Collections.sort(places,compareById);
+
+    }
+    public List<Place> groupContacts(List<Place>places)
+    {
+
+        if(places.size()==0)
+            return places;
+        sortPlaces(places);
+        List<Place>tmp = new ArrayList<>();
+
+        char c = Character.toUpperCase(places.get(0).getName().charAt(0));
+        Place place = new Place(Character.toString(c),null, null,"");
+        tmp.add(place);
+
+        for(int i=0;i<places.size();i++)
+        {
+            if(Character.toUpperCase(places.get(i).getName().charAt(0))!=c)
+            {
+                c = Character.toUpperCase(places.get(i).getName().charAt(0));
+
+                place = new Place(Character.toString(c),null, null,"");
+                tmp.add(place);
+
+            }
+
+            tmp.add(places.get(i));
+        }
+
+        return tmp;
+    }
+
 
     public void getUpdate() {
         places = mDatabase.getPlacesNormal();
+        places = groupContacts(places);
         notifyDataSetChanged();
     }
 
@@ -68,10 +130,8 @@ public class AddressBookAdapter extends BaseAdapter {
     @NonNull
     @Override
     public View getView(final int position, @Nullable View convertView, @NonNull ViewGroup parent) {
-        if (convertView == null) {
-            LayoutInflater inflater = LayoutInflater.from(context);
-            convertView = inflater.inflate(R.layout.row_place, null, false);
-        }
+        LayoutInflater inflater = LayoutInflater.from(context);
+        convertView = inflater.inflate(R.layout.row_place, null, false);
 
         final TextView txtName = convertView.findViewById(R.id.txtName);
         final TextView txtAddressLine = convertView.findViewById(R.id.txtAddressLine);
@@ -81,9 +141,43 @@ public class AddressBookAdapter extends BaseAdapter {
         final Place place = getItem(position);
         LatLng location = place.getLocation();
 
+
+        txtName.setText(place.getName());
+
+
+        if (place.getAvatar() != null) {
+            Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
+            ImageView ivAvatar = convertView.findViewById(R.id.ivAvatar);
+            ivAvatar.setBackground(new BitmapDrawable(context.getResources(), bmp));
+
+        }
+
+        ImageButton btnDelete = convertView.findViewById(R.id.btnDelete);
+        ImageButton btnEdit = convertView.findViewById(R.id.btnEdit);
+        ImageButton btnLocate = convertView.findViewById(R.id.btn_list_item_locate);
+
+        if(place.getLocation()==null)
+        {
+
+            txtName.setTypeface(txtName.getTypeface(), Typeface.BOLD);
+            txtName.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            ImageView ivAvatar = convertView.findViewById(R.id.ivAvatar);
+            ivAvatar.setVisibility(View.GONE);
+            txtAddressLine.setVisibility(View.GONE);
+
+
+            btnLocate.setVisibility(View.GONE);
+            btnEdit.setVisibility(View.GONE);
+            btnDelete.setVisibility(View.GONE);
+            btnFavorite.setVisibility(View.GONE);
+
+        }
+
         AddressLine addressLine = new AddressLine(new Geocoder(context), new OnAddressLineResponse() {
             @Override
             public void onAddressLineResponse(String addressLine) {
+
                 if (addressLine != null) {
                     txtAddressLine.setText(addressLine);
                 } else {
@@ -92,18 +186,7 @@ public class AddressBookAdapter extends BaseAdapter {
             }
         });
 
-
         addressLine.execute(location);
-        txtName.setText(place.getName());
-
-        if (place.getAvatar() != null) {
-            Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
-            ImageView ivAvatar = convertView.findViewById(R.id.ivAvatar);
-            ivAvatar.setBackground(new BitmapDrawable(context.getResources(), bmp));
-
-        }
-        ImageButton btnDelete = convertView.findViewById(R.id.btnDelete);
-        ImageButton btnEdit = convertView.findViewById(R.id.btnEdit);
 
         btnDelete.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -116,6 +199,8 @@ public class AddressBookAdapter extends BaseAdapter {
                     public void onClick(DialogInterface arg0, int arg1) {
                         mDatabase.deletePlace(place);
                         places.remove(position);
+                        upDateContacts(places);
+                        places = groupContacts(places);
                         notifyDataSetChanged();
                     }
                 });
@@ -144,6 +229,10 @@ public class AddressBookAdapter extends BaseAdapter {
                     public void onClick(View v) {
                         place.setName(edtNewName.getText().toString());
                         mDatabase.editPlace(place);
+
+                       upDateContacts(places);
+                       places = groupContacts(places);
+
                         notifyDataSetChanged();
                         dialog.dismiss();
                     }
@@ -162,7 +251,6 @@ public class AddressBookAdapter extends BaseAdapter {
         });
 
 
-        ImageButton btnLocate = convertView.findViewById(R.id.btn_list_item_locate);
         btnLocate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
