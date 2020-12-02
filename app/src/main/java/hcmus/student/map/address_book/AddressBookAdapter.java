@@ -8,6 +8,8 @@ import android.location.Geocoder;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -105,65 +107,6 @@ public class AddressBookAdapter extends BaseAdapter {
             ivAvatar.setBackground(new BitmapDrawable(context.getResources(), bmp));
 
         }
-//        ImageButton btnDelete = convertView.findViewById(R.id.btnDelete);
-//        ImageButton btnEdit = convertView.findViewById(R.id.btnEdit);
-//
-//        btnDelete.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-//                alertDialogBuilder.setMessage("Are you sure,You wanted to delete an address?");
-//
-//                alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface arg0, int arg1) {
-//                        mDatabase.deletePlace(place);
-//                        places.remove(position);
-//                        notifyDataSetChanged();
-//                    }
-//                });
-//
-//                alertDialogBuilder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                    }
-//                });
-//                alertDialogBuilder.show();
-//            }
-//        });
-//
-//        btnEdit.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                final Dialog dialog = new Dialog(context);
-//                dialog.setContentView(R.layout.dialog_edit);
-//                final EditText edtNewName = dialog.findViewById(R.id.edtNewName);
-//
-//                Button btnOK = dialog.findViewById(R.id.btnOK);
-//                Button btnCancel = dialog.findViewById(R.id.btnCancel);
-//
-//                btnOK.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        place.setName(edtNewName.getText().toString());
-//                        mDatabase.editPlace(place);
-//                        notifyDataSetChanged();
-//                        dialog.dismiss();
-//                    }
-//                });
-//
-//                btnCancel.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View v) {
-//                        dialog.dismiss();
-//                    }
-//                });
-//
-//                dialog.show();
-//
-//            }
-//        });
-
 
         ImageButton btnLocate = convertView.findViewById(R.id.btn_list_item_locate);
         btnLocate.setOnClickListener(new View.OnClickListener() {
