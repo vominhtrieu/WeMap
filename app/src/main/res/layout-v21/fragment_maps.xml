@@ -29,7 +29,7 @@
             android:layout_marginBottom="20dp"
             android:backgroundTint="@android:color/white"
             android:scaleType="center"
-            android:src="@drawable/ic_btn_show_contact"
+            android:src="@drawable/ic_btn_hide_contact"
             app:borderWidth="0dp"
             app:fabCustomSize="64dp" />
 
@@ -43,24 +43,24 @@
     </LinearLayout>
 
     <FrameLayout
-        android:id="@+id/frameBottom"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:clickable="true"
-        android:focusable="true"
-        android:layout_gravity="bottom" />
-
-    <FrameLayout
         android:id="@+id/frameTop"
-        android:clickable="true"
-        android:focusable="true"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="top">
+        android:layout_gravity="top"
+        android:clickable="true"
+        android:focusable="true">
 
         <fragment
             class="hcmus.student.map.map.search.SearchFragment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/frameBottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_gravity="bottom" />
 </FrameLayout>
