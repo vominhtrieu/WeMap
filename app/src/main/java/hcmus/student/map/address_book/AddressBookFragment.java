@@ -1,5 +1,10 @@
 package hcmus.student.map.address_book;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,8 +15,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+
 import hcmus.student.map.MainActivity;
 import hcmus.student.map.R;
+
+import static android.app.Activity.RESULT_OK;
 
 public class AddressBookFragment extends Fragment {
     private MainActivity activity;
@@ -44,5 +54,10 @@ public class AddressBookFragment extends Fragment {
     public void onResume() {
         super.onResume();
         adapter.getUpdate();
+    }
+
+        @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

@@ -1,4 +1,4 @@
-package hcmus.student.map.map;
+package hcmus.student.map.address_book;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -9,6 +9,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -32,30 +33,34 @@ import java.io.InputStream;
 
 import hcmus.student.map.MainActivity;
 import hcmus.student.map.R;
+import hcmus.student.map.map.AddContactFragment;
 import hcmus.student.map.model.Database;
+import hcmus.student.map.model.Place;
 
 import static android.app.Activity.RESULT_OK;
 
-public class AddContactFragment extends Fragment implements View.OnClickListener {
+public class EditPlaceFragment extends Fragment implements View.OnClickListener {
     MainActivity activity;
-    Button btnAdd, btnCancel;
-    EditText edtName;
+    Button btnOK, btnCancel;
+    EditText edtNewName;
     ImageButton btnCamera, btnFolder;
     ImageView ivAvatar;
+    Place place;
     LatLng latLng;
     byte[] selectedImage;
 
     int REQUEST_CODE_CAMERA = 123;
     int REQUEST_CODE_FOLDER = 456;
 
-    public static AddContactFragment newInstance(LatLng latLng) {
-        AddContactFragment fragment = new AddContactFragment();
+    public static EditPlaceFragment newInstance(Place place) {
+        EditPlaceFragment fragment = new EditPlaceFragment();
         Bundle args = new Bundle();
-        args.putDouble("lat", latLng.latitude);
-        args.putDouble("lng", latLng.longitude);
+        args.putDouble("lat", place.getLocation().latitude);
+        args.putDouble("lng", place.getLocation().latitude);
         fragment.setArguments(args);
         return fragment;
     }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -66,24 +71,27 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_add_contact, container, false);
+        View view = inflater.inflate(R.layout.dialog_edit, container, false);
 
-        btnAdd = view.findViewById(R.id.btnAddContact);
-        btnCancel = view.findViewById(R.id.btnCancelContact);
-        edtName = view.findViewById(R.id.edtName);
+        btnOK = view.findViewById(R.id.btnOK);
+        btnCancel = view.findViewById(R.id.btnCancel);
+        edtNewName = view.findViewById(R.id.edtNewName);
         btnCamera = view.findViewById(R.id.btnCamera);
         btnFolder = view.findViewById(R.id.btnFolder);
         ivAvatar = view.findViewById(R.id.ivAvatar);
 
-        ivAvatar.setEnabled(false);
+        edtNewName.setText(place.getName());
+        Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
+        ivAvatar.setBackground(new BitmapDrawable(activity.getResources(), bmp));
+
         btnCamera.setOnClickListener(this);
         btnFolder.setOnClickListener(this);
-        btnAdd.setOnClickListener(this);
+        btnOK.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
 
         Bundle args = getArguments();
 
-        latLng = new LatLng(args.getDouble("lat"), args.getDouble("lng"));
+        latLng = new LatLng(place.getLocation().latitude, place.getLocation().longitude);
         return view;
     }
 
@@ -97,13 +105,14 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
             case R.id.btnFolder:
                 GalleryIntent();
                 break;
-            case R.id.btnAddContact:
-                if (edtName.getText().toString().length() == 0) {
+            case R.id.btnOK:
+                if (edtNewName.getText().toString().length() == 0) {
                     Toast.makeText(activity, "Place name is required!", Toast.LENGTH_SHORT).show();
                 } else {
                     try {
                         Database db = new Database(getContext());
-                        db.insertPlace(edtName.getText().toString(), new LatLng(latLng.latitude, latLng.longitude), selectedImage);
+                        Place place=new Place(edtNewName.getText().toString(),new LatLng(latLng.latitude, latLng.longitude),selectedImage);
+                        db.editPlace(place);
                         activity.backToPreviousFragment();
                         activity.updateOnscreenMarker(latLng, selectedImage);
                     } catch (Exception e) {
@@ -111,7 +120,7 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
                     }
                 }
                 break;
-            case R.id.btnCancelContact:
+            case R.id.btnCancel:
                 activity.backToPreviousFragment();
                 break;
         }

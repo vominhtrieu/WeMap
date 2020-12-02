@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.hardware.SensorManager;
 import android.location.Location;
@@ -21,11 +22,13 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -45,6 +48,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import hcmus.student.map.MainActivity;
+import hcmus.student.map.R.drawable;
 import hcmus.student.map.R;
 import hcmus.student.map.map.direction.DirectionFragment;
 import hcmus.student.map.map.utilities.LocationChangeCallback;
@@ -129,7 +133,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        ImageButton btnLocation = getView().findViewById(R.id.btnLocation);
+        final ImageButton btnLocation = getView().findViewById(R.id.btnLocation);
 
         btnLocation.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,7 +147,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                     public void run() {
                         if (i==1 && check==true)
                         {
-                            Toast.makeText(main,"Move camera current location",Toast.LENGTH_SHORT).show();
                             if (mCurrentLocation == null) {
                                 Toast.makeText(context, R.string.txtNullLocation, Toast.LENGTH_SHORT).show();
                                 return;
@@ -169,12 +172,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                                         mMap.getCameraPosition().zoom >= DEFAULT_ZOOM ? mMap.getCameraPosition().zoom : DEFAULT_ZOOM
                                 ));
                                 mMap.getUiSettings().setScrollGesturesEnabled(false);
-                                Toast.makeText(main,"Move camera when user find way",Toast.LENGTH_SHORT).show();
+                                btnLocation.setBackground(ContextCompat.getDrawable(context, drawable.ic_aim));
                             }
+
                             else
                             {
+//                                btnLocation.setBackgroundColor(Color.parseColor("null"));
                                 mMap.getUiSettings().setScrollGesturesEnabled(true);
                                 check=true;
+                                btnLocation.setBackground(ContextCompat.getDrawable(context, drawable.location_indicator_button));
                             }
                         }
                         i=0;
@@ -282,21 +288,19 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     }
 
     @Override
-    public void moveCamera(LatLng location) {
+    public void RemoveMarker() {
+        marker.remove();
+    }
 
-//        mMap.setMyLocationEnabled(true);
+    @Override
+    public void moveCamera(LatLng location) {
         LatLng markerLoc=new LatLng(location.latitude, location.longitude);
         final CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(markerLoc)
-                .zoom(13)
-                .bearing(90)
+                .zoom(15)
                 .tilt(30)
                 .build();
-        mMap.addMarker(new MarkerOptions().position(new LatLng(location.latitude, location.longitude)).title("Marker"));
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
     }
 
     @Override
@@ -362,9 +366,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                 builder.include(point);
             }
         }
+        int padding=0;
         LatLngBounds bounds = builder.build();
-
-        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200), 1000, null);
+        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, padding), 1000, null);
 
         BitmapDrawable bitmapDrawable = (BitmapDrawable) ResourcesCompat.getDrawable(getResources(), R.drawable.marker_point,
                 context.getTheme());
@@ -381,5 +385,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         mRouteEndMarker = mMap.addMarker(new MarkerOptions()
                 .position(polylineOptions.get(0).getPoints().get(polylineOptions.get(0).getPoints().size() - 1))
                 .icon(descriptor).anchor(0.5f, 0.5f));
+//        int padding=0;
+//        LatLng newPos = new LatLng(bounds,padding);
+//        mMap.animateCamera(CameraUpdateFactory.newCameraPosition
+//                (new CameraPosition.Builder().target(newPos).build()));
     }
 }

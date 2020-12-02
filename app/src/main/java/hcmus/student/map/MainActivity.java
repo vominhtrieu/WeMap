@@ -226,9 +226,14 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
 
     @Override
     public void locatePlace(LatLng location) {
+
+
         mViewPager.setCurrentItem(0);
         MapsFragment fragment = (MapsFragment) adapter.getFragment(0);
         fragment.moveCamera(location);
+        TabLayout mTabs = findViewById(R.id.tabs);
+        TabLayout.Tab tab = mTabs.getTabAt(0);
+        tab.select();
     }
 
     @Override
