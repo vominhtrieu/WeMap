@@ -2,6 +2,7 @@ package hcmus.student.map.map.utilities;
 
 import android.animation.ValueAnimator;
 import android.location.Location;
+import android.util.Log;
 import android.view.animation.LinearInterpolator;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -21,7 +22,7 @@ public class MarkerAnimator {
         this.mMap = map;
     }
 
-    public void animate(final Location currentLocation) {
+    public void animate(final Location currentLocation, final boolean isCameraFollowing) {
         final ValueAnimator animator = ValueAnimator.ofFloat(0, 1);
 
         final LatLng startLatLng = mLocationIndicator.getPosition();
@@ -37,18 +38,17 @@ public class MarkerAnimator {
                 double newLng = startLatLng.longitude + (endLatLng.longitude - startLatLng.longitude) * fraction;
                 LatLng newPosition = new LatLng(newLat, newLng);
 
-                //Check if user moved camera, if yes, camera won't follow user's location
-                LatLng cameraTargetPosition = mMap.getCameraPosition().target;
-                LatLng indicatorPosition = mLocationIndicator.getPosition();
+                if (isCameraFollowing) {
+                    LatLng cameraPosition = mMap.getCameraPosition().target;
 
-                double latitudeDiff = cameraTargetPosition.latitude - indicatorPosition.latitude;
-                double longitudeDiff = cameraTargetPosition.longitude - indicatorPosition.longitude;
+                    double newCameraLat = newLat - cameraPosition.latitude;
+                    double newCameraLng = newLng - cameraPosition.longitude;
+                    newCameraLat = cameraPosition.latitude + newCameraLat * 0.1;
+                    newCameraLng = cameraPosition.longitude + newCameraLng * 0.1;
 
-                //We don't compute square root because this result is enough for checking whether user move the camera or not
-                double squareDistance = latitudeDiff * latitudeDiff + longitudeDiff * longitudeDiff;
-
-                if (squareDistance < FOLLOWING_THRESHOLD)
-                    mMap.moveCamera(CameraUpdateFactory.newLatLng(newPosition));
+                    LatLng newCameraPosition = new LatLng(newCameraLat, newCameraLng);
+                    mMap.moveCamera(CameraUpdateFactory.newLatLng(newCameraPosition));
+                }
                 mLocationIndicator.setPosition(newPosition);
             }
         });
