@@ -9,22 +9,24 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import hcmus.student.map.MainActivity;
 import hcmus.student.map.R;
-import hcmus.student.map.model.Database;
-import hcmus.student.map.model.Place;
 import hcmus.student.map.map.utilities.place.GetPlaces;
 import hcmus.student.map.map.utilities.place.PlaceRespondCallback;
 import hcmus.student.map.map.utilities.place.PlaceSearch;
+import hcmus.student.map.model.Database;
+import hcmus.student.map.model.Place;
 
-public class SearchResultAdapter extends BaseAdapter implements PlaceRespondCallback {
+public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapter.ViewHolder> implements PlaceRespondCallback {
     final static int DELAY_TYPING = 500;
 
     Context context;
@@ -36,6 +38,19 @@ public class SearchResultAdapter extends BaseAdapter implements PlaceRespondCall
     private final Runnable checker;
     private String query;
     private long lastTimeTyping;
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        private TextView txtPlaceName;
+        private ImageView ivAvatar;
+        private View parentView;
+
+        public ViewHolder(@NonNull View itemView) {
+            super(itemView);
+            parentView = itemView;
+            txtPlaceName = itemView.findViewById(R.id.txtPlaceName);
+            ivAvatar = itemView.findViewById(R.id.ivAvatar);
+        }
+    }
 
     public SearchResultAdapter(Context context, SearchClickCallback delegate) {
         this.context = context;
@@ -79,11 +94,10 @@ public class SearchResultAdapter extends BaseAdapter implements PlaceRespondCall
     }
 
     @Override
-    public int getCount() {
+    public int getItemCount() {
         return places.size();
     }
 
-    @Override
     public Object getItem(int position) {
         return places.get(position);
     }
@@ -93,24 +107,54 @@ public class SearchResultAdapter extends BaseAdapter implements PlaceRespondCall
         return position;
     }
 
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView == null) {
-            LayoutInflater inflater = ((Activity) context).getLayoutInflater();
-            convertView = inflater.inflate(R.layout.row_search_result, null, false);
-        }
-        ImageView ivAvatar = convertView.findViewById(R.id.ivAvatar);
-        TextView txtPlaceName = convertView.findViewById(R.id.txtPlaceName);
+//    @Override
+//    public View getView(int position, View convertView, ViewGroup parent) {
+//        if (convertView == null) {
+//            LayoutInflater inflater = ((Activity) context).getLayoutInflater();
+//            convertView = inflater.inflate(R.layout.row_search_result, null, false);
+//        }
+//        ImageView ivAvatar = convertView.findViewById(R.id.ivAvatar);
+//        TextView txtPlaceName = convertView.findViewById(R.id.txtPlaceName);
+//
+//        final Place place = places.get(position);
+//        if (place.getAvatar() != null) {
+//            Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
+//            ivAvatar.setBackground(new BitmapDrawable(context.getResources(), bmp));
+//            ivAvatar.setImageBitmap(bmp);
+//        }
+//        txtPlaceName.setText(place.getName());
+//
+//        convertView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                ((MainActivity) context).openSearchResultMarker(place.getLocation());
+//                places = new ArrayList<>();
+//                notifyDataSetChanged();
+//                if (delegate != null)
+//                    delegate.onSearchClickCallback(place);
+//            }
+//        });
+//        return convertView;
+//    }
 
+    @NonNull
+    @Override
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater inflater = ((Activity) context).getLayoutInflater();
+        return new ViewHolder(inflater.inflate(R.layout.row_search_result, parent, false));
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final Place place = places.get(position);
         if (place.getAvatar() != null) {
             Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
-            ivAvatar.setBackground(new BitmapDrawable(context.getResources(), bmp));
-            ivAvatar.setImageBitmap(bmp);
+            holder.ivAvatar.setBackground(new BitmapDrawable(context.getResources(), bmp));
+            holder.ivAvatar.setImageBitmap(bmp);
         }
-        txtPlaceName.setText(place.getName());
+        holder.txtPlaceName.setText(place.getName());
 
-        convertView.setOnClickListener(new View.OnClickListener() {
+        holder.parentView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ((MainActivity) context).openSearchResultMarker(place.getLocation());
@@ -120,7 +164,6 @@ public class SearchResultAdapter extends BaseAdapter implements PlaceRespondCall
                     delegate.onSearchClickCallback(place);
             }
         });
-        return convertView;
     }
 
     public void clear() {

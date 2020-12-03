@@ -6,12 +6,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -347,7 +345,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
 
     @Override
     public void createAvatarMarker(LatLng coordinate, byte[] avt) {
-        if (marker != null) {
+        if (marker != null && marker.getPosition() == coordinate) {
             marker.remove();
             marker = null;
         }
@@ -379,6 +377,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         mSensor.unregister();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onRouteRespond(List<PolylineOptions> polylineOptions, List<String> durations) {
         if (mRoutes != null) {
@@ -405,6 +404,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             List<LatLng> points = route.getPoints();
             for (LatLng point : points) {
                 builder.include(point);
+            }
+            if (i == polylineOptions.size() - 1) {
+                polyline.setWidth(SELECTED_ROUTE_WIDTH);
+                main.openRouteInfo(durations.get(i), polyline.getColor());
             }
         }
 
