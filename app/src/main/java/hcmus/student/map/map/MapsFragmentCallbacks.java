@@ -8,4 +8,5 @@ public interface MapsFragmentCallbacks {
     void createAvatarMarker(LatLng coordinate, byte[] avt);
     void closeDirection();
     void moveCamera(LatLng location);
+    void removeMarker();
 }

@@ -92,13 +92,10 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnCamera:
-                Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-                startActivityForResult(intent, REQUEST_CODE_CAMERA);
+                CameraIntent();
                 break;
             case R.id.btnFolder:
-                Intent intent1 = new Intent(Intent.ACTION_PICK);
-                intent1.setType("image/*");
-                startActivityForResult(intent1, REQUEST_CODE_FOLDER);
+                GalleryIntent();
                 break;
             case R.id.btnAddContact:
                 if (edtName.getText().toString().length() == 0) {
@@ -121,6 +118,15 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
         }
     }
 
+    private  void CameraIntent(){
+        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
+        startActivityForResult(intent, REQUEST_CODE_CAMERA);
+    }
+    private void GalleryIntent(){
+        Intent intent1 = new Intent(Intent.ACTION_PICK);
+        intent1.setType("image/*");
+        startActivityForResult(intent1, REQUEST_CODE_FOLDER);
+    }
     private void setSelectedImage(Bitmap bitmap) {
         ivAvatar.setImageBitmap(bitmap);
         ByteArrayOutputStream stream = new ByteArrayOutputStream();

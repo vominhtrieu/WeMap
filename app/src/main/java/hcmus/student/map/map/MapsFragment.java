@@ -1,17 +1,14 @@
 package hcmus.student.map.map;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +25,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
@@ -49,6 +47,8 @@ import java.util.List;
 
 import hcmus.student.map.MainActivity;
 import hcmus.student.map.R;
+import hcmus.student.map.map.custom_view.MapWrapper;
+import hcmus.student.map.map.custom_view.OnMapWrapperTouch;
 import hcmus.student.map.map.direction.DirectionFragment;
 import hcmus.student.map.map.utilities.LocationChangeCallback;
 import hcmus.student.map.map.utilities.MarkerAnimator;
@@ -60,7 +60,8 @@ import hcmus.student.map.map.utilities.direction.DirectionTask;
 import hcmus.student.map.model.Database;
 import hcmus.student.map.model.Place;
 
-public class MapsFragment extends Fragment implements OnMapReadyCallback, DirectionResponse, MapsFragmentCallbacks, LocationChangeCallback {
+public class MapsFragment extends Fragment implements OnMapReadyCallback, DirectionResponse,
+        MapsFragmentCallbacks, LocationChangeCallback {
 
     private static final int DEFAULT_ZOOM = 15;
     private static final int EPSILON = 5;
@@ -81,12 +82,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     private MainActivity main;
     private Context context;
     private DirectionFragment directionFragment;
-    private int i = 0;
-    private boolean check = true;
-
-    private boolean isContactShown = false;
-    SpeedMonitor speedMonitor;
-    TextView txtSpeed;
+    private boolean isCameraFollowing;
+    private boolean isContactShown;
+    private SpeedMonitor speedMonitor;
+    private TextView txtSpeed;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
 
@@ -100,16 +99,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        try {
-            context = getActivity();
-            main = (MainActivity) getActivity();
-            mRouteStartMarker = mRouteEndMarker = null;
-            mDatabase = new Database(context);
-            mContactMarkers = new ArrayList<>();
-            speedMonitor = new SpeedMonitor(context);
-        } catch (IllegalStateException e) {
-            throw new IllegalStateException("MainActivity must implement callbacks");
-        }
+        context = getContext();
+        main = (MainActivity) getActivity();
+        mRouteStartMarker = mRouteEndMarker = null;
+        mDatabase = new Database(context);
+        mContactMarkers = new ArrayList<>();
+        isCameraFollowing = true;
+        isContactShown = false;
+        speedMonitor = new SpeedMonitor(context);
     }
 
     @Nullable
@@ -121,7 +118,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         SensorManager sensorService = (SensorManager) main.getSystemService(Context.SENSOR_SERVICE);
         mMapView = view.findViewById(R.id.map);
         mMapView.onCreate(savedInstanceState);
-        txtSpeed =view.findViewById(R.id.txtSpeed);
+        txtSpeed = view.findViewById(R.id.txtSpeed);
         //Implement Rotation change here
         mSensor = new OrientationSensor(sensorService) {
             float previousRotation = 0;
@@ -143,50 +140,53 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        ImageButton btnLocation = getView().findViewById(R.id.btnLocation);
+
+        final ImageButton btnLocation = getView().findViewById(R.id.btnLocation);
         final FloatingActionButton btnContact = getView().findViewById(R.id.btnContact);
+        final MapWrapper mapContainer = getView().findViewById(R.id.mapContainer);
+        mapContainer.setOnMapWrapperTouch(new OnMapWrapperTouch() {
+            @Override
+            public void onMapWrapperTouch() {
+                isCameraFollowing = false;
+            }
+        });
 
         btnLocation.setOnClickListener(new View.OnClickListener() {
+            private int clickCount = 0;
+            Handler handler = null;
+
             @Override
             public void onClick(View v) {
-                i++;
-
-                Handler handler = new Handler();
+                clickCount++;
+                if (handler != null)
+                    return;
+                handler = new Handler();
                 handler.postDelayed(new Runnable() {
-                    @SuppressLint("MissingPermission")
                     @Override
                     public void run() {
-                        if (i == 1 && check == true) {
-                            Toast.makeText(main, "Move camera current location", Toast.LENGTH_SHORT).show();
-                            if (mCurrentLocation == null) {
-                                Toast.makeText(context, R.string.txtNullLocation, Toast.LENGTH_SHORT).show();
-                                return;
-                            }
-
-                            mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                                    new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()),
-                                    mMap.getCameraPosition().zoom >= DEFAULT_ZOOM ? mMap.getCameraPosition().zoom : DEFAULT_ZOOM
-                            ));
-                        } else if (i == 2) {
-                            if (check) {
-                                check = false;
-                                if (mCurrentLocation == null) {
-                                    Toast.makeText(context, R.string.txtNullLocation, Toast.LENGTH_SHORT).show();
-                                    return;
-                                }
-
-                                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                                        new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()),
-                                        mMap.getCameraPosition().zoom >= DEFAULT_ZOOM ? mMap.getCameraPosition().zoom : DEFAULT_ZOOM
-                                ));
-                                mMap.getUiSettings().setScrollGesturesEnabled(false);
-                                Toast.makeText(main, "Move camera when user find way", Toast.LENGTH_SHORT).show();
-                            } else {
-                                mMap.getUiSettings().setScrollGesturesEnabled(true);
-                                check = true;
-                            }
+                        if (mCurrentLocation == null) {
+                            Toast.makeText(context, R.string.txtNullLocation, Toast.LENGTH_SHORT).show();
+                            return;
                         }
-                        i = 0;
+                        final boolean check = clickCount >= 2;
+
+                        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLocation.getLatitude(),
+                                mCurrentLocation.getLongitude()), DEFAULT_ZOOM);
+                        mMap.animateCamera(cameraUpdate, new GoogleMap.CancelableCallback() {
+                            @Override
+                            public void onFinish() {
+                                if (check)
+                                    isCameraFollowing = true;
+                            }
+
+                            @Override
+                            public void onCancel() {
+                                isCameraFollowing = false;
+                            }
+                        });
+
+                        clickCount = 0;
+                        handler = null;
                     }
                 }, 500);
             }
@@ -197,11 +197,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             public void onClick(View v) {
                 if (isContactShown) {
                     hideAllAddress();
-                    btnContact.setImageDrawable(ResourcesCompat.getDrawable(getResources() ,R.drawable.ic_btn_show_contact, null));
+                    btnContact.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_btn_show_contact, null));
                     isContactShown = false;
                 } else {
                     showAllAddress();
-                    btnContact.setImageDrawable(ResourcesCompat.getDrawable(getResources() ,R.drawable.ic_btn_hide_contact, null));
+                    btnContact.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_btn_hide_contact, null));
                     isContactShown = true;
                 }
             }
@@ -263,10 +263,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                     location.getLongitude()), DEFAULT_ZOOM));
         }
         mCurrentLocation = location;
-//        txtSpeed.setText(Double.toString(speedMonitor.getSpeed(mCurrentLocation))+"km/h");
-//        speedMonitor.getSpeed(mCurrentLocation);
-        txtSpeed.setText(Double.toString(speedMonitor.getSpeed(mCurrentLocation))+"km/h");
-        animator.animate(location);
+        txtSpeed.setText(speedMonitor.getSpeed(mCurrentLocation) + "km/h");
+        animator.animate(location, isCameraFollowing);
     }
 
     @Override
@@ -327,21 +325,19 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     }
 
     @Override
-    public void moveCamera(LatLng location) {
+    public void removeMarker() {
+        marker.remove();
+    }
 
-//        mMap.setMyLocationEnabled(true);
+    @Override
+    public void moveCamera(LatLng location) {
         LatLng markerLoc = new LatLng(location.latitude, location.longitude);
         final CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(markerLoc)
-                .zoom(13)
-                .bearing(90)
+                .zoom(15)
                 .tilt(30)
                 .build();
-        mMap.addMarker(new MarkerOptions().position(new LatLng(location.latitude, location.longitude)).title("Marker"));
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
-        mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-
     }
 
     @Override
@@ -416,8 +412,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         }
 
         LatLngBounds bounds = builder.build();
-
-        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 200), 1000, null);
+        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 0), 1000, null);
 
         BitmapDrawable bitmapDrawable = (BitmapDrawable) ResourcesCompat.getDrawable(getResources(), R.drawable.marker_point,
                 context.getTheme());

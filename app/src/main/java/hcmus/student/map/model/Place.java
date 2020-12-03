@@ -5,23 +5,30 @@ import android.location.Location;
 import com.google.android.gms.maps.model.LatLng;
 
 public class Place {
+    private int id;
     private String name;
     private LatLng location;
     private byte[] avatar;
     private String favorite;
 
-    public Place(String name, LatLng location, byte[] avatar) {
+    public Place(int id, String name, LatLng location, byte[] avatar) {
+        this.id = id;
         this.name = name;
         this.location = location;
         this.avatar = avatar;
         this.favorite = "0";
     }
 
-    public Place(String name, LatLng location, byte[] avatar, String favorite) {
+    public Place(int id, String name, LatLng location, byte[] avatar, String favorite) {
+        this.id = id;
         this.name = name;
         this.location = location;
         this.avatar = avatar;
         this.favorite = favorite;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getName() {

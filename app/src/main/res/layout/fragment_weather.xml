@@ -2,46 +2,32 @@
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/weather_background"
-    android:padding="20dp">
+    android:background="@drawable/weather_background">
 
     <LinearLayout
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:orientation="vertical">
+        android:layout_gravity="start"
+        android:orientation="vertical"
+        android:padding="20dp">
 
         <TextView
             android:id="@+id/txtPlaceName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginBottom="20dp"
             android:textAlignment="center"
             android:textColor="@android:color/white"
             android:textSize="18sp" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+        <ImageView
+            android:id="@+id/ivWeatherStatus"
+            android:layout_width="120dp"
+            android:layout_height="120dp"
             android:layout_gravity="center"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <ImageView
-                android:id="@+id/ivWeatherStatus"
-                android:layout_width="96dp"
-                android:layout_height="96dp" />
-
-            <TextView
-                android:id="@+id/txtTemperature"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingStart="20dp"
-                android:paddingLeft="10dp"
-                android:textColor="@android:color/white"
-                android:textSize="72sp" />
-        </LinearLayout>
+            android:src="@drawable/ic_weather_01d" />
 
         <TextView
             android:id="@+id/txtDescription"
@@ -51,6 +37,14 @@
             android:textAllCaps="true"
             android:textColor="@android:color/white"
             android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/txtTemperature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="@android:color/white"
+            android:textSize="48sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -90,8 +84,8 @@
                 android:orientation="vertical">
 
                 <ImageView
-                    android:layout_width="33dp"
-                    android:layout_height="34dp"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
                     android:background="@drawable/ic_wind" />
 
                 <TextView
@@ -128,17 +122,37 @@
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/weatherForecastContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:layout_marginTop="20dp">
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="10dp"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:visibility="invisible">
+
+        <ImageButton
+            android:id="@+id/btnLeft"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center|end"
+            android:background="@drawable/ic_baseline_left" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rvWeather"
-            android:layout_width="wrap_content"
+            android:layout_width="288dp"
             android:layout_height="wrap_content"
+            android:layout_gravity="center"
             android:orientation="horizontal"
-            android:layout_gravity="center" />
+            android:overScrollMode="never" />
+
+        <ImageButton
+            android:id="@+id/btnRight"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center|start"
+            android:background="@drawable/ic_baseline_right" />
     </LinearLayout>
 
 </FrameLayout>

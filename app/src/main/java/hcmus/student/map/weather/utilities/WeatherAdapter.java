@@ -1,5 +1,7 @@
 package hcmus.student.map.weather.utilities;
 
+import android.content.Context;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +21,7 @@ import java.util.Locale;
 import hcmus.student.map.R;
 
 public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherViewHolder> {
+    private Context context;
     List<DailyWeather> dailyWeatherList;
     Calendar calendar;
 
@@ -35,9 +38,10 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherV
         }
     }
 
-    public WeatherAdapter() {
+    public WeatherAdapter(Context context) {
         dailyWeatherList = new ArrayList<>();
         calendar = Calendar.getInstance();
+        this.context = context;
     }
 
     public void update(List<DailyWeather> dailyWeatherList) {
@@ -64,10 +68,18 @@ public class WeatherAdapter extends RecyclerView.Adapter<WeatherAdapter.WeatherV
 
         calendar.add(Calendar.DATE, -position);
 
-        String dayOfWeek = new SimpleDateFormat("EE", Locale.ENGLISH).format(date.getTime());
+        Locale locale;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            locale = context.getResources().getConfiguration().getLocales().get(0);
+        } else {
+            locale = context.getResources().getConfiguration().locale;
+        }
+
+        String dayOfWeek = new SimpleDateFormat("EE", locale).format(date.getTime());
 
         holder.txtDayOfWeek.setText(dayOfWeek);
-        holder.ivWeatherStatus.setImageBitmap(dailyWeather.getIcon());
+        int imageId = context.getResources().getIdentifier("ic_weather_" + dailyWeather.getIcon(), "drawable", context.getPackageName());
+        holder.ivWeatherStatus.setImageResource(imageId);
         holder.txtMinTemp.setText(String.format(Locale.US, "%.1f°", dailyWeather.getMinTemp()));
         holder.txtMaxTemp.setText(String.format(Locale.US, "%.1f°", dailyWeather.getMaxTemp()));
     }
