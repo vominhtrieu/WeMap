@@ -141,13 +141,16 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        final ImageButton btnLocation = getView().findViewById(R.id.btnLocation);
+        final FloatingActionButton btnLocation = getView().findViewById(R.id.btnLocation);
         final FloatingActionButton btnContact = getView().findViewById(R.id.btnContact);
         final MapWrapper mapContainer = getView().findViewById(R.id.mapContainer);
         mapContainer.setOnMapWrapperTouch(new OnMapWrapperTouch() {
             @Override
             public void onMapWrapperTouch() {
-                isCameraFollowing = false;
+                if (isCameraFollowing) {
+                    isCameraFollowing = false;
+                    btnLocation.setImageResource(R.drawable.ic_baseline_location);
+                }
             }
         });
 
@@ -175,13 +178,18 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                         mMap.animateCamera(cameraUpdate, new GoogleMap.CancelableCallback() {
                             @Override
                             public void onFinish() {
-                                if (check)
+                                if (check && !isCameraFollowing) {
                                     isCameraFollowing = true;
+                                    btnLocation.setImageResource(R.drawable.ic_baseline_location_following);
+                                }
                             }
 
                             @Override
                             public void onCancel() {
-                                isCameraFollowing = false;
+                                if (!isCameraFollowing) {
+                                    isCameraFollowing = false;
+                                    btnLocation.setImageResource(R.drawable.ic_baseline_location);
+                                }
                             }
                         });
 
@@ -263,7 +271,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                     location.getLongitude()), DEFAULT_ZOOM));
         }
         mCurrentLocation = location;
-        txtSpeed.setText(speedMonitor.getSpeed(mCurrentLocation) + "km/h");
+        txtSpeed.setText(speedMonitor.getSpeed(mCurrentLocation) + " km/h");
         animator.animate(location, isCameraFollowing);
     }
 
