@@ -39,7 +39,7 @@ public class SearchFragment extends Fragment implements SearchView.OnQueryTextLi
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_search, null, false);
+        View view = inflater.inflate(R.layout.fragment_search, null, false); 
 
         final SearchView searchView = view.findViewById(R.id.svSearch);
         ListView lvSearchResult = view.findViewById(R.id.lvSearchResult);
