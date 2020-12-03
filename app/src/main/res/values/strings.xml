@@ -19,4 +19,7 @@
     <string name="txt_loading_address_line">Loading address line</string>
     <string name="txtDetectingLocation">Detecting location, cannot change tab</string>
     <string name="txt_search">Search...</string>
+    <string name="txtEdit">Edit</string>
+    <string name="txtDelete">Delete</string>
+    <string name="txtCancel">Cancel</string>
 </resources>

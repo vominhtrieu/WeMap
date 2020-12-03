@@ -5,16 +5,11 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.location.Location;
-import android.location.LocationListener;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Looper;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -26,26 +21,11 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationAvailability;
-import com.google.android.gms.location.LocationCallback;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationResult;
-import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResponse;
-import com.google.android.gms.location.SettingsClient;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import hcmus.student.map.map.AddContactFragment;
@@ -53,16 +33,16 @@ import hcmus.student.map.map.MapsFragment;
 import hcmus.student.map.map.MarkerInfoFragment;
 import hcmus.student.map.map.RouteInfoFragment;
 import hcmus.student.map.map.utilities.LocationChangeCallback;
+import hcmus.student.map.utitlies.LocationService;
+import hcmus.student.map.utitlies.OnLocationChange;
 
 
-public class MainActivity extends FragmentActivity implements MainCallbacks {
-    private static final long UPDATE_INTERVAL = 1000;
-    private static final long FASTEST_UPDATE_INTERVAL = 1000;
+public class MainActivity extends FragmentActivity implements MainCallbacks, OnLocationChange {
     private static final int LOCATION_STATUS_CODE = 1;
-    private FusedLocationProviderClient mClient;
     private ViewPager2 mViewPager;
     private ViewPagerAdapter adapter;
     private Location mCurrentLocation;
+    private LocationService service;
     private List<LocationChangeCallback> delegates;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -99,8 +79,7 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
             }
         });
 
-        mClient = LocationServices.getFusedLocationProviderClient(this);
-
+        service = new LocationService(this, this);
         delegates = new ArrayList<>();
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -122,46 +101,6 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
         }
     }
 
-    private void listenToLocationChange() {
-        //Request change location setting
-        final LocationRequest request = LocationRequest.create();
-        request.setInterval(UPDATE_INTERVAL);
-        request.setFastestInterval(FASTEST_UPDATE_INTERVAL);
-        request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
-        builder.addAllLocationRequests(Collections.singleton(request));
-        SettingsClient settingsClient = LocationServices.getSettingsClient(this);
-        final Task<LocationSettingsResponse> task = settingsClient.checkLocationSettings(builder.build());
-
-        //Listen for location change event
-        task.addOnSuccessListener(new OnSuccessListener<LocationSettingsResponse>() {
-            @Override
-            public void onSuccess(LocationSettingsResponse locationSettingsResponse) {
-                if (ActivityCompat.checkSelfPermission(MainActivity.this,
-                        Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    LocationCallback mLocationCallBack = new LocationCallback() {
-                        @Override
-                        public void onLocationResult(LocationResult locationResult) {
-                            super.onLocationResult(locationResult);
-                            Location temp = locationResult.getLastLocation();
-                            if (temp == null) return;
-
-                            mCurrentLocation = temp;
-                            notifyLocationChange();
-                        }
-                    };
-
-                    mClient.requestLocationUpdates(request, mLocationCallBack, Looper.myLooper());
-                }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                listenToLocationChange();
-            }
-        });
-    }
-
     private void notifyLocationChange() {
         for (LocationChangeCallback delegate : delegates) {
             delegate.onLocationChange(mCurrentLocation);
@@ -170,13 +109,7 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
 
     private void enableLocation() {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            Task<LocationAvailability> task = mClient.getLocationAvailability();
-            task.addOnSuccessListener(new OnSuccessListener<LocationAvailability>() {
-                @Override
-                public void onSuccess(LocationAvailability locationAvailability) {
-                    listenToLocationChange();
-                }
-            });
+            service.start();
         } else {
             AlertDialog.Builder builder = new AlertDialog.Builder(this);
             builder.setTitle("Warning!");
@@ -229,7 +162,8 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
     public void openMarkerInfo(Marker marker) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);;
+        fragmentTransaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
+        ;
         fragmentTransaction.replace(R.id.frameBottom, MarkerInfoFragment.newInstance(marker));
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
@@ -243,9 +177,14 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
 
     @Override
     public void locatePlace(LatLng location) {
+
+
         mViewPager.setCurrentItem(0);
         MapsFragment fragment = (MapsFragment) adapter.getFragment(0);
         fragment.moveCamera(location);
+        TabLayout mTabs = findViewById(R.id.tabs);
+        TabLayout.Tab tab = mTabs.getTabAt(0);
+        tab.select();
     }
 
     @Override
@@ -293,6 +232,12 @@ public class MainActivity extends FragmentActivity implements MainCallbacks {
 
     @Override
     public void updateOnscreenMarker(LatLng coordinate, byte[] avt) {
-        ((MapsFragment)adapter.getFragment(0)).createAvatarMarker(coordinate, avt);
+        ((MapsFragment) adapter.getFragment(0)).createAvatarMarker(coordinate, avt);
+    }
+
+    @Override
+    public void onLocationChange(Location location) {
+        mCurrentLocation = location;
+        notifyLocationChange();
     }
 }

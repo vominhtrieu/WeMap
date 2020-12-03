@@ -36,26 +36,12 @@
             android:layout_height="wrap_content"
             android:textSize="14sp" />
 
-    </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal|center_vertical"
-        android:orientation="vertical">
-
-        <ImageButton
-            android:id="@+id/btnDelete"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginBottom="10dp"
-            android:background="@drawable/ic_trash" />
-
-        <ImageButton
-            android:id="@+id/btnEdit"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:background="@drawable/ic_edit" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal|center_vertical"
+            android:orientation="vertical" />
     </LinearLayout>
 
     <Button
@@ -67,8 +53,17 @@
 
     <ImageButton
         android:id="@+id/btn_list_item_locate"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
         android:layout_gravity="center"
-        android:background="@drawable/location_indicator_button" />
+        android:background="@drawable/location_indicator_button"
+        android:tint="#882222" />
+
+    <ImageButton
+        android:id="@+id/btnMore"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_gravity="center"
+        android:background="@drawable/ic_baseline_more_vert_24"
+        android:tint="#882222" />
 </LinearLayout>
