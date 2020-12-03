@@ -22,7 +22,7 @@
             android:queryHint="@string/txt_search"
             android:submitBackground="@null" />
 
-        <ListView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/lvSearchResult"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

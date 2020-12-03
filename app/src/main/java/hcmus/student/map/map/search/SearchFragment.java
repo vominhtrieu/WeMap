@@ -14,6 +14,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import hcmus.student.map.R;
 
@@ -42,9 +44,10 @@ public class SearchFragment extends Fragment implements SearchView.OnQueryTextLi
         View view = inflater.inflate(R.layout.fragment_search, null, false); 
 
         final SearchView searchView = view.findViewById(R.id.svSearch);
-        ListView lvSearchResult = view.findViewById(R.id.lvSearchResult);
+        RecyclerView lvSearchResult = view.findViewById(R.id.lvSearchResult);
         adapter = new SearchResultAdapter(context, delegate);
         lvSearchResult.setAdapter(adapter);
+        lvSearchResult.setLayoutManager(new LinearLayoutManager(context));
         searchView.setOnQueryTextListener(this);
 
         return view;

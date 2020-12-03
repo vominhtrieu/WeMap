@@ -17,6 +17,7 @@ import android.widget.ListView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -59,8 +60,8 @@ public class DirectionFragment extends Fragment implements DirectionFragmentCall
         View view = inflater.inflate(R.layout.fragment_direction, null, false);
         edtOrigin = view.findViewById(R.id.edtOrigin);
         edtDest = view.findViewById(R.id.edtDest);
-        ListView lvFirstSearchResult = view.findViewById(R.id.lvFirstSearchResult);
-        ListView lvSecondSearchResult = view.findViewById(R.id.lvSecondSearchResult);
+        RecyclerView lvFirstSearchResult = view.findViewById(R.id.lvFirstSearchResult);
+        RecyclerView lvSecondSearchResult = view.findViewById(R.id.lvSecondSearchResult);
 
         final SearchResultAdapter firstAdapter = new SearchResultAdapter(context, new SearchClickCallback() {
             @Override
