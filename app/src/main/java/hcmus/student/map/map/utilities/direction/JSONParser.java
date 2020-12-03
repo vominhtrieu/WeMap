@@ -77,7 +77,7 @@ public class JSONParser {
                     double lat = location.getDouble("lat");
                     double lng = location.getDouble("lng");
 
-                    placeList.add(new Place(name, new LatLng(lat, lng), null));
+                    placeList.add(new Place(0, name, new LatLng(lat, lng), null));
 
                 } catch (JSONException e) {
                     e.printStackTrace();

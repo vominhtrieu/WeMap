@@ -106,17 +106,17 @@ public class DirectionFragment extends Fragment implements DirectionFragmentCall
 
                 if (originLocation != null)
                     origin = new Place(
-                            geocoder.getFromLocation(originLocation.latitude, originLocation.longitude, 1).get(0).getAddressLine(0),
+                            0, geocoder.getFromLocation(originLocation.latitude, originLocation.longitude, 1).get(0).getAddressLine(0),
                             originLocation, null);
                 else
-                    origin = new Place(activity.getResources().getString(R.string.txtCurrentLocation), null, null);
+                    origin = new Place(0, activity.getResources().getString(R.string.txtCurrentLocation), null, null);
 
                 if (destLocation != null)
                     dest = new Place(
-                            geocoder.getFromLocation(destLocation.latitude, destLocation.longitude, 1).get(0).getAddressLine(0),
+                            0, geocoder.getFromLocation(destLocation.latitude, destLocation.longitude, 1).get(0).getAddressLine(0),
                             destLocation, null);
                 else
-                    dest = new Place(activity.getResources().getString(R.string.txtCurrentLocation), null, null);
+                    dest = new Place(0, activity.getResources().getString(R.string.txtCurrentLocation), null, null);
 
                 edtOrigin.setText(origin.getName());
                 edtDest.setText(dest.getName());
@@ -192,8 +192,8 @@ public class DirectionFragment extends Fragment implements DirectionFragmentCall
         } else
             destName = geocoder.getFromLocation(dest.latitude, dest.longitude, 1).get(0).getAddressLine(0);
 
-        this.origin = new Place(originName, origin, null);
-        this.dest = new Place(destName, dest, null);
+        this.origin = new Place(0, originName, origin, null);
+        this.dest = new Place(0, destName, dest, null);
         notUserTypingChecker += 2;
         edtOrigin.setText(originName);
         edtDest.setText(destName);
