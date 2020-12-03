@@ -1,10 +1,6 @@
 package hcmus.student.map.address_book;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -15,18 +11,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-
 import hcmus.student.map.MainActivity;
 import hcmus.student.map.R;
 
-import static android.app.Activity.RESULT_OK;
-
 public class AddressBookFragment extends Fragment {
     private MainActivity activity;
-    AddressBookAdapter normalAdapter;
-    AddressFavoriteAdapter addressFavoriteAdapter;
+    NormalAddressAdapter normalAdapter;
+    FavoriteAddressAdapter addressFavoriteAdapter;
 
     public static AddressBookFragment newInstance() {
         AddressBookFragment fragment = new AddressBookFragment();
@@ -48,8 +39,8 @@ public class AddressBookFragment extends Fragment {
         ListView lvAddress = v.findViewById(R.id.lvAddress);
         ListView lvFavorite = v.findViewById(R.id.lvFavorite);
 
-        addressFavoriteAdapter = new AddressFavoriteAdapter(activity);
-        normalAdapter = new AddressBookAdapter(activity);
+        addressFavoriteAdapter = new FavoriteAddressAdapter(activity);
+        normalAdapter = new NormalAddressAdapter(activity);
 
         addressFavoriteAdapter.setUpdateAdapter(normalAdapter);
         normalAdapter.setUpdateAdapter(addressFavoriteAdapter);

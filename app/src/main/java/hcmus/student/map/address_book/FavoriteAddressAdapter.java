@@ -25,20 +25,20 @@ import hcmus.student.map.R;
 import hcmus.student.map.model.Database;
 import hcmus.student.map.model.Place;
 
-public class AddressFavoriteAdapter extends BaseAdapter {
+public class FavoriteAddressAdapter extends BaseAdapter {
     Database mDatabase;
     Context context;
     List<Place> placesFav;
-    AddressBookAdapter updateAdapter;
+    NormalAddressAdapter updateAdapter;
 
 
-    public AddressFavoriteAdapter(Context context) {
+    public FavoriteAddressAdapter(Context context) {
         this.context = context;
         placesFav = new ArrayList<>();
         this.mDatabase = new Database(context);
     }
 
-    public void setUpdateAdapter(AddressBookAdapter updateAdapter) {
+    public void setUpdateAdapter(NormalAddressAdapter updateAdapter) {
         this.updateAdapter = updateAdapter;
     }
 
@@ -88,14 +88,11 @@ public class AddressFavoriteAdapter extends BaseAdapter {
         btnFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                if (place.getFavorite().equals("1")) {
-                    LatLng location = place.getLocation();
-                    mDatabase.removeFavorite(location.latitude, location.longitude);
-                    btnFavorite.setBackgroundResource(R.drawable.ic_baseline_favorite);
-                    getUpdate();
-                    updateAdapter.getUpdate();
-                }
+                LatLng location = place.getLocation();
+                mDatabase.removeFavorite(place.getId());
+                btnFavorite.setBackgroundResource(R.drawable.ic_baseline_favorite);
+                getUpdate();
+                updateAdapter.getUpdate();
             }
         });
         return convertView;

@@ -110,11 +110,11 @@ public class EditPlaceFragment extends Fragment implements View.OnClickListener 
                     Toast.makeText(activity, "Place name is required!", Toast.LENGTH_SHORT).show();
                 } else {
                     try {
-                        Database db = new Database(getContext());
-                        Place place=new Place(edtNewName.getText().toString(),new LatLng(latLng.latitude, latLng.longitude),selectedImage);
-                        db.editPlace(place);
-                        activity.backToPreviousFragment();
-                        activity.updateOnscreenMarker(latLng, selectedImage);
+//                        Database db = new Database(getContext());
+//                        Place place=new Place(edtNewName.getText().toString(),new LatLng(latLng.latitude, latLng.longitude),selectedImage);
+//                        db.editPlace(place);
+//                        activity.backToPreviousFragment();
+//                        activity.updateOnscreenMarker(latLng, selectedImage);
                     } catch (Exception e) {
                         Toast.makeText(activity, "This place is already in contact book", Toast.LENGTH_SHORT).show();
                     }

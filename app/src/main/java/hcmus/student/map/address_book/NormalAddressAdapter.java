@@ -46,7 +46,7 @@ import hcmus.student.map.model.Place;
 import hcmus.student.map.utitlies.AddressLine;
 import hcmus.student.map.utitlies.OnAddressLineResponse;
 
-public class AddressBookAdapter extends BaseAdapter {
+public class NormalAddressAdapter extends BaseAdapter {
     Database mDatabase;
     Context context;
     List<Place> places;
@@ -55,9 +55,9 @@ public class AddressBookAdapter extends BaseAdapter {
     Uri imageUri;
     ImageView ivAvatar;
     List<Place> placesFavorite;
-    AddressFavoriteAdapter updateAdapter;
+    FavoriteAddressAdapter updateAdapter;
 
-    public AddressBookAdapter(Context context) {
+    public NormalAddressAdapter(Context context) {
         this.context = context;
         this.mDatabase = new Database(context);
         this.places = new ArrayList<>();
@@ -69,7 +69,7 @@ public class AddressBookAdapter extends BaseAdapter {
         notifyDataSetChanged();
     }
 
-    public void setUpdateAdapter(AddressFavoriteAdapter updateAdapter) {
+    public void setUpdateAdapter(FavoriteAddressAdapter updateAdapter) {
         this.updateAdapter = updateAdapter;
     }
 
@@ -129,7 +129,7 @@ public class AddressBookAdapter extends BaseAdapter {
             @Override
             public void onClick(View v) {
                 PopupMenu popupMenu = new PopupMenu(context, btnBaselineMore);
-                popupMenu.getMenuInflater().inflate(R.menu.menu_item, popupMenu.getMenu());
+                popupMenu.getMenuInflater().inflate(R.menu.menu_address , popupMenu.getMenu());
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
@@ -148,6 +148,17 @@ public class AddressBookAdapter extends BaseAdapter {
                     }
                 });
                 popupMenu.show();
+            }
+        });
+
+        btnFavorite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                LatLng location = place.getLocation();
+                mDatabase.addFavorite(place.getId());
+                btnFavorite.setBackgroundResource(R.drawable.ic_baseline_favorite);
+                getUpdate();
+                updateAdapter.getUpdate();
             }
         });
 
@@ -216,6 +227,7 @@ public class AddressBookAdapter extends BaseAdapter {
         }).setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
             }
         });
 
