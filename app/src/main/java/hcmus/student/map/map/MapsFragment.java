@@ -197,11 +197,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             public void onClick(View v) {
                 if (isContactShown) {
                     hideAllAddress();
-                    btnContact.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_btn_show_contact, null));
+                    btnContact.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_btn_hide_contact, null));
                     isContactShown = false;
                 } else {
                     showAllAddress();
-                    btnContact.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_btn_hide_contact, null));
+                    btnContact.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_btn_show_contact, null));
                     isContactShown = true;
                 }
             }
@@ -270,6 +270,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     @Override
     public void closeDirection() {
         getChildFragmentManager().popBackStack();
+
         if (mRoutes != null) {
             for (int i = 0; i < mRoutes.size(); i++) {
                 mRoutes.get(i).remove();
@@ -282,6 +283,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             mRouteEndMarker.remove();
 
         directionFragment = null;
+        Fragment fm = getFragmentManager().findFragmentById(R.id.frameBottom);
+        if (fm != null && fm.isAdded())
+            main.getSupportFragmentManager().beginTransaction().remove(fm).commit();
     }
 
     public void drawRoute(LatLng start, LatLng end) {
@@ -333,10 +337,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     public void moveCamera(LatLng location) {
         LatLng markerLoc = new LatLng(location.latitude, location.longitude);
         final CameraPosition cameraPosition = new CameraPosition.Builder()
-                .target(markerLoc)
-                .zoom(15)
-                .tilt(30)
-                .build();
+                .target(markerLoc).zoom(15).tilt(30).build();
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
@@ -363,10 +364,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             canvas.drawBitmap(bmpAvatar, 5, 5, null);
         }
 
-        mContactMarkers.add(mMap.addMarker(new MarkerOptions().position(coordinate)
-                .icon(BitmapDescriptorFactory.fromBitmap(bmpMarker))));
-        mMap.addMarker(new MarkerOptions().position(coordinate)
-                .icon(BitmapDescriptorFactory.fromBitmap(bmpMarker))).setZIndex(3);
+        Marker newMarker = mMap.addMarker(new MarkerOptions().position(coordinate)
+                .icon(BitmapDescriptorFactory.fromBitmap(bmpMarker)));
+        newMarker.setZIndex(3);
+        mContactMarkers.add(newMarker);
     }
 
     @Override
@@ -383,7 +384,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     }
 
     @Override
-    public void onRouteRespond(List<PolylineOptions> polylineOptions, List<String> durations) {
+    public void onRouteRespond
+            (List<PolylineOptions> polylineOptions, List<String> durations) {
         if (mRoutes != null) {
             for (int i = 0; i < mRoutes.size(); i++) {
                 mRoutes.get(i).remove();
