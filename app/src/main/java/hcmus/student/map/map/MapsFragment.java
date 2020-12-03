@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -27,7 +28,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps. MapView;
+import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -52,6 +53,7 @@ import hcmus.student.map.map.direction.DirectionFragment;
 import hcmus.student.map.map.utilities.LocationChangeCallback;
 import hcmus.student.map.map.utilities.MarkerAnimator;
 import hcmus.student.map.map.utilities.OrientationSensor;
+import hcmus.student.map.map.utilities.SpeedMonitor;
 import hcmus.student.map.map.utilities.direction.Direction;
 import hcmus.student.map.map.utilities.direction.DirectionResponse;
 import hcmus.student.map.map.utilities.direction.DirectionTask;
@@ -81,8 +83,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     private Context context;
     private DirectionFragment directionFragment;
     private boolean isCameraFollowing;
-
     private boolean isContactShown;
+    private SpeedMonitor speedMonitor;
+    private TextView txtSpeed;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
 
@@ -96,7 +99,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         context = getContext();
         main = (MainActivity) getActivity();
         mRouteStartMarker = mRouteEndMarker = null;
@@ -104,6 +106,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         mContactMarkers = new ArrayList<>();
         isCameraFollowing = true;
         isContactShown = false;
+        speedMonitor = new SpeedMonitor(context);
     }
 
     @Nullable
@@ -115,6 +118,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         SensorManager sensorService = (SensorManager) main.getSystemService(Context.SENSOR_SERVICE);
         mMapView = view.findViewById(R.id.map);
         mMapView.onCreate(savedInstanceState);
+        txtSpeed = view.findViewById(R.id.txtSpeed);
         //Implement Rotation change here
         mSensor = new OrientationSensor(sensorService) {
             float previousRotation = 0;
@@ -259,7 +263,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                     location.getLongitude()), DEFAULT_ZOOM));
         }
         mCurrentLocation = location;
-
+        txtSpeed.setText(speedMonitor.getSpeed(mCurrentLocation) + "km/h");
         animator.animate(location, isCameraFollowing);
     }
 

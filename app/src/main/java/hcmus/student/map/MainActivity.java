@@ -45,6 +45,7 @@ public class MainActivity extends FragmentActivity implements MainCallbacks, OnL
     private LocationService service;
     private List<LocationChangeCallback> delegates;
 
+
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -177,13 +178,12 @@ public class MainActivity extends FragmentActivity implements MainCallbacks, OnL
 
     @Override
     public void locatePlace(LatLng location) {
-
-
         mViewPager.setCurrentItem(0);
         MapsFragment fragment = (MapsFragment) adapter.getFragment(0);
         fragment.moveCamera(location);
         TabLayout mTabs = findViewById(R.id.tabs);
         TabLayout.Tab tab = mTabs.getTabAt(0);
+        assert tab != null;
         tab.select();
     }
 

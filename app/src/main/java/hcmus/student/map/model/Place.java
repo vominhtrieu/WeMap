@@ -1,5 +1,7 @@
 package hcmus.student.map.model;
 
+import android.location.Location;
+
 import com.google.android.gms.maps.model.LatLng;
 
 public class Place {
@@ -56,4 +58,11 @@ public class Place {
     public void setFavorite(String favorite) {
         this.favorite = favorite;
     }
+    public Double getLatitude() {
+        if(location!=null)
+            return location.latitude;
+        return null;
+    }
+
+
 }
