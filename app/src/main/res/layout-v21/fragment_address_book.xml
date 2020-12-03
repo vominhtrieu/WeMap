@@ -41,13 +41,6 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-<!--            <androidx.recyclerview.widget.RecyclerView-->
-<!--                android:id="@+id/rvFavorite"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:divider="@null"-->
-<!--                android:listSelector="@android:color/transparent" />-->
-
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvAddress"
                 android:layout_width="match_parent"

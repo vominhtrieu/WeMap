@@ -296,9 +296,8 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
         alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface arg0, int arg1) {
-                mDatabase.deletePlace(place);
+                mDatabase.deletePlace(place.getId());
                 places.remove(position);
-                //update Map.
                 notifyDataSetChanged();
             }
         }).setNegativeButton("No", new DialogInterface.OnClickListener() {

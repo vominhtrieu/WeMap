@@ -63,9 +63,9 @@ public class Database extends SQLiteOpenHelper {
         return getPlacesFromCursor(cursor);
     }
 
-    public void deletePlace(Place place) {
+    public void deletePlace(int id) {
         SQLiteDatabase db = getWritableDatabase();
-        db.delete(TABLE_NAME, KEY_LATITUDE + "=" + place.getLocation().latitude + " AND " + KEY_LONGITUDE + "=" + place.getLocation().longitude, null);
+        db.delete(TABLE_NAME, KEY_ID + "=" + id, null);
     }
 
     public void editPlace(Place place) {
@@ -105,21 +105,6 @@ public class Database extends SQLiteOpenHelper {
         cv.put(KEY_FAVORITE, "0");
         db.update(TABLE_NAME, cv, KEY_ID + "=" + id, null);
     }
-
-    public List<Place> getNormalPlaces() {
-        SQLiteDatabase database = getWritableDatabase();
-        Cursor cursor = database.query(TABLE_NAME, null, KEY_FAVORITE + "='0'", null, null,
-                null, KEY_NAME);
-        return getPlacesFromCursor(cursor);
-    }
-
-    public List<Place> getFavoritePlaces() {
-        SQLiteDatabase database = getWritableDatabase();
-        Cursor cursor = database.query(TABLE_NAME, null, KEY_FAVORITE + "='1'", null, null,
-                null, KEY_NAME);
-        return getPlacesFromCursor(cursor);
-    }
-
 
     @Override
     public void onCreate(SQLiteDatabase db) {
