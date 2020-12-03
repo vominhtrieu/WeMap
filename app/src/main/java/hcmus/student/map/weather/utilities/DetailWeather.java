@@ -1,16 +1,28 @@
 package hcmus.student.map.weather.utilities;
 
-public class DetailWeather {
-    private String icon, description;
-    private double temperature, rain, wind, humidity;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
-    public DetailWeather(String icon, String description, double temperature, double rain, double wind, double humidity) {
+import java.io.InputStream;
+import java.net.URL;
+import java.util.List;
+
+import javax.net.ssl.HttpsURLConnection;
+
+public class DetailWeather {
+    private String icon;
+    private String description;
+    private double temperature, rain, windSpeed, humidity;
+    private List<DailyWeather> dailyWeathers;
+
+    public DetailWeather(String icon, String description, double temperature, double rain, double windSpeed, double humidity, List<DailyWeather> dailyWeathers) {
         this.icon = icon;
         this.description = description;
         this.temperature = temperature;
         this.rain = rain;
-        this.wind = wind;
+        this.windSpeed = windSpeed;
         this.humidity = humidity;
+        this.dailyWeathers = dailyWeathers;
     }
 
     public String getIcon() {
@@ -29,11 +41,15 @@ public class DetailWeather {
         return rain;
     }
 
-    public double getWind() {
-        return wind;
+    public double getWindSpeed() {
+        return windSpeed;
     }
 
     public double getHumidity() {
         return humidity;
+    }
+
+    public List<DailyWeather> getDailyWeathers() {
+        return dailyWeathers;
     }
 }

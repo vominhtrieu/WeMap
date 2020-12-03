@@ -3,7 +3,6 @@ package hcmus.student.map.address_book;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,19 +17,10 @@ import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Geocoder;
 import android.net.Uri;
-import android.provider.ContactsContract;
-import android.provider.MediaStore;
-import android.text.Layout;
-import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -42,52 +32,45 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.constraintlayout.widget.ConstraintSet;
-import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.FragmentActivity;
-import androidx.viewpager.widget.ViewPager;
-import androidx.viewpager2.widget.ViewPager2;
 
 import com.google.android.gms.maps.model.LatLng;
 
 import java.io.ByteArrayOutputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import hcmus.student.map.MainActivity;
 import hcmus.student.map.R;
-import hcmus.student.map.ViewPagerAdapter;
-import hcmus.student.map.map.MapsFragment;
-import hcmus.student.map.map.MapsFragmentCallbacks;
 import hcmus.student.map.model.Database;
 import hcmus.student.map.model.Place;
 import hcmus.student.map.utitlies.AddressLine;
 import hcmus.student.map.utitlies.OnAddressLineResponse;
 
-import static android.app.Activity.RESULT_OK;
-import static android.provider.MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE;
-import static androidx.core.app.ActivityCompat.*;
-
 public class AddressBookAdapter extends BaseAdapter {
     Database mDatabase;
     Context context;
     List<Place> places;
-    final int REQUEST_CODE_CAMERA=123;
-    final int REQUEST_CODE_FOLDER=456;
+    final int REQUEST_CODE_CAMERA = 123;
+    final int REQUEST_CODE_FOLDER = 456;
     Uri imageUri;
     ImageView ivAvatar;
+    List<Place> placesFavorite;
+    AddressFavoriteAdapter updateAdapter;
 
     public AddressBookAdapter(Context context) {
         this.context = context;
         this.mDatabase = new Database(context);
         this.places = new ArrayList<>();
+        this.placesFavorite = new ArrayList<>();
     }
 
     public void getUpdate() {
-        places = mDatabase.getAllPlaces();
+        places = mDatabase.getPlacesNormal();
         notifyDataSetChanged();
+    }
+
+    public void setUpdateAdapter(AddressFavoriteAdapter updateAdapter) {
+        this.updateAdapter = updateAdapter;
     }
 
     @Override
@@ -102,7 +85,7 @@ public class AddressBookAdapter extends BaseAdapter {
 
     @Override
     public long getItemId(int position) {
-        return position;
+        return 0;
     }
 
     @NonNull
@@ -113,41 +96,44 @@ public class AddressBookAdapter extends BaseAdapter {
             convertView = inflater.inflate(R.layout.row_place, null, false);
         }
 
-        TextView txtListItemName = convertView.findViewById(R.id.txtListItemName);
-        final TextView txtListItemAddressLine = convertView.findViewById(R.id.txtListItemAddressLine);
-        txtListItemAddressLine.setText(R.string.txtLoadingAddressLine);
-        final Place place = getItem(position);
+        final TextView txtName = convertView.findViewById(R.id.txtName);
+        final TextView txtAddressLine = convertView.findViewById(R.id.txtAddressLine);
+        final Button btnFavorite = convertView.findViewById(R.id.btnFavorite);
 
-        txtListItemName.setText(place.getName());
+        txtAddressLine.setText(R.string.txt_loading_address_line);
+        final Place place = getItem(position);
         LatLng location = place.getLocation();
         AddressLine addressLine = new AddressLine(new Geocoder(context), new OnAddressLineResponse() {
             @Override
             public void onAddressLineResponse(String addressLine) {
                 if (addressLine != null) {
-                    txtListItemAddressLine.setText(addressLine);
+                    txtAddressLine.setText(addressLine);
                 } else {
-                    txtListItemAddressLine.setText(R.string.txtNullLocation);
+                    txtAddressLine.setText(R.string.txtNullLocation);
                 }
             }
         });
+
+
         addressLine.execute(location);
+        txtName.setText(place.getName());
 
         if (place.getAvatar() != null) {
             Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
             ImageView ivAvatar = convertView.findViewById(R.id.ivAvatar);
             ivAvatar.setBackground(new BitmapDrawable(context.getResources(), bmp));
         }
-        final ImageButton btnBaselineMore=convertView.findViewById(R.id.btnMore);
+
+        final ImageButton btnBaselineMore = convertView.findViewById(R.id.btnMore);
         btnBaselineMore.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PopupMenu popupMenu=new PopupMenu(context,btnBaselineMore);
-                popupMenu.getMenuInflater().inflate(R.menu.menu_item,popupMenu.getMenu());
+                PopupMenu popupMenu = new PopupMenu(context, btnBaselineMore);
+                popupMenu.getMenuInflater().inflate(R.menu.menu_item, popupMenu.getMenu());
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId())
-                        {
+                        switch (item.getItemId()) {
                             case R.id.itemEdit:
                                 GetDialogEdit(position);
                                 break;
@@ -165,7 +151,7 @@ public class AddressBookAdapter extends BaseAdapter {
             }
         });
 
-        ImageButton btnLocate=convertView.findViewById(R.id.btn_list_item_locate);
+        ImageButton btnLocate = convertView.findViewById(R.id.btn_list_item_locate);
         btnLocate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -175,25 +161,25 @@ public class AddressBookAdapter extends BaseAdapter {
         return convertView;
     }
 
-    private void GetDialogEdit(int position){
-        final Dialog dialogEdit=new Dialog(context);
-        dialogEdit.setContentView(R.layout.dialog_edit) ;
-        final EditText edtNewName=dialogEdit.findViewById(R.id.edtNewName);
+    private void GetDialogEdit(int position) {
+        final Dialog dialogEdit = new Dialog(context);
+        dialogEdit.setContentView(R.layout.dialog_edit);
+        final EditText edtNewName = dialogEdit.findViewById(R.id.edtNewName);
 
-        Button btnOK=dialogEdit.findViewById(R.id.btnOK);
-        Button btnCancel=dialogEdit.findViewById(R.id.btnCancel);
-        ivAvatar=dialogEdit.findViewById(R.id.ivAvatar);
+        Button btnOK = dialogEdit.findViewById(R.id.btnOK);
+        Button btnCancel = dialogEdit.findViewById(R.id.btnCancel);
+        ivAvatar = dialogEdit.findViewById(R.id.ivAvatar);
         final Place place = getItem(position);
         edtNewName.setText(place.getName());
         Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
         ivAvatar.setBackground(new BitmapDrawable(context.getResources(), bmp));
 
-        ImageButton btnCamera=(ImageButton)dialogEdit.findViewById(R.id.btnCamera);
+        ImageButton btnCamera = (ImageButton) dialogEdit.findViewById(R.id.btnCamera);
         btnCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 CameraIntent();
-                Toast.makeText(context,"click image",Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "click image", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -214,7 +200,8 @@ public class AddressBookAdapter extends BaseAdapter {
         });
         dialogEdit.show();
     }
-    private void GetDialogDelete(final int position){
+
+    private void GetDialogDelete(final int position) {
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
         alertDialogBuilder.setMessage("Are you sure,You wanted to delete an address?");
         final Place place = getItem(position);
@@ -234,15 +221,18 @@ public class AddressBookAdapter extends BaseAdapter {
 
         alertDialogBuilder.show();
     }
-    private  void CameraIntent(){
+
+    private void CameraIntent() {
         Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-        ((Activity)context).startActivityForResult(intent, REQUEST_CODE_CAMERA);
+        ((Activity) context).startActivityForResult(intent, REQUEST_CODE_CAMERA);
     }
-    private void GalleryIntent(){
+
+    private void GalleryIntent() {
         Intent intent1 = new Intent(Intent.ACTION_PICK);
         intent1.setType("image/*");
-        ((Activity)context).startActivityForResult(intent1, REQUEST_CODE_FOLDER);
+        ((Activity) context).startActivityForResult(intent1, REQUEST_CODE_FOLDER);
     }
+
     private void setSelectedImage(Bitmap bitmap) {
 
         ivAvatar.setImageBitmap(bitmap);
@@ -250,28 +240,6 @@ public class AddressBookAdapter extends BaseAdapter {
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
 //        this.selectedImage = stream.toByteArray();
     }
-
-//    @Override
-//    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode, resultCode, data);
-//        if (resultCode == RESULT_OK) {
-//            if (requestCode == REQUEST_CODE_CAMERA && resultCode == RESULT_OK && data != null) {
-//                Bitmap bitmap = (Bitmap) data.getExtras().get("data");
-//                setSelectedImage(getCircularBitmap(bitmap));
-//            }
-//
-//            if (requestCode == REQUEST_CODE_FOLDER && resultCode == RESULT_OK && data != null) {
-//                Uri uri = data.getData();
-//                try {
-//                    InputStream inputStream =  ((Activity)context).getContentResolver().openInputStream(uri);
-//                    Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
-//                    setSelectedImage(getCircularBitmap(bitmap));
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }
-//    }
 
     private Bitmap getCircularBitmap(Bitmap bitmap) {
         int squareBitmapWidth = Math.min(bitmap.getWidth(), bitmap.getHeight());

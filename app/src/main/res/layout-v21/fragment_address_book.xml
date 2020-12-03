@@ -29,30 +29,44 @@
             android:layout_gravity="center"
             android:background="@drawable/ic_baseline_search" />
     </LinearLayout>
-    <!--Apply favorite feature here-->
-    <!--    <LinearLayout-->
-    <!--        android:layout_width="match_parent"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:orientation="horizontal">-->
 
-    <!--        <ImageView-->
-    <!--            android:layout_width="36dp"-->
-    <!--            android:layout_height="36dp"-->
-    <!--            android:layout_margin="10dp"-->
-    <!--            android:src="@drawable/ic_baseline_favorite" />-->
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:fillViewport="true">
 
-    <!--        <ListView-->
-    <!--            android:id="@+id/lvFavorite"-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="match_parent"-->
-    <!--            android:layout_marginStart="20dp"-->
-    <!--            android:layout_marginEnd="10dp" />-->
-    <!--    </LinearLayout>-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-    <ListView
-        android:id="@+id/lvAddress"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:divider="@null"/>
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/ic_baseline_favorite_red" />
 
+            <ListView
+                android:id="@+id/lvFavorite"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="@null" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="List Address:"
+                android:textColor="#000"
+                android:textSize="20dp" />
+
+            <ListView
+                android:id="@+id/lvAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:divider="@null" />
+        </LinearLayout>
+
+    </ScrollView>
 </LinearLayout>
