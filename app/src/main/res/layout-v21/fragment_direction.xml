@@ -44,7 +44,7 @@
 
             </LinearLayout>
 
-            <ListView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/lvFirstSearchResult"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -74,7 +74,7 @@
                     android:textColor="@android:color/black" />
             </LinearLayout>
 
-            <ListView
+            <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/lvSecondSearchResult"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

@@ -291,7 +291,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             mRouteEndMarker.remove();
 
         directionFragment = null;
-        Fragment fm = getFragmentManager().findFragmentById(R.id.frameBottom);
+        Fragment fm = getFragmentManager().findFragmentById(R.id.frameRouteInfo);
         if (fm != null && fm.isAdded())
             main.getSupportFragmentManager().beginTransaction().remove(fm).commit();
     }

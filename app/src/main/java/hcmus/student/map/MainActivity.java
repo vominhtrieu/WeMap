@@ -217,7 +217,7 @@ public class MainActivity extends FragmentActivity implements MainCallbacks, OnL
     @Override
     public void openRouteInfo(String routeDuration, int routeColor) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frameBottom, RouteInfoFragment.newInstance(routeDuration, routeColor));
+        fragmentTransaction.replace(R.id.frameRouteInfo, RouteInfoFragment.newInstance(routeDuration, routeColor));
         fragmentTransaction.commit();
     }
 
