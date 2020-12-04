@@ -115,7 +115,7 @@ public class Database extends SQLiteOpenHelper {
         String sql = String.format(
                 "CREATE TABLE %s (%s INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT, %s REAL, %s REAL, %s BLOB, %s TEXT)",
                 TABLE_NAME, KEY_ID, KEY_NAME, KEY_LATITUDE, KEY_LONGITUDE, KEY_AVATAR, KEY_FAVORITE);
-        Log.e("sql", sql);
+
         SQLiteStatement statement = db.compileStatement(sql);
         statement.execute();
     }
