@@ -202,7 +202,7 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.itemEdit:
-                        showEditDialog(position);
+                        ((MainActivity)context).editPlaces(place);
                         break;
                     case R.id.itemDelete:
                         ShowDeleteDialog(position);
@@ -249,46 +249,6 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
         return places.size();
     }
 
-    private void showEditDialog(int position) {
-        final Dialog dialogEdit = new Dialog(context);
-        dialogEdit.setContentView(R.layout.dialog_edit);
-        final EditText edtNewName = dialogEdit.findViewById(R.id.edtNewName);
-
-        Button btnOK = dialogEdit.findViewById(R.id.btnOK);
-        Button btnCancel = dialogEdit.findViewById(R.id.btnCancel);
-        ivAvatar = dialogEdit.findViewById(R.id.ivAvatar);
-        final Place place = places.get(position);
-        edtNewName.setText(place.getName());
-        Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
-        ivAvatar.setBackground(new BitmapDrawable(context.getResources(), bmp));
-
-        ImageButton btnCamera = dialogEdit.findViewById(R.id.btnCamera);
-        btnCamera.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cameraIntent();
-                Toast.makeText(context, "click image", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        btnOK.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                place.setName(edtNewName.getText().toString());
-                mDatabase.editPlace(place);
-                notifyDataSetChanged();
-                dialogEdit.dismiss();
-            }
-        });
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialogEdit.dismiss();
-            }
-        });
-        dialogEdit.show();
-    }
-
     private void ShowDeleteDialog(final int position) {
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
         alertDialogBuilder.setMessage("Are you sure,You wanted to delete an address?");
@@ -310,8 +270,4 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
         alertDialogBuilder.show();
     }
 
-    private void cameraIntent() {
-        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-        ((Activity) context).startActivityForResult(intent, REQUEST_CODE_CAMERA);
-    }
 }

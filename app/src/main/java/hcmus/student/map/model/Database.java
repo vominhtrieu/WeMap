@@ -77,7 +77,7 @@ public class Database extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_AVATAR, place.getAvatar());
         values.put(KEY_NAME, place.getName());
-        db.update(TABLE_NAME, values, KEY_LATITUDE + "=" + place.getLocation().latitude + " AND " + KEY_LONGITUDE + "=" + place.getLocation().longitude, null);
+        db.update(TABLE_NAME, values, KEY_ID+"="+place.getId(), null);
         db.close();
     }
 
