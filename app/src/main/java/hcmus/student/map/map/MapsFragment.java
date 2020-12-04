@@ -13,7 +13,6 @@ import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,6 +43,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import hcmus.student.map.MainActivity;
 import hcmus.student.map.R;
@@ -271,7 +271,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                     location.getLongitude()), DEFAULT_ZOOM));
         }
         mCurrentLocation = location;
-        txtSpeed.setText(speedMonitor.getSpeed(mCurrentLocation) + " km/h");
+        txtSpeed.setText(String.format(Locale.US, "%.1f km/h", speedMonitor.getSpeed(mCurrentLocation)));
         animator.animate(location, isCameraFollowing);
     }
 
