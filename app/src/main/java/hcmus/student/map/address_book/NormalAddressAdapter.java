@@ -202,7 +202,7 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.itemEdit:
-                        ((MainActivity)context).editPlaces(place);
+                        ((MainActivity) context).editPlaces(place);
                         break;
                     case R.id.itemDelete:
                         ShowDeleteDialog(position);
@@ -221,15 +221,14 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
             }
         });
 
-        if(place.getFavorite().equals("1"))
+        if (place.getFavorite().equals("1"))
             btnFavorite.setBackgroundResource(R.drawable.ic_baseline_favorite_red);
         btnFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (place.getFavorite().equals("0")) {
                     mDatabase.addFavorite(place.getId());
-                }
-                else {
+                } else {
                     mDatabase.removeFavorite(place.getId());
                 }
                 getUpdate();

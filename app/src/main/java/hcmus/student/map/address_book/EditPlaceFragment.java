@@ -57,14 +57,14 @@ public class EditPlaceFragment extends Fragment implements View.OnClickListener 
         EditPlaceFragment fragment = new EditPlaceFragment();
         Bundle args = new Bundle();
 
-        args.putInt("id",place.getId());
-        args.putString("name",place.getName());
+        args.putInt("id", place.getId());
+        args.putString("name", place.getName());
         args.putDouble("lat", place.getLocation().latitude);
         args.putDouble("lng", place.getLocation().latitude);
-        args.putByteArray("avatar",place.getAvatar());
-        args.putString("favorite",place.getFavorite());
+        args.putByteArray("avatar", place.getAvatar());
+        args.putString("favorite", place.getFavorite());
 
-        Log.d("name",place.getName());
+        Log.d("name", place.getName());
         fragment.setArguments(args);
         return fragment;
     }
@@ -90,12 +90,13 @@ public class EditPlaceFragment extends Fragment implements View.OnClickListener 
         btnFolder = view.findViewById(R.id.btnFolder);
         ivAvatar = view.findViewById(R.id.ivAvatar);
 
-        latLng = new LatLng(args.getDouble("lat"),args.getDouble("lng"));
+        latLng = new LatLng(args.getDouble("lat"), args.getDouble("lng"));
 
-        place=new Place(args.getInt("id"),args.getString("name"),latLng,args.getByteArray("avatar"),args.getString("favorite"));
+        place = new Place(args.getInt("id"), args.getString("name"), latLng, args.getByteArray("avatar"), args.getString("favorite"));
 
         edtNewName.setText(place.getName());
-        Log.d("name",place.getName());
+        Log.d("name", place.getName());
+        Log.d("id", "" + place.getId());
 
         if (place.getAvatar() != null) {
             Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
@@ -127,7 +128,7 @@ public class EditPlaceFragment extends Fragment implements View.OnClickListener 
                     try {
                         Database db = new Database(getContext());
                         place.setName(edtNewName.getText().toString());
-                        if(selectedImage!=null){
+                        if (selectedImage != null) {
                             place.setAvatar(selectedImage);
                         }
                         db.editPlace(place);
@@ -145,15 +146,17 @@ public class EditPlaceFragment extends Fragment implements View.OnClickListener 
         }
     }
 
-    private  void CameraIntent(){
+    private void CameraIntent() {
         Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
         startActivityForResult(intent, REQUEST_CODE_CAMERA);
     }
-    private void GalleryIntent(){
+
+    private void GalleryIntent() {
         Intent intent1 = new Intent(Intent.ACTION_PICK);
         intent1.setType("image/*");
         startActivityForResult(intent1, REQUEST_CODE_FOLDER);
     }
+
     private void setSelectedImage(Bitmap bitmap) {
         ivAvatar.setImageBitmap(bitmap);
         ByteArrayOutputStream stream = new ByteArrayOutputStream();

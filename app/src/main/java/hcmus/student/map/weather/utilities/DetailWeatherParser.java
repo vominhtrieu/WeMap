@@ -11,7 +11,7 @@ import java.util.List;
 
 public class DetailWeatherParser {
     final static int MAX_NUMBER_OF_DAY = 7;
-    DetailWeather parse(String data) throws JSONException {
+    public DetailWeather parse(String data) throws JSONException {
         JSONObject jsonObject = new JSONObject(data);
         JSONObject current = jsonObject.getJSONObject("current");
 

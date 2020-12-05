@@ -2,6 +2,7 @@ package hcmus.student.map.map;
 
 import android.location.Geocoder;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +13,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.Formatter;
 import java.util.Locale;
@@ -22,12 +25,16 @@ import hcmus.student.map.MainActivity;
 import hcmus.student.map.R;
 import hcmus.student.map.utitlies.AddressLine;
 import hcmus.student.map.utitlies.OnAddressLineResponse;
+import hcmus.student.map.weather.WeatherAsynTask;
+import hcmus.student.map.weather.utilities.DetailWeather;
+import hcmus.student.map.weather.utilities.GetWeather;
+import hcmus.student.map.weather.utilities.OnWeatherResponse;
 
-public class MarkerInfoFragment extends Fragment implements View.OnClickListener, OnAddressLineResponse {
+public class MarkerInfoFragment extends Fragment implements View.OnClickListener, OnAddressLineResponse, OnWeatherResponse {
     private MainActivity activity;
     private LatLng latLng;
     Button btnAdd, btnClose, btnDirection;
-    TextView txtPlaceName, txtLat, txtLng;
+    TextView txtPlaceName, txtLat, txtLng,txtTemperature,txtHumidity,txtWind;
 
     public static MarkerInfoFragment newInstance(Marker marker) {
         MarkerInfoFragment fragment = new MarkerInfoFragment();
@@ -42,6 +49,11 @@ public class MarkerInfoFragment extends Fragment implements View.OnClickListener
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.activity = (MainActivity) getActivity();
+        Bundle args = getArguments();
+        latLng = new LatLng(args.getDouble("lat"), args.getDouble("lng"));
+        String url = GetWeather.getUrl(activity, latLng);
+        WeatherAsynTask weatherAsynTask = new WeatherAsynTask(this);
+        weatherAsynTask.execute(url);
     }
 
     @Nullable
@@ -55,6 +67,9 @@ public class MarkerInfoFragment extends Fragment implements View.OnClickListener
         btnAdd = view.findViewById(R.id.btnAdd);
         btnDirection = view.findViewById(R.id.btnDirection);
         btnClose = view.findViewById(R.id.btnClose);
+        txtTemperature=view.findViewById(R.id.txtTemperature);
+        txtHumidity=view.findViewById(R.id.txtHumidity);
+        txtWind=view.findViewById(R.id.txtWind);
 
         StringBuilder sb = new StringBuilder();
         Formatter formatter = new Formatter(sb, Locale.US);
@@ -102,6 +117,27 @@ public class MarkerInfoFragment extends Fragment implements View.OnClickListener
         } else {
             txtPlaceName.setText(R.string.txtUnknownLocation);
         }
+    }
+
+    @Override
+    public void onWeatherResponse(DetailWeather detailWeather) {
+        if (detailWeather != null) {
+//            Log.d("Tem",String.valueOf());
+            StringBuilder sb1 = new StringBuilder();
+            Formatter formatter1 = new Formatter(sb1, Locale.US);
+            txtTemperature.setText(formatter1.format("%s %.2f", "Temperature: ",detailWeather.getTemperature()).toString());
+            StringBuilder sb2 = new StringBuilder();
+            Formatter formatter2 = new Formatter(sb2, Locale.US);
+            txtWind.setText(formatter2.format("%s %.2f", "Wind Speed: ",detailWeather.getWindSpeed()).toString());
+            StringBuilder sb3 = new StringBuilder();
+            Formatter formatter3 = new Formatter(sb3, Locale.US);
+            txtHumidity.setText(formatter3.format("%s %.2f", "Humidity: ",detailWeather.getHumidity()).toString());
+        } else {
+            txtTemperature.setText(R.string.txtUnknownLocation);
+            txtHumidity.setText(R.string.txtUnknownLocation);
+            txtWind.setText(R.string.txtUnknownLocation);
+        }
+
     }
 }
 
