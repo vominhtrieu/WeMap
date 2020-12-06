@@ -1,5 +1,6 @@
 package hcmus.student.map.map;
 
+import android.content.Context;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.util.Log;
@@ -7,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -33,8 +35,10 @@ import hcmus.student.map.weather.utilities.OnWeatherResponse;
 public class MarkerInfoFragment extends Fragment implements View.OnClickListener, OnAddressLineResponse, OnWeatherResponse {
     private MainActivity activity;
     private LatLng latLng;
+    private Context context;
     Button btnAdd, btnClose, btnDirection;
     TextView txtPlaceName, txtLat, txtLng,txtTemperature,txtHumidity,txtWind;
+    private ImageView ivIcon;
 
     public static MarkerInfoFragment newInstance(Marker marker) {
         MarkerInfoFragment fragment = new MarkerInfoFragment();
@@ -49,6 +53,7 @@ public class MarkerInfoFragment extends Fragment implements View.OnClickListener
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.activity = (MainActivity) getActivity();
+        context=getContext();
         Bundle args = getArguments();
         latLng = new LatLng(args.getDouble("lat"), args.getDouble("lng"));
         String url = GetWeather.getUrl(activity, latLng);
@@ -70,6 +75,8 @@ public class MarkerInfoFragment extends Fragment implements View.OnClickListener
         txtTemperature=view.findViewById(R.id.txtTemperature);
         txtHumidity=view.findViewById(R.id.txtHumidity);
         txtWind=view.findViewById(R.id.txtWind);
+        ivIcon=view.findViewById(R.id.ivIcon);
+
 
         StringBuilder sb = new StringBuilder();
         Formatter formatter = new Formatter(sb, Locale.US);
@@ -123,15 +130,17 @@ public class MarkerInfoFragment extends Fragment implements View.OnClickListener
     public void onWeatherResponse(DetailWeather detailWeather) {
         if (detailWeather != null) {
 //            Log.d("Tem",String.valueOf());
+            int imageId = context.getResources().getIdentifier("ic_weather_" + detailWeather.getIcon(), "drawable", context.getPackageName());
+            ivIcon.setImageResource(imageId);;
             StringBuilder sb1 = new StringBuilder();
             Formatter formatter1 = new Formatter(sb1, Locale.US);
-            txtTemperature.setText(formatter1.format("%s %.2f", "Temperature: ",detailWeather.getTemperature()).toString());
+            txtTemperature.setText(formatter1.format("%s %.2foC", "Temperature: ",detailWeather.getTemperature()).toString());
             StringBuilder sb2 = new StringBuilder();
             Formatter formatter2 = new Formatter(sb2, Locale.US);
-            txtWind.setText(formatter2.format("%s %.2f", "Wind Speed: ",detailWeather.getWindSpeed()).toString());
+            txtWind.setText(formatter2.format("%s %.2fmph", "Wind Speed: ",detailWeather.getWindSpeed()).toString());
             StringBuilder sb3 = new StringBuilder();
             Formatter formatter3 = new Formatter(sb3, Locale.US);
-            txtHumidity.setText(formatter3.format("%s %.2f", "Humidity: ",detailWeather.getHumidity()).toString());
+            txtHumidity.setText(formatter3.format("%s %.2f%%", "Humidity: ",detailWeather.getHumidity()).toString());
         } else {
             txtTemperature.setText(R.string.txtUnknownLocation);
             txtHumidity.setText(R.string.txtUnknownLocation);
