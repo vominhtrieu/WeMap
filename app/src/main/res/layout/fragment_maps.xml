@@ -50,8 +50,9 @@
             app:elevation="2dp" />
 
         <androidx.cardview.widget.CardView
-            android:layout_width="96dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:minWidth="96dp"
             android:layout_gravity="end"
             android:background="@android:color/white"
             android:gravity="center_horizontal"

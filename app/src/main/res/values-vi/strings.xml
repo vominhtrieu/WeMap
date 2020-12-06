@@ -22,5 +22,8 @@
     <string name="txt_search">Tìm kiếm...</string>
     <string name="txtTemperature">Nhiệt độ</string>
     <string name="txtWind">Tốc độ gió</string>
-    <string tools:ignore="MissingTranslation" name="txtHumidity">Độ ẩm</string>
+    <string name="txtHumidity" tools:ignore="MissingTranslation">Độ ẩm</string>
+    <string name="txtEdit">Chỉnh sửa</string>
+    <string name="txtDelete">Xóa</string>
+    <string name="txtCancel">Hủy</string>
 </resources>

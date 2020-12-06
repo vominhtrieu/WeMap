@@ -27,7 +27,7 @@ import hcmus.student.map.model.Database;
 import hcmus.student.map.model.Place;
 
 public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapter.ViewHolder> implements PlaceRespondCallback {
-    final static int DELAY_TYPING = 500;
+    final static int DELAY_TYPING = 200;
 
     Context context;
     List<Place> places;
