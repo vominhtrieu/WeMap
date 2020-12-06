@@ -12,6 +12,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,12 +56,18 @@ public class EditPlaceFragment extends Fragment implements View.OnClickListener 
     public static EditPlaceFragment newInstance(Place place) {
         EditPlaceFragment fragment = new EditPlaceFragment();
         Bundle args = new Bundle();
+
+        args.putInt("id", place.getId());
+        args.putString("name", place.getName());
         args.putDouble("lat", place.getLocation().latitude);
         args.putDouble("lng", place.getLocation().latitude);
+        args.putByteArray("avatar", place.getAvatar());
+        args.putString("favorite", place.getFavorite());
+
+        Log.d("name", place.getName());
         fragment.setArguments(args);
         return fragment;
     }
-
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,6 +80,9 @@ public class EditPlaceFragment extends Fragment implements View.OnClickListener 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.dialog_edit, container, false);
 
+        Bundle args = getArguments();
+
+
         btnOK = view.findViewById(R.id.btnOK);
         btnCancel = view.findViewById(R.id.btnCancel);
         edtNewName = view.findViewById(R.id.edtNewName);
@@ -80,18 +90,24 @@ public class EditPlaceFragment extends Fragment implements View.OnClickListener 
         btnFolder = view.findViewById(R.id.btnFolder);
         ivAvatar = view.findViewById(R.id.ivAvatar);
 
+        latLng = new LatLng(args.getDouble("lat"), args.getDouble("lng"));
+
+        place = new Place(args.getInt("id"), args.getString("name"), latLng, args.getByteArray("avatar"), args.getString("favorite"));
+
         edtNewName.setText(place.getName());
-        Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
-        ivAvatar.setBackground(new BitmapDrawable(activity.getResources(), bmp));
+        Log.d("name", place.getName());
+        Log.d("id", "" + place.getId());
+
+        if (place.getAvatar() != null) {
+            Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
+            ivAvatar.setBackground(new BitmapDrawable(view.getResources(), bmp));
+        }
 
         btnCamera.setOnClickListener(this);
         btnFolder.setOnClickListener(this);
         btnOK.setOnClickListener(this);
         btnCancel.setOnClickListener(this);
 
-        Bundle args = getArguments();
-
-        latLng = new LatLng(place.getLocation().latitude, place.getLocation().longitude);
         return view;
     }
 
@@ -110,13 +126,17 @@ public class EditPlaceFragment extends Fragment implements View.OnClickListener 
                     Toast.makeText(activity, "Place name is required!", Toast.LENGTH_SHORT).show();
                 } else {
                     try {
-//                        Database db = new Database(getContext());
-//                        Place place=new Place(edtNewName.getText().toString(),new LatLng(latLng.latitude, latLng.longitude),selectedImage);
-//                        db.editPlace(place);
-//                        activity.backToPreviousFragment();
-//                        activity.updateOnscreenMarker(latLng, selectedImage);
+                        Database db = new Database(getContext());
+                        place.setName(edtNewName.getText().toString());
+                        if (selectedImage != null) {
+                            place.setAvatar(selectedImage);
+                        }
+                        db.editPlace(place);
+                        activity.backToPreviousFragment();
+                        activity.updateOnscreenMarker(latLng, selectedImage);
                     } catch (Exception e) {
-                        Toast.makeText(activity, "This place is already in contact book", Toast.LENGTH_SHORT).show();
+                        activity.updateOnscreenMarker(latLng, selectedImage);
+                        activity.backToPreviousFragment();
                     }
                 }
                 break;
@@ -126,15 +146,17 @@ public class EditPlaceFragment extends Fragment implements View.OnClickListener 
         }
     }
 
-    private  void CameraIntent(){
+    private void CameraIntent() {
         Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
         startActivityForResult(intent, REQUEST_CODE_CAMERA);
     }
-    private void GalleryIntent(){
+
+    private void GalleryIntent() {
         Intent intent1 = new Intent(Intent.ACTION_PICK);
         intent1.setType("image/*");
         startActivityForResult(intent1, REQUEST_CODE_FOLDER);
     }
+
     private void setSelectedImage(Bitmap bitmap) {
         ivAvatar.setImageBitmap(bitmap);
         ByteArrayOutputStream stream = new ByteArrayOutputStream();

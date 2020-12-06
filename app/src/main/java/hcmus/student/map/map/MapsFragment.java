@@ -10,6 +10,7 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -59,6 +60,11 @@ import hcmus.student.map.map.utilities.direction.DirectionResponse;
 import hcmus.student.map.map.utilities.direction.DirectionTask;
 import hcmus.student.map.model.Database;
 import hcmus.student.map.model.Place;
+import hcmus.student.map.weather.WeatherAsynTask;
+import hcmus.student.map.weather.utilities.DetailWeather;
+import hcmus.student.map.weather.utilities.GetWeather;
+import hcmus.student.map.weather.utilities.GetWeatherDetailTask;
+import hcmus.student.map.weather.utilities.OnWeatherResponse;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback, DirectionResponse,
         MapsFragmentCallbacks, LocationChangeCallback {
@@ -86,6 +92,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     private boolean isContactShown;
     private SpeedMonitor speedMonitor;
     private TextView txtSpeed;
+    private DetailWeather detailWeather1;
+    WeatherAsynTask weatherAsynTask;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
 
@@ -107,6 +115,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         isCameraFollowing = true;
         isContactShown = false;
         speedMonitor = new SpeedMonitor(context);
+
+
     }
 
     @Nullable
@@ -140,7 +150,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
         final FloatingActionButton btnLocation = getView().findViewById(R.id.btnLocation);
         final FloatingActionButton btnContact = getView().findViewById(R.id.btnContact);
         final MapWrapper mapContainer = getView().findViewById(R.id.mapContainer);
@@ -319,7 +328,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             createAvatarMarker(place.getLocation(), place.getAvatar());
         }
     }
-
     private void hideAllAddress() {
         for (Marker marker : mContactMarkers) {
             marker.remove();
@@ -335,7 +343,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         transaction.addToBackStack(null);
         transaction.commit();
     }
-
     @Override
     public void removeMarker() {
         marker.remove();

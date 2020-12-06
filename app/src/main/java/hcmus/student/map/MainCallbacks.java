@@ -5,6 +5,7 @@ import android.graphics.Color;
 import com.google.android.gms.maps.model.LatLng;
 
 import hcmus.student.map.map.utilities.LocationChangeCallback;
+import hcmus.student.map.model.Place;
 
 public interface MainCallbacks {
     void registerLocationChange(LocationChangeCallback delegate);
@@ -19,4 +20,6 @@ public interface MainCallbacks {
 
     void updateOnscreenMarker(LatLng coordinate, byte[] avt);
     void locatePlace(LatLng location);
+    void editPlaces(Place place);
+    void updateMap();
 }

@@ -1,4 +1,4 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Map</string>
     <string name="title_activity_maps">Map</string>
     <string name="txt_latitude">Latitude:</string>
@@ -22,4 +22,7 @@
     <string name="txtEdit">Edit</string>
     <string name="txtDelete">Delete</string>
     <string name="txtCancel">Cancel</string>
+    <string name="txtTemperature">Temperature</string>
+    <string name="txtWind">Wind Speed</string>
+    <string tools:ignore="MissingTranslation" name="txtHumidity">Humidity</string>
 </resources>
