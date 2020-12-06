@@ -2,7 +2,6 @@ package hcmus.student.map.map.direction;
 
 import android.content.Context;
 import android.location.Geocoder;
-import android.location.Location;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -12,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,22 +18,26 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.material.tabs.TabLayout;
 
 import java.io.IOException;
 
 import hcmus.student.map.MainActivity;
 import hcmus.student.map.R;
-import hcmus.student.map.model.Place;
 import hcmus.student.map.map.search.SearchClickCallback;
 import hcmus.student.map.map.search.SearchResultAdapter;
+import hcmus.student.map.model.Place;
 
 public class DirectionFragment extends Fragment implements DirectionFragmentCallback {
+    final static String[] transportModes = {"driving", "transit", "walking"};
     MainActivity activity;
     Context context;
     int notUserTypingChecker;
     Place origin;
     Place dest;
     EditText edtOrigin, edtDest;
+    String mode;
+    TabLayout tabLayout;
 
     public static DirectionFragment newInstance(LatLng origin, LatLng dest) {
         Bundle args = new Bundle();
@@ -52,6 +54,7 @@ public class DirectionFragment extends Fragment implements DirectionFragmentCall
         activity = (MainActivity) getActivity();
         context = getContext();
         notUserTypingChecker = 0;
+        mode = transportModes[0];
     }
 
     @Nullable
@@ -62,19 +65,36 @@ public class DirectionFragment extends Fragment implements DirectionFragmentCall
         edtDest = view.findViewById(R.id.edtDest);
         RecyclerView lvFirstSearchResult = view.findViewById(R.id.lvFirstSearchResult);
         RecyclerView lvSecondSearchResult = view.findViewById(R.id.lvSecondSearchResult);
+        tabLayout = view.findViewById(R.id.tabs);
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                mode = transportModes[tab.getPosition()];
+                activity.drawRoute(origin.getLocation(), dest.getLocation(), mode);
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
 
         final SearchResultAdapter firstAdapter = new SearchResultAdapter(context, new SearchClickCallback() {
             @Override
             public void onSearchClickCallback(Place place) {
-                activity.drawRoute(origin.getLocation(), dest.getLocation());
-
+                activity.drawRoute(origin.getLocation(), dest.getLocation(), mode);
             }
         });
 
         final SearchResultAdapter secondAdapter = new SearchResultAdapter(context, new SearchClickCallback() {
             @Override
             public void onSearchClickCallback(Place place) {
-                activity.drawRoute(origin.getLocation(), place.getLocation());
+                activity.drawRoute(origin.getLocation(), place.getLocation(), mode);
             }
         });
 
@@ -83,14 +103,14 @@ public class DirectionFragment extends Fragment implements DirectionFragmentCall
         btnLocate1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                activity.drawRoute(null, dest.getLocation());
+                activity.drawRoute(null, dest.getLocation(), mode);
             }
         });
 
         btnLocate2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                activity.drawRoute(origin.getLocation(), null);
+                activity.drawRoute(origin.getLocation(), null, mode);
             }
         });
 
@@ -171,7 +191,7 @@ public class DirectionFragment extends Fragment implements DirectionFragmentCall
                 origin = dest;
                 dest = temp;
 
-                activity.drawRoute(origin.getLocation(), dest.getLocation());
+                activity.drawRoute(origin.getLocation(), dest.getLocation(), mode);
             }
         });
 

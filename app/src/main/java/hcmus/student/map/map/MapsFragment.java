@@ -85,7 +85,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     private boolean isCameraFollowing;
     private boolean isContactShown;
     private SpeedMonitor speedMonitor;
+
     private TextView txtSpeed;
+    private FloatingActionButton btnLocation;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
 
@@ -141,7 +143,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
 
-        final FloatingActionButton btnLocation = getView().findViewById(R.id.btnLocation);
+        btnLocation = getView().findViewById(R.id.btnLocation);
         final FloatingActionButton btnContact = getView().findViewById(R.id.btnContact);
         final MapWrapper mapContainer = getView().findViewById(R.id.mapContainer);
         mapContainer.setOnMapWrapperTouch(new OnMapWrapperTouch() {
@@ -173,8 +175,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                         }
                         final boolean check = clickCount >= 2;
 
+                        float zoomLevel = mMap.getCameraPosition().zoom < DEFAULT_ZOOM ? DEFAULT_ZOOM : mMap.getCameraPosition().zoom;
+
                         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLocation.getLatitude(),
-                                mCurrentLocation.getLongitude()), DEFAULT_ZOOM);
+                                mCurrentLocation.getLongitude()), zoomLevel);
                         mMap.animateCamera(cameraUpdate, new GoogleMap.CancelableCallback() {
                             @Override
                             public void onFinish() {
@@ -219,6 +223,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             @Override
             public void onMapLongClick(LatLng latLng) {
                 if (marker != null) marker.remove();
+                stopFollowing();
                 marker = mMap.addMarker(new MarkerOptions().position(latLng));
                 marker.setZIndex(5);
                 mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -257,6 +262,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             return;
         //Display location indicator
         if (mCurrentLocation == null) {
+            btnLocation.setImageResource(R.drawable.ic_baseline_location_following);
             BitmapDrawable bitmapDrawable = (BitmapDrawable) ResourcesCompat.getDrawable(getResources(), R.drawable.location_indicator,
                     context.getTheme());
             Bitmap bitmap = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 72, 72, false);
@@ -296,7 +302,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             main.getSupportFragmentManager().beginTransaction().remove(fm).commit();
     }
 
-    public void drawRoute(LatLng start, LatLng end) {
+    public void stopFollowing() {
+        isCameraFollowing = false;
+        btnLocation.setImageResource(R.drawable.ic_baseline_location);
+    }
+
+    public void drawRoute(LatLng start, LatLng end, String mode) {
+        stopFollowing();
         LatLng startPos = start == null ? new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()) : start;
         LatLng endPos = end == null ? new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()) : end;
         if (directionFragment == null)
@@ -309,7 +321,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             }
         }
 
-        String url = Direction.getDirectionUrl(startPos, endPos, main);
+        String url = Direction.getDirectionUrl(startPos, endPos, mode, main);
         new DirectionTask(this).execute(url);
     }
 
@@ -353,6 +365,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     public void openSearchResultMarker(LatLng coordinate) {
         if (marker != null)
             marker.remove();
+        stopFollowing();
         marker = mMap.addMarker(new MarkerOptions().position(coordinate));
         mMap.animateCamera(CameraUpdateFactory.newLatLng(coordinate));
     }
@@ -387,8 +400,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
 
     @Override
     public void onPause() {
-        super.onPause();
+        mMapView.onPause();
         mSensor.unregister();
+        super.onPause();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)

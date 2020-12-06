@@ -1,6 +1,4 @@
-package hcmus.student.map;
-
-import android.graphics.Color;
+package hcmus.student.map.utitlies;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -18,5 +16,6 @@ public interface MainCallbacks {
     void backToPreviousFragment();
 
     void updateOnscreenMarker(LatLng coordinate, byte[] avt);
+
     void locatePlace(LatLng location);
 }

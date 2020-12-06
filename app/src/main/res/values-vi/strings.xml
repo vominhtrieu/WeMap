@@ -20,4 +20,7 @@
     <string name="hint_destination_edt">Điểm đích</string>
     <string name="route_info_duration">Thời gian:</string>
     <string name="txt_search">Tìm kiếm...</string>
+    <string name="txtEdit">Chỉnh sửa</string>
+    <string name="txtDelete">Xóa</string>
+    <string name="txtCancel">Hủy</string>
 </resources>

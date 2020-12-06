@@ -1,4 +1,4 @@
-package hcmus.student.map;
+package hcmus.student.map.utitlies;
 
 import android.os.Build;
 
