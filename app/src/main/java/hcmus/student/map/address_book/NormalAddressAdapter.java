@@ -182,12 +182,13 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
             }
         });
 
-
         addressLine.execute(location);
 
         if (place.getAvatar() != null) {
             Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
             ivAvatar.setBackground(new BitmapDrawable(context.getResources(), bmp));
+        } else {
+            ivAvatar.setBackgroundResource(R.drawable.ic_image);
         }
 
         final PopupMenu popupMenu = new PopupMenu(context, btnMore);
@@ -218,6 +219,8 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
 
         if (place.getFavorite().equals("1"))
             btnFavorite.setBackgroundResource(R.drawable.ic_baseline_favorite_red);
+        else
+            btnFavorite.setBackgroundResource(R.drawable.ic_baseline_favorite);
         btnFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
