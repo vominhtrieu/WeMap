@@ -22,7 +22,8 @@
             android:id="@+id/tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:tabIndicatorColor="#0070FF"
+            app:tabIconTint="@color/tab_color_selector"
+            app:tabIndicatorColor="@color/colorPrimary"
             app:tabIndicatorGravity="top"
             app:tabIndicatorHeight="3dp"
             app:tabMode="fixed">

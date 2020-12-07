@@ -38,8 +38,10 @@ import hcmus.student.map.model.Place;
 import hcmus.student.map.utitlies.AddressChangeCallback;
 import hcmus.student.map.utitlies.AddressProvider;
 import hcmus.student.map.utitlies.LocationService;
+import hcmus.student.map.utitlies.MainCallbacks;
 import hcmus.student.map.utitlies.OnAddressChange;
 import hcmus.student.map.utitlies.OnLocationChange;
+import hcmus.student.map.utitlies.ViewPagerAdapter;
 
 
 public class MainActivity extends FragmentActivity implements MainCallbacks, OnLocationChange, OnAddressChange {
@@ -67,6 +69,7 @@ public class MainActivity extends FragmentActivity implements MainCallbacks, OnL
         adapter = new ViewPagerAdapter(this);
         mViewPager.setAdapter(new ViewPagerAdapter(this));
         mViewPager.setAdapter(adapter);
+
         mTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
@@ -179,9 +182,9 @@ public class MainActivity extends FragmentActivity implements MainCallbacks, OnL
         fragmentTransaction.commit();
     }
 
-    public void drawRoute(LatLng start, LatLng end) {
+    public void drawRoute(LatLng start, LatLng end, String mode) {
         MapsFragment fragment = (MapsFragment) adapter.getFragment(0);
-        fragment.drawRoute(start, end);
+        fragment.drawRoute(start, end, mode);
     }
 
     @Override
@@ -230,7 +233,6 @@ public class MainActivity extends FragmentActivity implements MainCallbacks, OnL
     @Override
     public void openAddContact(LatLng latLng) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        //fragmentTransaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right, R.anim.slide_in_right, R.anim.slide_out_left);
         fragmentTransaction.replace(R.id.frameBottom, AddContactFragment.newInstance(latLng));
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.commit();

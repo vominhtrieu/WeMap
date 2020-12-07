@@ -222,12 +222,11 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
             @Override
             public void onClick(View v) {
                 if (place.getFavorite().equals("0")) {
-                    //mDatabase.addFavorite(place.getId());
                     mAddressProvider.addFavorite(place.getId());
-                }
-                else {
-                    //mDatabase.removeFavorite(place.getId());
+                    btnFavorite.setBackgroundResource(R.drawable.ic_baseline_favorite_red);
+                } else {
                     mAddressProvider.removeFavorite(place.getId());
+                    btnFavorite.setBackgroundResource(R.drawable.ic_baseline_favorite);
                 }
                 getUpdate();
             }
@@ -292,7 +291,7 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     private void ShowDeleteDialog(final int position) {
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-        alertDialogBuilder.setMessage("Are you sure,You wanted to delete an address?");
+        alertDialogBuilder.setMessage("Do you really want to delete this address?");
         final Place place = places.get(position);
         alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override

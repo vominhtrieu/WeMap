@@ -12,16 +12,11 @@ import hcmus.student.map.model.Database;
 import hcmus.student.map.model.Place;
 
 public class AddressProvider {
-
-    private Context context;
-
     private Database mDatabase;
     private OnAddressChange delegate;
     private List<Place> places;
 
-
     public AddressProvider(Context context, OnAddressChange delegate) {
-        this.context = context;
         this.delegate = delegate;
         mDatabase = new Database(context);
         places = mDatabase.getAllPlaces();

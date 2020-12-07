@@ -10,87 +10,117 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="10dp">
+        android:orientation="vertical">
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="5dp"
-            android:layout_marginRight="5dp"
-            android:layout_weight="1"
-            android:orientation="vertical" >
+            android:orientation="horizontal"
+            android:padding="10dp">
 
             <LinearLayout
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:layout_marginEnd="5dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-                <ImageButton
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_gravity="center_vertical"
-                    android:background="@drawable/location_indicator_button" />
-
-                <EditText
-                    android:id="@+id/edtOrigin"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:backgroundTint="@android:color/white"
-                    android:hint="@string/hint_origin_edt"
-                    android:textColor="@android:color/black" />
+                    android:orientation="horizontal">
 
-            </LinearLayout>
+                    <ImageButton
+                        android:id="@+id/btnLocate1"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="center_vertical"
+                        android:background="@drawable/location_indicator_button" />
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/lvFirstSearchResult"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:divider="@null"
-                android:maxHeight="60dp" />
+                    <EditText
+                        android:id="@+id/edtOrigin"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@android:color/white"
+                        android:hint="@string/hint_origin_edt"
+                        android:inputType="textNoSuggestions"
+                        android:maxLines="1"
+                        android:textColor="@android:color/black" />
+                </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <ImageButton
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    android:layout_gravity="center_vertical"
-                    android:background="@drawable/location_indicator_button" />
-
-                <EditText
-                    android:id="@+id/edtDest"
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/lvFirstSearchResult"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:backgroundTint="@android:color/white"
-                    android:hint="@string/hint_destination_edt"
-                    android:textColor="@android:color/black" />
+                    android:divider="@null"
+                    android:maxHeight="60dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageButton
+                        android:id="@+id/btnLocate2"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
+                        android:layout_gravity="center_vertical"
+                        android:background="@drawable/location_indicator_button" />
+
+                    <EditText
+                        android:id="@+id/edtDest"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:backgroundTint="@android:color/white"
+                        android:hint="@string/hint_destination_edt"
+                        android:inputType="textNoSuggestions"
+                        android:maxLines="1"
+                        android:textColor="@android:color/black" />
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/lvSecondSearchResult"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:divider="@null"
+                    android:maxHeight="60dp" />
             </LinearLayout>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/lvSecondSearchResult"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:divider="@null"
-                android:maxHeight="60dp" />
+            <Button
+                android:id="@+id/btnSwap"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="5dp"
+                android:background="@drawable/ic_baseline_swap_vertical"
+                android:textAlignment="center" />
         </LinearLayout>
 
-        <Button
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:paddingTop="20dp"
-            android:layout_marginEnd="5dp"
-            android:layout_marginRight="5dp"
-            android:background="@drawable/ic_baseline_swap_vertical"
-            android:textAlignment="center"
-            android:gravity="center_horizontal" />
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginBottom="10dp"
+            app:tabIconTint="@color/white_tab_color_selector"
+            app:tabIndicator="@drawable/tab_indicator"
+            app:tabIndicatorColor="@color/colorPrimary"
+            app:tabIndicatorGravity="stretch">
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:icon="@drawable/ic_car" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:icon="@drawable/ic_walking" />
+
+            <com.google.android.material.tabs.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:icon="@drawable/ic_bus" />
+        </com.google.android.material.tabs.TabLayout>
     </LinearLayout>
-
-
-    <com.google.android.gms.maps.MapView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
 </androidx.cardview.widget.CardView>

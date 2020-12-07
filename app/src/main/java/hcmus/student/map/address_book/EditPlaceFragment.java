@@ -34,6 +34,7 @@ import java.io.InputStream;
 
 import hcmus.student.map.MainActivity;
 import hcmus.student.map.R;
+
 import hcmus.student.map.model.Place;
 import hcmus.student.map.utitlies.AddressProvider;
 
@@ -88,7 +89,7 @@ public class EditPlaceFragment extends Fragment implements View.OnClickListener 
         btnCancel = view.findViewById(R.id.btnCancel);
         edtNewName = view.findViewById(R.id.edtNewName);
         btnCamera = view.findViewById(R.id.btnCamera);
-        btnFolder = view.findViewById(R.id.btnFolder);
+        btnFolder = view.findViewById(R.id.btnGallery);
         ivAvatar = view.findViewById(R.id.ivAvatar);
 
         latLng = new LatLng(args.getDouble("lat"), args.getDouble("lng"));
@@ -119,7 +120,7 @@ public class EditPlaceFragment extends Fragment implements View.OnClickListener 
             case R.id.btnCamera:
                 CameraIntent();
                 break;
-            case R.id.btnFolder:
+            case R.id.btnGallery:
                 GalleryIntent();
                 break;
             case R.id.btnOK:
