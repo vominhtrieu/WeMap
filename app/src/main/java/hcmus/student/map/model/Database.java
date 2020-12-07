@@ -109,7 +109,7 @@ public class Database extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String sql = String.format(Locale.US, "CREATE TABLE %s (%s INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                        "%s TEXT, %s REAL UNIQUE, %s REAL UNIQUE, %s BLOB, %s TEXT))",
+                        "%s TEXT, %s REAL UNIQUE, %s REAL UNIQUE, %s BLOB, %s TEXT)",
                 TABLE_NAME, KEY_ID, KEY_NAME, KEY_LATITUDE, KEY_LONGITUDE, KEY_AVATAR, KEY_FAVORITE);
 
         SQLiteStatement statement = db.compileStatement(sql);

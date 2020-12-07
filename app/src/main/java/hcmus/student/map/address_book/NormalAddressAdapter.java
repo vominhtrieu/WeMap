@@ -3,6 +3,7 @@ package hcmus.student.map.address_book;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.AsyncQueryHandler;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,15 +12,21 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Geocoder;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +36,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import hcmus.student.map.MainActivity;
@@ -38,12 +46,14 @@ import hcmus.student.map.model.Place;
 import hcmus.student.map.utitlies.AddressLine;
 import hcmus.student.map.utitlies.OnAddressLineResponse;
 
-public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
     Database mDatabase;
     Context context;
     List<Place> places;
     final int REQUEST_CODE_CAMERA = 123;
     ImageView ivAvatar;
+
+
 
     public static class FavoriteViewHolder extends RecyclerView.ViewHolder {
         public FavoriteViewHolder(@NonNull View itemView) {
@@ -79,7 +89,7 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
     }
 
-    public NormalAddressAdapter(Context context) {
+    public NormalAddressAdapter(Context context){
         this.context = context;
         this.mDatabase = new Database(context);
         this.places = new ArrayList<>();
@@ -121,6 +131,8 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
         notifyDataSetChanged();
     }
 
+
+
     @Override
     public int getItemViewType(int position) {
         if (places.get(position).getLocation() == null) {
@@ -130,6 +142,8 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
         return 2;
     }
+
+
 
     @NonNull
     @Override
@@ -155,6 +169,7 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
             onBindAlphabetViewHolder((AlphabetViewHolder) holder, position);
         else if (holder.getItemViewType() == 2)
             onBindPlaceViewHolder((PlaceViewHolder) holder, position);
+
     }
 
     public void onBindAlphabetViewHolder(@NonNull AlphabetViewHolder holder, int position) {
@@ -187,13 +202,13 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
             }
         });
 
-
         addressLine.execute(location);
 
         if (place.getAvatar() != null) {
             Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
             ivAvatar.setBackground(new BitmapDrawable(context.getResources(), bmp));
         }
+
 
         final PopupMenu popupMenu = new PopupMenu(context, btnMore);
         popupMenu.getMenuInflater().inflate(R.menu.menu_address, popupMenu.getMenu());
@@ -231,6 +246,7 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
                 }
                 else {
                     mDatabase.removeFavorite(place.getId());
+                    btnFavorite.setBackgroundResource(R.drawable.ic_baseline_favorite);
                 }
                 getUpdate();
             }
@@ -247,6 +263,13 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public int getItemCount() {
         return places.size();
+    }
+
+    public void searchPlaceContact(String data){
+        places = mDatabase.searchForPlaces(data);
+        places = groupAddress(places);
+        notifyDataSetChanged();
+
     }
 
     private void showEditDialog(int position) {
@@ -314,4 +337,7 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
         Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
         ((Activity) context).startActivityForResult(intent, REQUEST_CODE_CAMERA);
     }
+
+
+
 }

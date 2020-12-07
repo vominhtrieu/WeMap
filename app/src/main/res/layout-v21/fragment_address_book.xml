@@ -12,22 +12,31 @@
         android:background="@android:color/holo_blue_dark"
         android:paddingHorizontal="20dp"
         android:paddingVertical="10dp">
+        <SearchView
+            android:id="@+id/svSearchContact"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:iconifiedByDefault="false"
+            android:queryHint="All Address" />
+            />
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="start|center"
-            android:text="@string/title_address_book"
-            android:textColor="#fff"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+<!--        <TextView-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:layout_weight="1"-->
+<!--            android:gravity="start|center"-->
+<!--            android:text="@string/title_address_book"-->
+<!--            android:textColor="#fff"-->
+<!--            android:textSize="24sp"-->
+<!--            android:textStyle="bold" />-->
 
-        <Button
-            android:layout_width="36dp"
-            android:layout_height="36dp"
-            android:layout_gravity="center"
-            android:background="@drawable/ic_baseline_search" />
+<!--        <Button-->
+<!--            -->
+<!--            android:layout_width="36dp"-->
+<!--            android:layout_height="36dp"-->
+<!--            android:layout_gravity="center"-->
+<!--            android:background="@drawable/ic_baseline_search" />-->
     </LinearLayout>
 
     <ScrollView
