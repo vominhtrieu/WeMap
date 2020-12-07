@@ -11,19 +11,22 @@ import java.util.List;
 import hcmus.student.map.model.Database;
 import hcmus.student.map.model.Place;
 
-public class AddressManager {
+public class AddressProvider {
 
     private Context context;
+
     private Database mDatabase;
     private OnAddressChange delegate;
     private List<Place> places;
 
-    public AddressManager(Context context, OnAddressChange delegate) {
+
+    public AddressProvider(Context context, OnAddressChange delegate) {
         this.context = context;
         this.delegate = delegate;
         mDatabase = new Database(context);
         places = mDatabase.getAllPlaces();
     }
+
 
     public List<Place> getPlaces() {
         return places;

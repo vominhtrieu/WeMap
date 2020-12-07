@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Bản đồ</string>
     <string name="title_activity_maps">Bản đồ</string>
     <string name="txt_latitude">Kinh độ:</string>
@@ -20,4 +20,7 @@
     <string name="hint_destination_edt">Điểm đích</string>
     <string name="route_info_duration">Thời gian:</string>
     <string name="txt_search">Tìm kiếm...</string>
+    <string name="txtTemperature">Nhiệt độ</string>
+    <string name="txtWind">Tốc độ gió</string>
+    <string tools:ignore="MissingTranslation" name="txtHumidity">Độ ẩm</string>
 </resources>

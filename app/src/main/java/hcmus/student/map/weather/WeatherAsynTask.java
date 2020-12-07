@@ -1,18 +1,23 @@
-package hcmus.student.map.weather.utilities;
+package hcmus.student.map.weather;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
+import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import hcmus.student.map.utitlies.FetchUrlTask;
+import hcmus.student.map.weather.utilities.DetailWeather;
+import hcmus.student.map.weather.utilities.DetailWeatherParser;
+import hcmus.student.map.weather.utilities.OnWeatherResponse;
 
-public class GetWeatherDetailTask extends AsyncTask<String, Void, DetailWeather> {
-    OnDetailWeatherResponse delegate;
-
-    public GetWeatherDetailTask(OnDetailWeatherResponse delegate) {
-        this.delegate = delegate;
+public class WeatherAsynTask extends AsyncTask<String, Void, DetailWeather> {
+    OnWeatherResponse delegate;
+    public WeatherAsynTask(OnWeatherResponse delegate) {
+        this.delegate =  delegate;
     }
 
     @Override
@@ -30,6 +35,6 @@ public class GetWeatherDetailTask extends AsyncTask<String, Void, DetailWeather>
 
     @Override
     protected void onPostExecute(DetailWeather detailWeather) {
-        delegate.onDetailWeatherResponse(detailWeather);
+        delegate.onWeatherResponse(detailWeather);
     }
 }

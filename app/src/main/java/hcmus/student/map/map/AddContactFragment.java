@@ -32,8 +32,7 @@ import java.io.InputStream;
 
 import hcmus.student.map.MainActivity;
 import hcmus.student.map.R;
-import hcmus.student.map.model.Database;
-import hcmus.student.map.utitlies.AddressManager;
+import hcmus.student.map.utitlies.AddressProvider;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -45,7 +44,7 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
     ImageView ivAvatar;
     LatLng latLng;
     byte[] selectedImage;
-    AddressManager addressManager;
+    AddressProvider mAddressProvider;
 
     int REQUEST_CODE_CAMERA = 123;
     int REQUEST_CODE_FOLDER = 456;
@@ -63,7 +62,7 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = (MainActivity) getActivity();
-        addressManager = new AddressManager(getContext(), activity);
+        mAddressProvider = activity.getAddressProvider();
     }
 
     @Nullable
@@ -105,7 +104,7 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
                     Toast.makeText(activity, "Place name is required!", Toast.LENGTH_SHORT).show();
                 } else {
                     try {
-                        addressManager.insertPlace(edtName.getText().toString(), new LatLng(latLng.latitude, latLng.longitude), selectedImage);
+                        mAddressProvider.insertPlace(edtName.getText().toString(), new LatLng(latLng.latitude, latLng.longitude), selectedImage);
 //                        Database db = new Database(getContext());
 //                        db.insertPlace(edtName.getText().toString(), new LatLng(latLng.latitude, latLng.longitude), selectedImage);
                         activity.backToPreviousFragment();

@@ -4,6 +4,8 @@ import com.google.android.gms.maps.model.LatLng;
 
 import hcmus.student.map.map.utilities.LocationChangeCallback;
 import hcmus.student.map.utitlies.AddressChangeCallback;
+import hcmus.student.map.model.Place;
+import hcmus.student.map.utitlies.AddressProvider;
 
 public interface MainCallbacks {
     void registerLocationChange(LocationChangeCallback delegate);
@@ -19,4 +21,8 @@ public interface MainCallbacks {
     void backToPreviousFragment();
 
     void locatePlace(LatLng location);
+
+    void editPlaces(Place place);
+
+    AddressProvider getAddressProvider();
 }

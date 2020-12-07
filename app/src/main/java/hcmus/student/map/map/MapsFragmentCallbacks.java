@@ -7,5 +7,5 @@ public interface MapsFragmentCallbacks {
     void openSearchResultMarker(LatLng coordinate);
     void closeDirection();
     void moveCamera(LatLng location);
-    void removeMarker();
+    //void removeMarker();
 }

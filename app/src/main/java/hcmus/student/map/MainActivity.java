@@ -28,6 +28,7 @@ import com.google.android.material.tabs.TabLayout;
 import java.util.ArrayList;
 import java.util.List;
 
+import hcmus.student.map.address_book.EditPlaceFragment;
 import hcmus.student.map.map.AddContactFragment;
 import hcmus.student.map.map.MapsFragment;
 import hcmus.student.map.map.MarkerInfoFragment;
@@ -35,7 +36,7 @@ import hcmus.student.map.map.RouteInfoFragment;
 import hcmus.student.map.map.utilities.LocationChangeCallback;
 import hcmus.student.map.model.Place;
 import hcmus.student.map.utitlies.AddressChangeCallback;
-import hcmus.student.map.utitlies.AddressManager;
+import hcmus.student.map.utitlies.AddressProvider;
 import hcmus.student.map.utitlies.LocationService;
 import hcmus.student.map.utitlies.OnAddressChange;
 import hcmus.student.map.utitlies.OnLocationChange;
@@ -48,6 +49,7 @@ public class MainActivity extends FragmentActivity implements MainCallbacks, OnL
     private Location mCurrentLocation;
     private LocationService service;
     private List<LocationChangeCallback> delegates;
+    private AddressProvider addressProvider;
     private List<AddressChangeCallback> addressDelegates;
 
 
@@ -87,6 +89,7 @@ public class MainActivity extends FragmentActivity implements MainCallbacks, OnL
 
         service = new LocationService(this, this);
         delegates = new ArrayList<>();
+        addressProvider = new AddressProvider(this, this);
         addressDelegates = new ArrayList<>();
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -193,6 +196,16 @@ public class MainActivity extends FragmentActivity implements MainCallbacks, OnL
     }
 
     @Override
+    public void editPlaces(Place place) {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        //fragmentTransaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right, R.anim.slide_in_right, R.anim.slide_out_left);
+        fragmentTransaction.replace(R.id.frameBottom, EditPlaceFragment.newInstance(place));
+        fragmentTransaction.addToBackStack(null);
+        fragmentTransaction.commit();
+    }
+
+
+    @Override
     public void registerLocationChange(LocationChangeCallback delegate) {
         delegates.add(delegate);
     }
@@ -243,6 +256,11 @@ public class MainActivity extends FragmentActivity implements MainCallbacks, OnL
     public void onLocationChange(Location location) {
         mCurrentLocation = location;
         notifyLocationChange();
+    }
+
+    @Override
+    public AddressProvider getAddressProvider() {
+        return addressProvider;
     }
 
     @Override
