@@ -25,4 +25,7 @@
     <string name="txtTemperature">Temperature</string>
     <string name="txtWind">Wind Speed</string>
     <string tools:ignore="MissingTranslation" name="txtHumidity">Humidity</string>
+    <string name="txtDeleteConfirm">Do you really want to delete this address?</string>
+    <string name="txtYes">Yes</string>
+    <string name="txtNo">No</string>
 </resources>

@@ -6,8 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
-import android.util.Log;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -15,6 +13,7 @@ import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class Database extends SQLiteOpenHelper {
     static final String DATABASE_NAME = "Contact List";
@@ -112,8 +111,8 @@ public class Database extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String sql = String.format(
-                "CREATE TABLE %s (%s INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT, %s REAL, %s REAL, %s BLOB, %s TEXT)",
+        String sql = String.format(Locale.US, "CREATE TABLE %s (%s INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        "%s TEXT, %s REAL UNIQUE, %s REAL UNIQUE, %s BLOB, %s TEXT)",
                 TABLE_NAME, KEY_ID, KEY_NAME, KEY_LATITUDE, KEY_LONGITUDE, KEY_AVATAR, KEY_FAVORITE);
 
         SQLiteStatement statement = db.compileStatement(sql);

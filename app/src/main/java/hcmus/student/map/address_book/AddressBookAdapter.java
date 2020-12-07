@@ -26,17 +26,20 @@ import java.util.List;
 
 import hcmus.student.map.MainActivity;
 import hcmus.student.map.R;
+import hcmus.student.map.model.Database;
 import hcmus.student.map.model.Place;
 import hcmus.student.map.utitlies.AddressChangeCallback;
 import hcmus.student.map.utitlies.AddressLine;
 import hcmus.student.map.utitlies.AddressProvider;
 import hcmus.student.map.utitlies.OnAddressLineResponse;
 
-public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements AddressChangeCallback {
+public class AddressBookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements AddressChangeCallback {
     Context context;
 
     AddressProvider mAddressProvider;
     List<Place> places;
+    Database mDatabase;
+
 
     public static class FavoriteViewHolder extends RecyclerView.ViewHolder {
         public FavoriteViewHolder(@NonNull View itemView) {
@@ -72,12 +75,13 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
     }
 
-    public NormalAddressAdapter(Context context) {
+    public AddressBookAdapter(Context context) {
         this.context = context;
         this.mAddressProvider = ((MainActivity) context).getAddressProvider();
         //this.mDatabase = new Database(context);
         this.places = new ArrayList<>();
         ((MainActivity) context).registerAddressChange(this);
+        mDatabase = new Database(context);
         getUpdate();
     }
 
@@ -116,6 +120,7 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
         notifyDataSetChanged();
     }
 
+
     @Override
     public int getItemViewType(int position) {
         if (places.get(position).getLocation() == null) {
@@ -125,6 +130,7 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
         return 2;
     }
+
 
     @NonNull
     @Override
@@ -150,6 +156,7 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
             onBindAlphabetViewHolder((AlphabetViewHolder) holder, position);
         else if (holder.getItemViewType() == 2)
             onBindPlaceViewHolder((PlaceViewHolder) holder, position);
+
     }
 
     public void onBindAlphabetViewHolder(@NonNull AlphabetViewHolder holder, int position) {
@@ -182,13 +189,13 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
             }
         });
 
-
         addressLine.execute(location);
 
         if (place.getAvatar() != null) {
             Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
             ivAvatar.setBackground(new BitmapDrawable(context.getResources(), bmp));
         }
+
 
         final PopupMenu popupMenu = new PopupMenu(context, btnMore);
         popupMenu.getMenuInflater().inflate(R.menu.menu_address, popupMenu.getMenu());
@@ -200,7 +207,7 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
                         ((MainActivity) context).editPlaces(place);
                         break;
                     case R.id.itemDelete:
-                        ShowDeleteDialog(position);
+                        showDeleteDialog(position);
                         break;
                     case R.id.itemCancel:
                         break;
@@ -245,64 +252,23 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
         return places.size();
     }
 
-//    private void showEditDialog(int position) {
-//        final Dialog dialogEdit = new Dialog(context);
-//        dialogEdit.setContentView(R.layout.dialog_edit);
-//        final EditText edtNewName = dialogEdit.findViewById(R.id.edtNewName);
-//
-//        Button btnOK = dialogEdit.findViewById(R.id.btnOK);
-//        Button btnCancel = dialogEdit.findViewById(R.id.btnCancel);
-//        ivAvatar = dialogEdit.findViewById(R.id.ivAvatar);
-//        final Place place = places.get(position);
-//        edtNewName.setText(place.getName());
-//        if (place.getAvatar() != null) {
-//            Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
-//            ivAvatar.setBackground(new BitmapDrawable(context.getResources(), bmp));
-//        }
-//
-//        ImageButton btnCamera = dialogEdit.findViewById(R.id.btnCamera);
-//        btnCamera.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                cameraIntent();
-//                Toast.makeText(context, "click image", Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//
-//        btnOK.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                place.setName(edtNewName.getText().toString());
-////                mDatabase.editPlace(place);
-////                notifyDataSetChanged();
-//                mAddressProvider.updatePlace(place);
-//                //getUpdate();
-//                dialogEdit.dismiss();
-//            }
-//        });
-//        btnCancel.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                dialogEdit.dismiss();
-//            }
-//        });
-//        dialogEdit.show();
-//    }
+    public void searchForPlaces(String data) {
+        places = mDatabase.searchForPlaces(data);
+        places = groupAddress(places);
+        notifyDataSetChanged();
 
-    private void ShowDeleteDialog(final int position) {
+    }
+
+    private void showDeleteDialog(final int position) {
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-        alertDialogBuilder.setMessage("Do you really want to delete this address?");
+        alertDialogBuilder.setMessage(R.string.txtDeleteConfirm);
         final Place place = places.get(position);
-        alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setPositiveButton(R.string.txtYes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface arg0, int arg1) {
-                //mDatabase.deletePlace(place.getId());
-                //places.remove(position);
                 mAddressProvider.deletePlace(place.getId());
-                //getUpdate();
-                //notifyDataSetChanged();
             }
-        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+        }).setNegativeButton(R.string.txtNo, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -326,4 +292,5 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
     public void onAddressDelete(int placeId) {
         getUpdate();
     }
+
 }

@@ -26,4 +26,7 @@
     <string name="txtEdit">Chỉnh sửa</string>
     <string name="txtDelete">Xóa</string>
     <string name="txtCancel">Hủy</string>
+    <string name="txtDeleteConfirm">Bạn có chắc muốn xóa địa chỉ này?</string>
+    <string name="txtYes">Có</string>
+    <string name="txtNo">Không</string>
 </resources>
