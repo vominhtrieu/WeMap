@@ -194,6 +194,8 @@ public class AddressBookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         if (place.getAvatar() != null) {
             Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
             ivAvatar.setBackground(new BitmapDrawable(context.getResources(), bmp));
+        } else {
+            ivAvatar.setBackgroundResource(R.drawable.ic_image);
         }
 
 
@@ -225,6 +227,8 @@ public class AddressBookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
         if (place.getFavorite().equals("1"))
             btnFavorite.setBackgroundResource(R.drawable.ic_baseline_favorite_red);
+        else
+            btnFavorite.setBackgroundResource(R.drawable.ic_baseline_favorite);
         btnFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
