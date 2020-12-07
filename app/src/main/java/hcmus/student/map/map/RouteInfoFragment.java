@@ -13,6 +13,8 @@ import hcmus.student.map.R;
 
 public class RouteInfoFragment extends Fragment {
     private MainActivity activity;
+    private TextView txtDuration;
+    private View vRouteIndicator;
 
     public static RouteInfoFragment newInstance(String routeDuration, int routeColor) {
         RouteInfoFragment fragment = new RouteInfoFragment();

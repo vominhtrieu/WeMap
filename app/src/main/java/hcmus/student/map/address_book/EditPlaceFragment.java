@@ -34,8 +34,9 @@ import java.io.InputStream;
 
 import hcmus.student.map.MainActivity;
 import hcmus.student.map.R;
-import hcmus.student.map.model.Database;
+
 import hcmus.student.map.model.Place;
+import hcmus.student.map.utitlies.AddressProvider;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -48,6 +49,7 @@ public class EditPlaceFragment extends Fragment implements View.OnClickListener 
     Place place;
     LatLng latLng;
     byte[] selectedImage;
+    AddressProvider mAddressProvider;
 
     int REQUEST_CODE_CAMERA = 123;
     int REQUEST_CODE_FOLDER = 456;
@@ -72,6 +74,7 @@ public class EditPlaceFragment extends Fragment implements View.OnClickListener 
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = (MainActivity) getActivity();
+        mAddressProvider = activity.getAddressProvider();
     }
 
     @Nullable
@@ -125,16 +128,17 @@ public class EditPlaceFragment extends Fragment implements View.OnClickListener 
                     Toast.makeText(activity, "Place name is required!", Toast.LENGTH_SHORT).show();
                 } else {
                     try {
-                        Database db = new Database(getContext());
+                        //Database db = new Database(getContext());
                         place.setName(edtNewName.getText().toString());
                         if (selectedImage != null) {
                             place.setAvatar(selectedImage);
                         }
-                        db.editPlace(place);
+                        //db.editPlace(place);
                         activity.backToPreviousFragment();
-                        activity.updateOnscreenMarker(latLng, selectedImage);
+                        mAddressProvider.updatePlace(place);
+                        //activity.updateOnscreenMarker(latLng, selectedImage);
                     } catch (Exception e) {
-                        activity.updateOnscreenMarker(latLng, selectedImage);
+                        //activity.updateOnscreenMarker(latLng, selectedImage);
                         activity.backToPreviousFragment();
                     }
                 }
@@ -192,8 +196,8 @@ public class EditPlaceFragment extends Fragment implements View.OnClickListener 
         RectF rectF = new RectF(rect);
         canvas.drawOval(rectF, paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        float left = (squareBitmapWidth - bitmap.getWidth()) / 2;
-        float top = (squareBitmapWidth - bitmap.getHeight()) / 2;
+        float left = (float) (squareBitmapWidth - bitmap.getWidth()) / 2;
+        float top = (float) (squareBitmapWidth - bitmap.getHeight()) / 2;
         canvas.drawBitmap(bitmap, left, top, paint);
         bitmap.recycle();
         return resultBitmap;

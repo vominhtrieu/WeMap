@@ -57,30 +57,33 @@ import hcmus.student.map.map.utilities.SpeedMonitor;
 import hcmus.student.map.map.utilities.direction.Direction;
 import hcmus.student.map.map.utilities.direction.DirectionResponse;
 import hcmus.student.map.map.utilities.direction.DirectionTask;
-import hcmus.student.map.model.Database;
 import hcmus.student.map.model.Place;
+import hcmus.student.map.utitlies.AddressChangeCallback;
+import hcmus.student.map.utitlies.AddressProvider;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback, DirectionResponse,
-        MapsFragmentCallbacks, LocationChangeCallback {
+        MapsFragmentCallbacks, LocationChangeCallback, AddressChangeCallback {
 
     private static final int DEFAULT_ZOOM = 15;
     private static final int EPSILON = 5;
     private static final int NORMAL_ROUTE_WIDTH = 8;
     private static final int SELECTED_ROUTE_WIDTH = 12;
+    private static final double THRESHOLD = 1e-6;
+
+    private MainActivity main;
+    private Context context;
 
     private GoogleMap mMap;
     private Location mCurrentLocation;
     private Marker mLocationIndicator;
-    private Marker marker;
+    private Marker mDefaultMarker;
+    private AddressProvider mAddressProvider;
     private List<Marker> mContactMarkers;
     private ArrayList<Polyline> mRoutes;
     private Marker mRouteStartMarker, mRouteEndMarker;
     private MapView mMapView;
     private OrientationSensor mSensor;
-    private Database mDatabase;
     private MarkerAnimator animator;
-    private MainActivity main;
-    private Context context;
     private DirectionFragment directionFragment;
     private boolean isCameraFollowing;
     private boolean isContactShown;
@@ -103,12 +106,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         context = getContext();
         main = (MainActivity) getActivity();
         mRouteStartMarker = mRouteEndMarker = null;
-        mDatabase = new Database(context);
         mContactMarkers = new ArrayList<>();
         isCameraFollowing = true;
         isContactShown = false;
         speedMonitor = new SpeedMonitor(context);
-
+        mAddressProvider = main.getAddressProvider();
     }
 
     @Nullable
@@ -135,6 +137,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             }
         };
         main.registerLocationChange(this);
+        main.registerAddressChange(this);
         mMapView.getMapAsync(this);
         return view;
     }
@@ -223,10 +226,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
-                if (marker != null) marker.remove();
+                if (mDefaultMarker != null) mDefaultMarker.remove();
                 stopFollowing();
-                marker = mMap.addMarker(new MarkerOptions().position(latLng));
-                marker.setZIndex(5);
+                mDefaultMarker = mMap.addMarker(new MarkerOptions().position(latLng));
+                mDefaultMarker.setZIndex(5);
                 mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
             }
         });
@@ -255,6 +258,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                 main.openRouteInfo(polyline.getTag().toString(), polyline.getColor());
             }
         });
+
+        updateContactMarkers();
+        hideAllAddress();
     }
 
     @Override
@@ -326,16 +332,45 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         new DirectionTask(this).execute(url);
     }
 
+    private Marker createMarker(int id, LatLng location, byte[] avatar) {
+        if (mDefaultMarker != null && compareLatLng(mDefaultMarker.getPosition(), location)) {
+            mDefaultMarker.remove();
+            mDefaultMarker = null;
+        }
+        Bitmap bmpMarker = BitmapFactory.decodeResource(getResources(), R.drawable.marker_frame).copy(Bitmap.Config.ARGB_8888, true);
+        bmpMarker = Bitmap.createScaledBitmap(bmpMarker, 100, 115, false);
+        if (avatar != null) {
+            Bitmap bmpAvatar = BitmapFactory.decodeByteArray(avatar, 0, avatar.length);
+            bmpAvatar = Bitmap.createScaledBitmap(bmpAvatar, 90, 90, false);
+            Canvas canvas = new Canvas(bmpMarker);
+            canvas.drawBitmap(bmpAvatar, 5, 5, null);
+        }
+
+        Marker newMarker = mMap.addMarker(new MarkerOptions().position(location)
+                .icon(BitmapDescriptorFactory.fromBitmap(bmpMarker)));
+        newMarker.setZIndex(3);
+        newMarker.setTag(id);
+        return newMarker;
+    }
+
+    private void updateContactMarkers() {
+        mContactMarkers.clear();
+        for (Place place : mAddressProvider.getPlaces()) {
+            Marker newMarker = createMarker(place.getId(), place.getLocation(), place.getAvatar());
+            newMarker.setVisible(isContactShown);
+            mContactMarkers.add(newMarker);
+        }
+    }
+
     private void showAllAddress() {
-        List<Place> places = mDatabase.getAllPlaces();
-        for (Place place : places) {
-            createAvatarMarker(place.getLocation(), place.getAvatar());
+        for (Marker marker : mContactMarkers) {
+            marker.setVisible(true);
         }
     }
 
     private void hideAllAddress() {
         for (Marker marker : mContactMarkers) {
-            marker.remove();
+            marker.setVisible(false);
         }
     }
 
@@ -350,11 +385,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     }
 
     @Override
-    public void removeMarker() {
-        marker.remove();
-    }
-
-    @Override
     public void moveCamera(LatLng location) {
         LatLng markerLoc = new LatLng(location.latitude, location.longitude);
         final CameraPosition cameraPosition = new CameraPosition.Builder()
@@ -364,32 +394,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
 
     @Override
     public void openSearchResultMarker(LatLng coordinate) {
-        if (marker != null)
-            marker.remove();
+        if (mDefaultMarker != null)
+            mDefaultMarker.remove();
+        mDefaultMarker = mMap.addMarker(new MarkerOptions().position(coordinate));
         stopFollowing();
-        marker = mMap.addMarker(new MarkerOptions().position(coordinate));
         mMap.animateCamera(CameraUpdateFactory.newLatLng(coordinate));
-    }
-
-    @Override
-    public void createAvatarMarker(LatLng coordinate, byte[] avt) {
-        if (marker != null && marker.getPosition() == coordinate) {
-            marker.remove();
-            marker = null;
-        }
-        Bitmap bmpMarker = BitmapFactory.decodeResource(getResources(), R.drawable.marker_frame).copy(Bitmap.Config.ARGB_8888, true);
-        bmpMarker = Bitmap.createScaledBitmap(bmpMarker, 100, 115, false);
-        if (avt != null) {
-            Bitmap bmpAvatar = BitmapFactory.decodeByteArray(avt, 0, avt.length);
-            bmpAvatar = Bitmap.createScaledBitmap(bmpAvatar, 90, 90, false);
-            Canvas canvas = new Canvas(bmpMarker);
-            canvas.drawBitmap(bmpAvatar, 5, 5, null);
-        }
-
-        Marker newMarker = mMap.addMarker(new MarkerOptions().position(coordinate)
-                .icon(BitmapDescriptorFactory.fromBitmap(bmpMarker)));
-        newMarker.setZIndex(3);
-        mContactMarkers.add(newMarker);
     }
 
     @Override
@@ -406,7 +415,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         super.onPause();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onRouteRespond
             (List<PolylineOptions> polylineOptions, List<String> durations) {
@@ -459,5 +467,32 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         mRouteEndMarker = mMap.addMarker(new MarkerOptions()
                 .position(polylineOptions.get(0).getPoints().get(polylineOptions.get(0).getPoints().size() - 1))
                 .icon(descriptor).anchor(0.5f, 0.5f));
+    }
+
+    @Override
+    public void onAddressInsert(Place place) {
+        mContactMarkers.add(createMarker(place.getId(), place.getLocation(), place.getAvatar()));
+    }
+
+    @Override
+    public void onAddressUpdate(Place place) {
+        for (Marker marker : mContactMarkers) {
+            marker.remove();
+        }
+        updateContactMarkers();
+    }
+
+    @Override
+    public void onAddressDelete(int placeId) {
+        for (Marker marker : mContactMarkers) {
+            if (marker.getTag().equals(placeId)) {
+                marker.remove();
+                break;
+            }
+        }
+    }
+
+    private boolean compareLatLng(LatLng latLng1, LatLng latLng2) {
+        return Math.abs(latLng1.latitude - latLng2.latitude) < THRESHOLD && Math.abs(latLng1.longitude - latLng2.longitude) < THRESHOLD;
     }
 }
