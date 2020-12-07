@@ -23,8 +23,7 @@ public class RouteInfoFragment extends Fragment {
     private MainActivity activity;
     private TextView txtDuration;
     private View vRouteIndicator;
-
-    @RequiresApi(api = Build.VERSION_CODES.O)
+    
     public static RouteInfoFragment newInstance(String routeDuration, int routeColor) {
         RouteInfoFragment fragment = new RouteInfoFragment();
         Bundle args = new Bundle();

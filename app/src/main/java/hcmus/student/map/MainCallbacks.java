@@ -1,13 +1,14 @@
 package hcmus.student.map;
 
-import android.graphics.Color;
-
 import com.google.android.gms.maps.model.LatLng;
 
 import hcmus.student.map.map.utilities.LocationChangeCallback;
+import hcmus.student.map.utitlies.AddressChangeCallback;
 
 public interface MainCallbacks {
     void registerLocationChange(LocationChangeCallback delegate);
+
+    void registerAddressChange(AddressChangeCallback delegate);
 
     void openSearchResultMarker(LatLng latLng);
 
@@ -17,6 +18,5 @@ public interface MainCallbacks {
 
     void backToPreviousFragment();
 
-    void updateOnscreenMarker(LatLng coordinate, byte[] avt);
     void locatePlace(LatLng location);
 }

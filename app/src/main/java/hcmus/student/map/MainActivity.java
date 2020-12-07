@@ -33,17 +33,22 @@ import hcmus.student.map.map.MapsFragment;
 import hcmus.student.map.map.MarkerInfoFragment;
 import hcmus.student.map.map.RouteInfoFragment;
 import hcmus.student.map.map.utilities.LocationChangeCallback;
+import hcmus.student.map.model.Place;
+import hcmus.student.map.utitlies.AddressChangeCallback;
+import hcmus.student.map.utitlies.AddressManager;
 import hcmus.student.map.utitlies.LocationService;
+import hcmus.student.map.utitlies.OnAddressChange;
 import hcmus.student.map.utitlies.OnLocationChange;
 
 
-public class MainActivity extends FragmentActivity implements MainCallbacks, OnLocationChange {
+public class MainActivity extends FragmentActivity implements MainCallbacks, OnLocationChange, OnAddressChange {
     private static final int LOCATION_STATUS_CODE = 1;
     private ViewPager2 mViewPager;
     private ViewPagerAdapter adapter;
     private Location mCurrentLocation;
     private LocationService service;
     private List<LocationChangeCallback> delegates;
+    private List<AddressChangeCallback> addressDelegates;
 
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -82,6 +87,7 @@ public class MainActivity extends FragmentActivity implements MainCallbacks, OnL
 
         service = new LocationService(this, this);
         delegates = new ArrayList<>();
+        addressDelegates = new ArrayList<>();
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -164,7 +170,6 @@ public class MainActivity extends FragmentActivity implements MainCallbacks, OnL
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right);
-        ;
         fragmentTransaction.replace(R.id.frameBottom, MarkerInfoFragment.newInstance(marker));
         fragmentTransaction.addToBackStack(null);
         fragmentTransaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
@@ -193,6 +198,11 @@ public class MainActivity extends FragmentActivity implements MainCallbacks, OnL
     }
 
     @Override
+    public void registerAddressChange(AddressChangeCallback delegate) {
+        addressDelegates.add(delegate);
+    }
+
+    @Override
     public void openSearchResultMarker(LatLng latLng) {
         MapsFragment fragment = (MapsFragment) adapter.getFragment(0);
         InputMethodManager imm = (InputMethodManager) this.getSystemService(Activity.INPUT_METHOD_SERVICE);
@@ -213,7 +223,6 @@ public class MainActivity extends FragmentActivity implements MainCallbacks, OnL
         fragmentTransaction.commit();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void openRouteInfo(String routeDuration, int routeColor) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
@@ -231,13 +240,29 @@ public class MainActivity extends FragmentActivity implements MainCallbacks, OnL
     }
 
     @Override
-    public void updateOnscreenMarker(LatLng coordinate, byte[] avt) {
-        ((MapsFragment) adapter.getFragment(0)).createAvatarMarker(coordinate, avt);
-    }
-
-    @Override
     public void onLocationChange(Location location) {
         mCurrentLocation = location;
         notifyLocationChange();
+    }
+
+    @Override
+    public void onAddressInsert(Place place) {
+        for (AddressChangeCallback delegate : addressDelegates) {
+            delegate.onAddressInsert(place);
+        }
+    }
+
+    @Override
+    public void onAddressUpdate(Place place) {
+        for (AddressChangeCallback delegate : addressDelegates) {
+            delegate.onAddressUpdate(place);
+        }
+    }
+
+    @Override
+    public void onAddressDelete(int placeId) {
+        for (AddressChangeCallback delegate : addressDelegates) {
+            delegate.onAddressDelete(placeId);
+        }
     }
 }

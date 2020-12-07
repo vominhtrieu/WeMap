@@ -33,6 +33,7 @@ import java.io.InputStream;
 import hcmus.student.map.MainActivity;
 import hcmus.student.map.R;
 import hcmus.student.map.model.Database;
+import hcmus.student.map.utitlies.AddressManager;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -44,6 +45,7 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
     ImageView ivAvatar;
     LatLng latLng;
     byte[] selectedImage;
+    AddressManager addressManager;
 
     int REQUEST_CODE_CAMERA = 123;
     int REQUEST_CODE_FOLDER = 456;
@@ -61,6 +63,7 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         activity = (MainActivity) getActivity();
+        addressManager = new AddressManager(getContext(), activity);
     }
 
     @Nullable
@@ -102,10 +105,11 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
                     Toast.makeText(activity, "Place name is required!", Toast.LENGTH_SHORT).show();
                 } else {
                     try {
-                        Database db = new Database(getContext());
-                        db.insertPlace(edtName.getText().toString(), new LatLng(latLng.latitude, latLng.longitude), selectedImage);
+                        addressManager.insertPlace(edtName.getText().toString(), new LatLng(latLng.latitude, latLng.longitude), selectedImage);
+//                        Database db = new Database(getContext());
+//                        db.insertPlace(edtName.getText().toString(), new LatLng(latLng.latitude, latLng.longitude), selectedImage);
                         activity.backToPreviousFragment();
-                        activity.updateOnscreenMarker(latLng, selectedImage);
+//                        activity.updateOnscreenMarker(latLng, selectedImage);
                     } catch (Exception e) {
                         e.printStackTrace();
                         Toast.makeText(activity, "This place is already in contact book", Toast.LENGTH_SHORT).show();
@@ -122,11 +126,13 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
         Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
         startActivityForResult(intent, REQUEST_CODE_CAMERA);
     }
+
     private void GalleryIntent(){
         Intent intent1 = new Intent(Intent.ACTION_PICK);
         intent1.setType("image/*");
         startActivityForResult(intent1, REQUEST_CODE_FOLDER);
     }
+
     private void setSelectedImage(Bitmap bitmap) {
         ivAvatar.setImageBitmap(bitmap);
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -163,8 +169,8 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
         RectF rectF = new RectF(rect);
         canvas.drawOval(rectF, paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
-        float left = (squareBitmapWidth - bitmap.getWidth()) / 2;
-        float top = (squareBitmapWidth - bitmap.getHeight()) / 2;
+        float left = (float) (squareBitmapWidth - bitmap.getWidth()) / 2;
+        float top = (float) (squareBitmapWidth - bitmap.getHeight()) / 2;
         canvas.drawBitmap(bitmap, left, top, paint);
         bitmap.recycle();
         return resultBitmap;

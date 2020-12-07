@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Geocoder;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,15 +36,34 @@ import hcmus.student.map.MainActivity;
 import hcmus.student.map.R;
 import hcmus.student.map.model.Database;
 import hcmus.student.map.model.Place;
+import hcmus.student.map.utitlies.AddressChangeCallback;
 import hcmus.student.map.utitlies.AddressLine;
+import hcmus.student.map.utitlies.AddressManager;
 import hcmus.student.map.utitlies.OnAddressLineResponse;
 
-public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    Database mDatabase;
+public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements AddressChangeCallback {
     Context context;
+
+    Database mDatabase;
+    AddressManager mAddressManager;
     List<Place> places;
     final int REQUEST_CODE_CAMERA = 123;
     ImageView ivAvatar;
+
+    @Override
+    public void onAddressInsert(Place place) {
+        getUpdate();
+    }
+
+    @Override
+    public void onAddressUpdate(Place place) {
+        getUpdate();
+    }
+
+    @Override
+    public void onAddressDelete(int placeId) {
+        getUpdate();
+    }
 
     public static class FavoriteViewHolder extends RecyclerView.ViewHolder {
         public FavoriteViewHolder(@NonNull View itemView) {
@@ -81,8 +101,10 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     public NormalAddressAdapter(Context context) {
         this.context = context;
+        this.mAddressManager = new AddressManager(context, (MainActivity) context);
         this.mDatabase = new Database(context);
         this.places = new ArrayList<>();
+        ((MainActivity) context).registerAddressChange(this);
         getUpdate();
     }
 
@@ -116,7 +138,7 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
 
     public void getUpdate() {
-        places = mDatabase.getAllPlaces();
+        places = mAddressManager.getPlaces();
         places = groupAddress(places);
         notifyDataSetChanged();
     }
@@ -227,10 +249,14 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
             @Override
             public void onClick(View v) {
                 if (place.getFavorite().equals("0")) {
-                    mDatabase.addFavorite(place.getId());
+                    //mDatabase.addFavorite(place.getId());
+                    mAddressManager.addFavorite(place.getId());
+                    getUpdate();
                 }
                 else {
-                    mDatabase.removeFavorite(place.getId());
+                    //mDatabase.removeFavorite(place.getId());
+                    mAddressManager.removeFavorite(place.getId());
+                    getUpdate();
                 }
                 getUpdate();
             }
@@ -259,8 +285,10 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
         ivAvatar = dialogEdit.findViewById(R.id.ivAvatar);
         final Place place = places.get(position);
         edtNewName.setText(place.getName());
-        Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
-        ivAvatar.setBackground(new BitmapDrawable(context.getResources(), bmp));
+        if (place.getAvatar() != null) {
+            Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
+            ivAvatar.setBackground(new BitmapDrawable(context.getResources(), bmp));
+        }
 
         ImageButton btnCamera = dialogEdit.findViewById(R.id.btnCamera);
         btnCamera.setOnClickListener(new View.OnClickListener() {
@@ -275,8 +303,10 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
             @Override
             public void onClick(View v) {
                 place.setName(edtNewName.getText().toString());
-                mDatabase.editPlace(place);
-                notifyDataSetChanged();
+//                mDatabase.editPlace(place);
+//                notifyDataSetChanged();
+                mAddressManager.updatePlace(place);
+                //getUpdate();
                 dialogEdit.dismiss();
             }
         });
@@ -296,9 +326,11 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
         alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface arg0, int arg1) {
-                mDatabase.deletePlace(place.getId());
-                places.remove(position);
-                notifyDataSetChanged();
+                //mDatabase.deletePlace(place.getId());
+                //places.remove(position);
+                mAddressManager.deletePlace(place.getId());
+                //getUpdate();
+                //notifyDataSetChanged();
             }
         }).setNegativeButton("No", new DialogInterface.OnClickListener() {
             @Override
