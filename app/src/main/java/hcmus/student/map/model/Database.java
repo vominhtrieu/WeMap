@@ -26,8 +26,11 @@ public class Database extends SQLiteOpenHelper {
     static final String KEY_FAVORITE = "FAVORITE";
     static final int DATABASE_VERSION = 1;
 
+    private Context context;
+
     public Database(@Nullable Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        this.context = context;
     }
 
     private List<Place> getPlacesFromCursor(Cursor cursor) {
@@ -73,7 +76,7 @@ public class Database extends SQLiteOpenHelper {
         ContentValues values = new ContentValues();
         values.put(KEY_AVATAR, place.getAvatar());
         values.put(KEY_NAME, place.getName());
-        db.update(TABLE_NAME, values, KEY_LATITUDE + "=" + place.getLocation().latitude + " AND " + KEY_LONGITUDE + "=" + place.getLocation().longitude, null);
+        db.update(TABLE_NAME, values, KEY_ID + "=" + place.getId(), null);
         db.close();
     }
 

@@ -1,34 +1,20 @@
 package hcmus.student.map.address_book;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.AsyncQueryHandler;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Geocoder;
-import android.net.Uri;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
-import android.widget.SearchView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -36,23 +22,23 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import hcmus.student.map.MainActivity;
 import hcmus.student.map.R;
 import hcmus.student.map.model.Database;
 import hcmus.student.map.model.Place;
+import hcmus.student.map.utitlies.AddressChangeCallback;
 import hcmus.student.map.utitlies.AddressLine;
+import hcmus.student.map.utitlies.AddressProvider;
 import hcmus.student.map.utitlies.OnAddressLineResponse;
 
-public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>{
-    Database mDatabase;
+public class AddressBookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements AddressChangeCallback {
     Context context;
-    List<Place> places;
-    final int REQUEST_CODE_CAMERA = 123;
-    ImageView ivAvatar;
 
+    AddressProvider mAddressProvider;
+    List<Place> places;
+    Database mDatabase;
 
 
     public static class FavoriteViewHolder extends RecyclerView.ViewHolder {
@@ -89,10 +75,13 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
     }
 
-    public NormalAddressAdapter(Context context){
+    public AddressBookAdapter(Context context) {
         this.context = context;
-        this.mDatabase = new Database(context);
+        this.mAddressProvider = ((MainActivity) context).getAddressProvider();
+        //this.mDatabase = new Database(context);
         this.places = new ArrayList<>();
+        ((MainActivity) context).registerAddressChange(this);
+        mDatabase = new Database(context);
         getUpdate();
     }
 
@@ -126,11 +115,10 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
     }
 
     public void getUpdate() {
-        places = mDatabase.getAllPlaces();
+        places = mAddressProvider.getPlaces();
         places = groupAddress(places);
         notifyDataSetChanged();
     }
-
 
 
     @Override
@@ -142,7 +130,6 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
         return 2;
     }
-
 
 
     @NonNull
@@ -217,10 +204,10 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.itemEdit:
-                        showEditDialog(position);
+                        ((MainActivity) context).editPlaces(place);
                         break;
                     case R.id.itemDelete:
-                        ShowDeleteDialog(position);
+                        showDeleteDialog(position);
                         break;
                     case R.id.itemCancel:
                         break;
@@ -236,16 +223,16 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
             }
         });
 
-        if(place.getFavorite().equals("1"))
+        if (place.getFavorite().equals("1"))
             btnFavorite.setBackgroundResource(R.drawable.ic_baseline_favorite_red);
         btnFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (place.getFavorite().equals("0")) {
-                    mDatabase.addFavorite(place.getId());
-                }
-                else {
-                    mDatabase.removeFavorite(place.getId());
+                    mAddressProvider.addFavorite(place.getId());
+                    btnFavorite.setBackgroundResource(R.drawable.ic_baseline_favorite_red);
+                } else {
+                    mAddressProvider.removeFavorite(place.getId());
                     btnFavorite.setBackgroundResource(R.drawable.ic_baseline_favorite);
                 }
                 getUpdate();
@@ -265,65 +252,23 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
         return places.size();
     }
 
-    public void searchPlaceContact(String data){
+    public void searchForPlaces(String data) {
         places = mDatabase.searchForPlaces(data);
         places = groupAddress(places);
         notifyDataSetChanged();
 
     }
 
-    private void showEditDialog(int position) {
-        final Dialog dialogEdit = new Dialog(context);
-        dialogEdit.setContentView(R.layout.dialog_edit);
-        final EditText edtNewName = dialogEdit.findViewById(R.id.edtNewName);
-
-        Button btnOK = dialogEdit.findViewById(R.id.btnOK);
-        Button btnCancel = dialogEdit.findViewById(R.id.btnCancel);
-        ivAvatar = dialogEdit.findViewById(R.id.ivAvatar);
-        final Place place = places.get(position);
-        edtNewName.setText(place.getName());
-        Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
-        ivAvatar.setBackground(new BitmapDrawable(context.getResources(), bmp));
-
-        ImageButton btnCamera = dialogEdit.findViewById(R.id.btnCamera);
-        btnCamera.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cameraIntent();
-                Toast.makeText(context, "click image", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        btnOK.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                place.setName(edtNewName.getText().toString());
-                mDatabase.editPlace(place);
-                notifyDataSetChanged();
-                dialogEdit.dismiss();
-            }
-        });
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialogEdit.dismiss();
-            }
-        });
-        dialogEdit.show();
-    }
-
-    private void ShowDeleteDialog(final int position) {
+    private void showDeleteDialog(final int position) {
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-        alertDialogBuilder.setMessage("Are you sure,You wanted to delete an address?");
+        alertDialogBuilder.setMessage(R.string.txtDeleteConfirm);
         final Place place = places.get(position);
-        alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+        alertDialogBuilder.setPositiveButton(R.string.txtYes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface arg0, int arg1) {
-                mDatabase.deletePlace(place.getId());
-                places.remove(position);
-                notifyDataSetChanged();
+                mAddressProvider.deletePlace(place.getId());
             }
-        }).setNegativeButton("No", new DialogInterface.OnClickListener() {
+        }).setNegativeButton(R.string.txtNo, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.dismiss();
@@ -333,11 +278,19 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
         alertDialogBuilder.show();
     }
 
-    private void cameraIntent() {
-        Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
-        ((Activity) context).startActivityForResult(intent, REQUEST_CODE_CAMERA);
+    @Override
+    public void onAddressInsert(Place place) {
+        getUpdate();
     }
 
+    @Override
+    public void onAddressUpdate(Place place) {
+        getUpdate();
+    }
 
+    @Override
+    public void onAddressDelete(int placeId) {
+        getUpdate();
+    }
 
 }
