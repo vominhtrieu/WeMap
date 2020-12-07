@@ -86,7 +86,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     private boolean isContactShown;
     private SpeedMonitor speedMonitor;
     private FloatingActionButton btnLocation;
-
     private TextView txtSpeed;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -143,6 +142,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
         btnLocation = getView().findViewById(R.id.btnLocation);
         final FloatingActionButton btnContact = getView().findViewById(R.id.btnContact);
         final MapWrapper mapContainer = getView().findViewById(R.id.mapContainer);

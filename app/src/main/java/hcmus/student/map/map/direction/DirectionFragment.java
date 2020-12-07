@@ -66,6 +66,24 @@ public class DirectionFragment extends Fragment implements DirectionFragmentCall
         edtDest = view.findViewById(R.id.edtDest);
         RecyclerView lvFirstSearchResult = view.findViewById(R.id.lvFirstSearchResult);
         RecyclerView lvSecondSearchResult = view.findViewById(R.id.lvSecondSearchResult);
+        tabLayout = view.findViewById(R.id.tabs);
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                mode = transportModes[tab.getPosition()];
+                activity.drawRoute(origin.getLocation(), dest.getLocation(), mode);
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
 
         lvFirstSearchResult.setLayoutManager(new LinearLayoutManager(context));
         lvSecondSearchResult.setLayoutManager(new LinearLayoutManager(context));
