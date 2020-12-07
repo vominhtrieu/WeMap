@@ -1,6 +1,7 @@
 package hcmus.student.map.map;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.util.Log;
@@ -105,7 +106,7 @@ public class MarkerInfoFragment extends Fragment implements View.OnClickListener
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.btnDirection:
-                activity.drawRoute(null, latLng);
+                activity.drawRoute(null, latLng, "driving");
                 activity.backToPreviousFragment();
                 break;
             case R.id.btnAdd:
@@ -131,10 +132,11 @@ public class MarkerInfoFragment extends Fragment implements View.OnClickListener
         if (detailWeather != null) {
 //            Log.d("Tem",String.valueOf());
             int imageId = context.getResources().getIdentifier("ic_weather_" + detailWeather.getIcon(), "drawable", context.getPackageName());
-            ivIcon.setImageResource(imageId);;
+            ivIcon.setImageResource(imageId);
+            ivIcon.setColorFilter(Color.BLACK);
             StringBuilder sb1 = new StringBuilder();
             Formatter formatter1 = new Formatter(sb1, Locale.US);
-            txtTemperature.setText(formatter1.format("%s %.2foC", "Temperature: ",detailWeather.getTemperature()).toString());
+            txtTemperature.setText(formatter1.format("%s %.2f°", "Temperature: ",detailWeather.getTemperature()).toString());
             StringBuilder sb2 = new StringBuilder();
             Formatter formatter2 = new Formatter(sb2, Locale.US);
             txtWind.setText(formatter2.format("%s %.2fmph", "Wind Speed: ",detailWeather.getWindSpeed()).toString());

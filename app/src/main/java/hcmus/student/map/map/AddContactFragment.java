@@ -72,7 +72,7 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
         btnCancel = view.findViewById(R.id.btnCancelContact);
         edtName = view.findViewById(R.id.edtName);
         btnCamera = view.findViewById(R.id.btnCamera);
-        btnFolder = view.findViewById(R.id.btnFolder);
+        btnFolder = view.findViewById(R.id.btnGallery);
         ivAvatar = view.findViewById(R.id.ivAvatar);
 
         ivAvatar.setEnabled(false);
@@ -94,7 +94,7 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
             case R.id.btnCamera:
                 CameraIntent();
                 break;
-            case R.id.btnFolder:
+            case R.id.btnGallery:
                 GalleryIntent();
                 break;
             case R.id.btnAddContact:

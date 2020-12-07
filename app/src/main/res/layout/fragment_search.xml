@@ -18,13 +18,14 @@
             android:layout_height="wrap_content"
             android:background="@android:color/white"
             android:iconifiedByDefault="false"
-            android:queryHint="Search..." />
+            android:queryBackground="@null"
+            android:queryHint="@string/txt_search"
+            android:submitBackground="@null" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/lvSearchResult"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:maxHeight="60dp"
             android:divider="@null" />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

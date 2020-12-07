@@ -10,7 +10,6 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,11 +59,6 @@ import hcmus.student.map.map.utilities.direction.DirectionResponse;
 import hcmus.student.map.map.utilities.direction.DirectionTask;
 import hcmus.student.map.model.Database;
 import hcmus.student.map.model.Place;
-import hcmus.student.map.weather.WeatherAsynTask;
-import hcmus.student.map.weather.utilities.DetailWeather;
-import hcmus.student.map.weather.utilities.GetWeather;
-import hcmus.student.map.weather.utilities.GetWeatherDetailTask;
-import hcmus.student.map.weather.utilities.OnWeatherResponse;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback, DirectionResponse,
         MapsFragmentCallbacks, LocationChangeCallback {
@@ -91,9 +85,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     private boolean isCameraFollowing;
     private boolean isContactShown;
     private SpeedMonitor speedMonitor;
+    private FloatingActionButton btnLocation;
     private TextView txtSpeed;
-    private DetailWeather detailWeather1;
-    WeatherAsynTask weatherAsynTask;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
 
@@ -115,7 +108,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         isCameraFollowing = true;
         isContactShown = false;
         speedMonitor = new SpeedMonitor(context);
-
 
     }
 
@@ -150,9 +142,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        final FloatingActionButton btnLocation = getView().findViewById(R.id.btnLocation);
+
+        btnLocation = getView().findViewById(R.id.btnLocation);
         final FloatingActionButton btnContact = getView().findViewById(R.id.btnContact);
         final MapWrapper mapContainer = getView().findViewById(R.id.mapContainer);
+
         mapContainer.setOnMapWrapperTouch(new OnMapWrapperTouch() {
             @Override
             public void onMapWrapperTouch() {
@@ -182,8 +176,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                         }
                         final boolean check = clickCount >= 2;
 
+                        float zoomLevel = mMap.getCameraPosition().zoom < DEFAULT_ZOOM ? DEFAULT_ZOOM : mMap.getCameraPosition().zoom;
+
                         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(new LatLng(mCurrentLocation.getLatitude(),
-                                mCurrentLocation.getLongitude()), DEFAULT_ZOOM);
+                                mCurrentLocation.getLongitude()), zoomLevel);
                         mMap.animateCamera(cameraUpdate, new GoogleMap.CancelableCallback() {
                             @Override
                             public void onFinish() {
@@ -228,6 +224,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             @Override
             public void onMapLongClick(LatLng latLng) {
                 if (marker != null) marker.remove();
+                stopFollowing();
                 marker = mMap.addMarker(new MarkerOptions().position(latLng));
                 marker.setZIndex(5);
                 mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
@@ -266,6 +263,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             return;
         //Display location indicator
         if (mCurrentLocation == null) {
+            btnLocation.setImageResource(R.drawable.ic_baseline_location_following);
             BitmapDrawable bitmapDrawable = (BitmapDrawable) ResourcesCompat.getDrawable(getResources(), R.drawable.location_indicator,
                     context.getTheme());
             Bitmap bitmap = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 72, 72, false);
@@ -305,7 +303,13 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             main.getSupportFragmentManager().beginTransaction().remove(fm).commit();
     }
 
-    public void drawRoute(LatLng start, LatLng end) {
+    public void stopFollowing() {
+        isCameraFollowing = false;
+        btnLocation.setImageResource(R.drawable.ic_baseline_location);
+    }
+
+    public void drawRoute(LatLng start, LatLng end, String mode) {
+        stopFollowing();
         LatLng startPos = start == null ? new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()) : start;
         LatLng endPos = end == null ? new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude()) : end;
         if (directionFragment == null)
@@ -318,7 +322,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             }
         }
 
-        String url = Direction.getDirectionUrl(startPos, endPos, main);
+        String url = Direction.getDirectionUrl(startPos, endPos, mode, main);
         new DirectionTask(this).execute(url);
     }
 
@@ -328,6 +332,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             createAvatarMarker(place.getLocation(), place.getAvatar());
         }
     }
+
     private void hideAllAddress() {
         for (Marker marker : mContactMarkers) {
             marker.remove();
@@ -343,6 +348,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         transaction.addToBackStack(null);
         transaction.commit();
     }
+
     @Override
     public void removeMarker() {
         marker.remove();
@@ -360,6 +366,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     public void openSearchResultMarker(LatLng coordinate) {
         if (marker != null)
             marker.remove();
+        stopFollowing();
         marker = mMap.addMarker(new MarkerOptions().position(coordinate));
         mMap.animateCamera(CameraUpdateFactory.newLatLng(coordinate));
     }
@@ -394,8 +401,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
 
     @Override
     public void onPause() {
-        super.onPause();
+        mMapView.onPause();
         mSensor.unregister();
+        super.onPause();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)

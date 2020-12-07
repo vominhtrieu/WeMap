@@ -1,27 +1,20 @@
 package hcmus.student.map.address_book;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Geocoder;
-import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -228,8 +221,10 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
             public void onClick(View v) {
                 if (place.getFavorite().equals("0")) {
                     mDatabase.addFavorite(place.getId());
+                    btnFavorite.setBackgroundResource(R.drawable.ic_baseline_favorite_red);
                 } else {
                     mDatabase.removeFavorite(place.getId());
+                    btnFavorite.setBackgroundResource(R.drawable.ic_baseline_favorite);
                 }
                 getUpdate();
             }
@@ -250,7 +245,7 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     private void ShowDeleteDialog(final int position) {
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-        alertDialogBuilder.setMessage("Are you sure,You wanted to delete an address?");
+        alertDialogBuilder.setMessage("Do you really want to delete this address?");
         final Place place = places.get(position);
         alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override

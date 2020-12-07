@@ -11,7 +11,7 @@
         android:layout_width="64dp"
         android:layout_height="64dp"
         android:layout_gravity="center"
-        android:background="@drawable/icon_image"
+        android:background="@drawable/ic_image"
         android:scaleType="fitXY" />
 
     <LinearLayout
