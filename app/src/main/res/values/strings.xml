@@ -5,7 +5,7 @@
     <string name="txt_longitude">Longitude:</string>
     <string name="btn_add_contact">Add</string>
     <string name="txt_place_name">Place name</string>
-    <string name="instruction_photo_select">Select a photo to represent the location(optional)</string>
+    <string name="txtAvatar">Avatar</string>
     <string name="btn_add">Add</string>
     <string name="btn_cancel">Cancel</string>
     <string name="title_address_book">All Address</string>

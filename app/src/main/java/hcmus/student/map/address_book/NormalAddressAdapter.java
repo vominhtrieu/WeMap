@@ -245,7 +245,7 @@ public class NormalAddressAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     private void ShowDeleteDialog(final int position) {
         final AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
-        alertDialogBuilder.setMessage("Are you sure,You wanted to delete an address?");
+        alertDialogBuilder.setMessage("Do you really want to delete this address?");
         final Place place = places.get(position);
         alertDialogBuilder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
