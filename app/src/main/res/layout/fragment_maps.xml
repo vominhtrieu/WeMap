@@ -32,7 +32,7 @@
             android:layout_marginBottom="5dp"
             android:backgroundTint="@android:color/white"
             android:scaleType="center"
-            android:src="@drawable/ic_btn_hide_contact"
+            android:src="@drawable/ic_toggle_visibility"
             app:borderWidth="0dp"
             app:elevation="2dp" />
 

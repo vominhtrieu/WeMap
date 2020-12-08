@@ -71,7 +71,7 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
         View view = inflater.inflate(R.layout.fragment_add_contact, container, false);
 
         btnAdd = view.findViewById(R.id.btnAddContact);
-        btnCancel = view.findViewById(R.id.btnCancelContact);
+        btnCancel = view.findViewById(R.id.btnCancel);
         edtName = view.findViewById(R.id.edtName);
         btnCamera = view.findViewById(R.id.btnCamera);
         btnFolder = view.findViewById(R.id.btnGallery);
@@ -115,7 +115,7 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
                     }
                 }
                 break;
-            case R.id.btnCancelContact:
+            case R.id.btnCancel:
                 activity.backToPreviousFragment();
                 break;
         }

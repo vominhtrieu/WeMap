@@ -28,4 +28,6 @@
     <string name="txtDeleteConfirm">Do you really want to delete this address?</string>
     <string name="txtYes">Yes</string>
     <string name="txtNo">No</string>
+    <string name="txtOk">OK</string>
+    <string name="txt_new_name">New name:</string>
 </resources>

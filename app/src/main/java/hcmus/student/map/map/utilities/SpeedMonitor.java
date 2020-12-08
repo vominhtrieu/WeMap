@@ -30,6 +30,9 @@ public class SpeedMonitor {
             float distance = currentLocation.distanceTo(oldLocation);
 
             float timeDifferent = (float) ((newTime - oldTime) / 1000);
+            if (timeDifferent == 0) {
+                return -1;
+            }
             //Get speed in km per hour
             double speed = distance * 3.6 / timeDifferent;
             oldTime = newTime;

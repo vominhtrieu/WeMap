@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    card_view:cardUseCompatPadding="true">
+    app:cardCornerRadius="5dp"
+    app:cardElevation="5dp"
+    app:cardUseCompatPadding="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -11,39 +13,6 @@
         android:background="@android:color/white"
         android:orientation="vertical"
         android:padding="20dp">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="New name:"
-                android:textColor="#000"
-                android:textSize="20sp" />
-
-            <EditText
-                android:id="@+id/edtNewName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="#000"
-                android:textSize="20sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
-
-        </LinearLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/txtAvatar"
-            android:textColor="#000"
-            android:textSize="20sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -72,53 +41,70 @@
                     android:id="@+id/btnCamera"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:backgroundTint="@android:color/white"
-                    android:src="@drawable/ic_baseline_photo_camera"
-                    card_view:borderWidth="0dp"
                     android:layout_margin="10dp"
-                    android:elevation="5dp" />
+                    android:src="@drawable/ic_baseline_photo_camera"
+                    app:backgroundTint="@color/colorPrimary"
+                    app:borderWidth="0dp"
+                    app:elevation="5dp"
+                    app:tint="@android:color/white" />
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/btnGallery"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:backgroundTint="@android:color/white"
-                    android:src="@drawable/ic_baseline_image"
                     android:layout_margin="10dp"
-                    card_view:borderWidth="0dp"/>
+                    android:src="@drawable/ic_baseline_image"
+                    app:backgroundTint="@color/colorPrimary"
+                    app:borderWidth="0dp"
+                    app:tint="@android:color/white" />
             </LinearLayout>
         </LinearLayout>
+
+        <EditText
+            android:id="@+id/edtNewName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/txt_new_name"
+            android:textColor="#000"
+            android:textSize="20sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="40dp"
+            android:gravity="center">
 
-            <Button
-                android:id="@+id/btnOK"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_weight="1"
-                android:background="@drawable/btn_background"
-                android:text="OK"
-                android:textAllCaps="false"
-                android:textColor="#000"
-                android:textSize="20sp" />
-
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCancel"
-                android:layout_width="0dp"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="140dp"
+                android:layout_height="wrap_content"
+                android:paddingVertical="10dp"
+                android:text="@string/btn_cancel"
+                android:textAlignment="textStart"
+                android:textColor="@color/colorDanger"
+                android:textSize="16sp"
+                app:cornerRadius="20dp"
+                app:icon="@drawable/ic_baseline_close"
+                app:iconSize="18sp"
+                app:iconTint="@color/colorDanger"
+                app:strokeColor="@color/colorDanger" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnOK"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="140dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:layout_marginLeft="10dp"
-                android:layout_weight="1"
-                android:background="@drawable/btn_background"
-                android:text="CANCEL"
-                android:textAllCaps="false"
-                android:textColor="#000"
-                android:textSize="20sp" />
+                android:layout_marginEnd="10dp"
+                android:paddingVertical="10dp"
+                android:text="@string/txtOk"
+                android:textAlignment="textStart"
+                android:textColor="#fff"
+                android:textSize="16sp"
+                app:cornerRadius="20dp"
+                app:icon="@drawable/ic_baseline_check"
+                app:iconSize="16sp" />
         </LinearLayout>
 
     </LinearLayout>

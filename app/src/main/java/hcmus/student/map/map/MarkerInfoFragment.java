@@ -57,9 +57,6 @@ public class MarkerInfoFragment extends Fragment implements View.OnClickListener
         context=getContext();
         Bundle args = getArguments();
         latLng = new LatLng(args.getDouble("lat"), args.getDouble("lng"));
-        String url = GetWeather.getUrl(activity, latLng);
-        WeatherAsynTask weatherAsynTask = new WeatherAsynTask(this);
-        weatherAsynTask.execute(url);
     }
 
     @Nullable
@@ -98,6 +95,9 @@ public class MarkerInfoFragment extends Fragment implements View.OnClickListener
         btnDirection.setOnClickListener(this);
         btnClose.setOnClickListener(this);
 
+        String url = GetWeather.getUrl(activity, latLng);
+        WeatherAsynTask weatherAsynTask = new WeatherAsynTask(this);
+        weatherAsynTask.execute(url);
         return view;
     }
 

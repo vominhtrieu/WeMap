@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Geocoder;
 import android.view.LayoutInflater;
@@ -20,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,9 +62,9 @@ public class AddressBookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         protected ImageView ivAvatar;
         protected TextView txtName;
         protected TextView txtAddressLine;
-        protected ImageButton btnFavorite;
+        protected FloatingActionButton btnFavorite;
+        protected FloatingActionButton btnLocate;
         protected ImageButton btnMore;
-        protected ImageButton btnLocate;
 
         public PlaceViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -171,9 +173,9 @@ public class AddressBookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         final ImageView ivAvatar = holder.ivAvatar;
         final TextView txtAddressLine = holder.txtAddressLine;
         final TextView txtName = holder.txtName;
-        final ImageButton btnFavorite = holder.btnFavorite;
+        final FloatingActionButton btnFavorite = holder.btnFavorite;
+        final FloatingActionButton btnLocate = holder.btnLocate;
         final ImageButton btnMore = holder.btnMore;
-        final ImageButton btnLocate = holder.btnLocate;
 
         txtName.setText(place.getName());
         txtAddressLine.setText(R.string.txt_loading_address_line);
@@ -226,18 +228,17 @@ public class AddressBookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         });
 
         if (place.getFavorite().equals("1"))
-            btnFavorite.setBackgroundResource(R.drawable.ic_baseline_favorite_red);
+            btnFavorite.setColorFilter(Color.parseColor("#ec5858"));
         else
-            btnFavorite.setBackgroundResource(R.drawable.ic_baseline_favorite);
+            btnFavorite.setColorFilter(Color.parseColor("#000000"));
+
         btnFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (place.getFavorite().equals("0")) {
                     mAddressProvider.addFavorite(place.getId());
-                    btnFavorite.setBackgroundResource(R.drawable.ic_baseline_favorite_red);
                 } else {
                     mAddressProvider.removeFavorite(place.getId());
-                    btnFavorite.setBackgroundResource(R.drawable.ic_baseline_favorite);
                 }
                 getUpdate();
             }
