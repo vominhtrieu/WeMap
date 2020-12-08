@@ -37,15 +37,14 @@
                         android:layout_gravity="center_vertical"
                         android:background="@drawable/location_indicator_button" />
 
-                    <EditText
-                        android:id="@+id/edtOrigin"
+                    <SearchView
+                        android:id="@+id/svOrigin"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:backgroundTint="@android:color/white"
-                        android:hint="@string/hint_origin_edt"
-                        android:inputType="textNoSuggestions"
-                        android:maxLines="1"
-                        android:textColor="@android:color/black" />
+                        android:iconifiedByDefault="false"
+                        android:queryBackground="@null"
+                        android:queryHint="@string/hint_origin_edt"
+                        android:searchIcon="@null" />
                 </LinearLayout>
 
                 <androidx.recyclerview.widget.RecyclerView
@@ -67,15 +66,15 @@
                         android:layout_gravity="center_vertical"
                         android:background="@drawable/location_indicator_button" />
 
-                    <EditText
-                        android:id="@+id/edtDest"
+                    <SearchView
+                        android:id="@+id/svDest"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:backgroundTint="@android:color/white"
-                        android:hint="@string/hint_destination_edt"
-                        android:inputType="textNoSuggestions"
-                        android:maxLines="1"
-                        android:textColor="@android:color/black" />
+                        android:background="@android:color/white"
+                        android:iconifiedByDefault="false"
+                        android:queryBackground="@null"
+                        android:queryHint="@string/hint_destination_edt"
+                        android:searchIcon="@null" />
                 </LinearLayout>
 
                 <androidx.recyclerview.widget.RecyclerView

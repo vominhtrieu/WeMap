@@ -172,7 +172,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
 
     @Override
     public void onRespond(String url, List<Place> placeList) {
-        if (!currentRequest.equals(url))
+        if (currentRequest != null && !currentRequest.equals(url))
             return;
         if (placeList == null)
             return;

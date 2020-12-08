@@ -15,6 +15,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/colorPrimary"
+            android:queryBackground="@null"
             android:iconifiedByDefault="false"
             android:queryHint="@string/txt_search" />
 

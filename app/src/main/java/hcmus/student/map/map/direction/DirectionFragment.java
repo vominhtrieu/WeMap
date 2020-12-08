@@ -9,8 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.SearchView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,7 +36,7 @@ public class DirectionFragment extends Fragment implements DirectionFragmentCall
     int notUserTypingChecker;
     Place origin;
     Place dest;
-    EditText edtOrigin, edtDest;
+    SearchView svOrigin, svDest;
     String mode;
     TabLayout tabLayout;
 
@@ -62,8 +62,8 @@ public class DirectionFragment extends Fragment implements DirectionFragmentCall
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_direction, null, false);
-        edtOrigin = view.findViewById(R.id.edtOrigin);
-        edtDest = view.findViewById(R.id.edtDest);
+        svOrigin = view.findViewById(R.id.svOrigin);
+        svDest = view.findViewById(R.id.svDest);
         RecyclerView lvFirstSearchResult = view.findViewById(R.id.lvFirstSearchResult);
         RecyclerView lvSecondSearchResult = view.findViewById(R.id.lvSecondSearchResult);
         tabLayout = view.findViewById(R.id.tabs);
@@ -110,7 +110,7 @@ public class DirectionFragment extends Fragment implements DirectionFragmentCall
         final SearchResultAdapter firstAdapter = new SearchResultAdapter(context, new SearchClickCallback() {
             @Override
             public void onSearchClickCallback(Place place) {
-                activity.drawRoute(origin.getLocation(), dest.getLocation(), mode);
+                activity.drawRoute(place.getLocation(), dest.getLocation(), mode);
             }
         });
 
@@ -162,47 +162,43 @@ public class DirectionFragment extends Fragment implements DirectionFragmentCall
                 else
                     dest = new Place(0, activity.getResources().getString(R.string.txtCurrentLocation), null, null);
 
-                edtOrigin.setText(origin.getName());
-                edtDest.setText(dest.getName());
+                svOrigin.setQuery(origin.getName(), false);
+                svDest.setQuery(dest.getName(), false);
             } catch (Exception e) {
                 origin = null;
                 dest = null;
             }
         }
 
-        edtOrigin.addTextChangedListener(new TextWatcher() {
+        svOrigin.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            public boolean onQueryTextSubmit(String query) {
+                return false;
             }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            public boolean onQueryTextChange(String newText) {
                 if (notUserTypingChecker == 0)
-                    firstAdapter.search(s.toString());
+                    firstAdapter.search(newText);
                 else
                     notUserTypingChecker--;
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
+                return false;
             }
         });
 
-        edtDest.addTextChangedListener(new TextWatcher() {
+        svDest.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            public boolean onQueryTextSubmit(String query) {
+                return false;
             }
 
             @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            public boolean onQueryTextChange(String newText) {
                 if (notUserTypingChecker == 0)
-                    secondAdapter.search(s.toString());
+                    secondAdapter.search(newText);
                 else
                     notUserTypingChecker--;
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
+                return false;
             }
         });
 
@@ -239,7 +235,7 @@ public class DirectionFragment extends Fragment implements DirectionFragmentCall
         this.origin = new Place(0, originName, origin, null);
         this.dest = new Place(0, destName, dest, null);
         notUserTypingChecker += 2;
-        edtOrigin.setText(originName);
-        edtDest.setText(destName);
+        svOrigin.setQuery(originName, false);
+        svDest.setQuery(destName, false);
     }
 }
