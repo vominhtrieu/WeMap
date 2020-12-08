@@ -195,7 +195,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
 
                             @Override
                             public void onCancel() {
-                                if (!isCameraFollowing) {
+                                if (isCameraFollowing) {
                                     isCameraFollowing = false;
                                     btnLocation.clearColorFilter();
                                 }
@@ -288,7 +288,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                     location.getLongitude()), DEFAULT_ZOOM));
         }
         mCurrentLocation = location;
-        txtSpeed.setText(String.format(Locale.US, "%.1f km/h", speedMonitor.getSpeed(mCurrentLocation)));
+        double speed = speedMonitor.getSpeed(mCurrentLocation);
+        if (speed >= 0)
+            txtSpeed.setText(String.format(Locale.US, "%.1f km/h", speed));
         animator.animate(location, isCameraFollowing);
     }
 
@@ -390,6 +392,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
 
     @Override
     public void moveCamera(LatLng location) {
+        stopFollowing();
         LatLng markerLoc = new LatLng(location.latitude, location.longitude);
         final CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(markerLoc).zoom(15).tilt(30).build();
