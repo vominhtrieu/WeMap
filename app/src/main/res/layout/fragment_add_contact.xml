@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    card_view:cardCornerRadius="5dp"
-    card_view:cardElevation="5dp"
-    card_view:cardUseCompatPadding="true">
+    app:cardCornerRadius="5dp"
+    app:cardElevation="5dp"
+    app:cardUseCompatPadding="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -14,25 +14,6 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/txt_place_name"
-                android:textColor="#000"
-                android:textSize="20sp" />
-
-            <EditText
-                android:id="@+id/edtName"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textColor="#000"
-                android:textSize="20sp" />
-        </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -40,13 +21,6 @@
             android:layout_marginTop="10dp">
 
         </LinearLayout>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/txtAvatar"
-            android:textColor="#000"
-            android:textSize="20sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -57,8 +31,8 @@
 
             <ImageView
                 android:id="@+id/ivAvatar"
-                android:layout_width="180dp"
-                android:layout_height="180dp"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
                 android:layout_marginEnd="20dp"
                 android:background="@drawable/ic_image"
                 android:scaleType="fitXY" />
@@ -74,53 +48,70 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
-                    android:backgroundTint="@color/colorPrimary"
                     android:src="@drawable/ic_baseline_photo_camera"
-                    android:tint="@android:color/white"
-                    card_view:borderWidth="0dp" />
+                    app:backgroundTint="@color/colorPrimary"
+                    app:borderWidth="0dp"
+                    app:tint="@android:color/white"
+                    app:elevation="5dp"/>
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/btnGallery"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
-                    android:backgroundTint="@color/colorPrimary"
                     android:src="@drawable/ic_baseline_image"
-                    android:tint="@android:color/white"
-                    card_view:borderWidth="0dp" />
+                    app:backgroundTint="@color/colorPrimary"
+                    app:borderWidth="0dp"
+                    app:tint="@android:color/white" />
             </LinearLayout>
         </LinearLayout>
+
+        <EditText
+            android:id="@+id/edtName"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:hint="@string/txt_place_name"
+            android:textColor="#000"
+            android:textSize="20sp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="40dp"
+            android:gravity="center">
 
-            <Button
-                android:id="@+id/btnAddContact"
-                android:layout_width="0dp"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnCancel"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="150dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_weight="1"
-                android:background="@drawable/btn_background"
-                android:text="@string/btn_add_contact"
-                android:textAllCaps="false"
-                android:textColor="#000"
-                android:textSize="20sp" />
+                android:paddingVertical="10dp"
+                android:text="@string/btn_cancel"
+                android:textAlignment="textStart"
+                android:textColor="@color/colorDanger"
+                android:textSize="16sp"
+                app:cornerRadius="20dp"
+                app:icon="@drawable/ic_baseline_close"
+                app:iconSize="16sp"
+                app:iconTint="@color/colorDanger"
+                app:strokeColor="@color/colorDanger" />
 
-            <Button
-                android:id="@+id/btnCancelContact"
-                android:layout_width="0dp"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnAddContact"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="150dp"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:layout_marginLeft="10dp"
-                android:layout_weight="1"
-                android:background="@drawable/btn_background"
-                android:text="@string/btn_cancel"
-                android:textAllCaps="false"
-                android:textColor="#000"
-                android:textSize="20sp" />
+                android:layout_marginEnd="10dp"
+                android:paddingVertical="10dp"
+                android:text="@string/btn_add_contact"
+                android:textAlignment="textStart"
+                android:textColor="#fff"
+                android:textSize="16sp"
+                app:cornerRadius="20dp"
+                app:icon="@drawable/ic_baseline_add" />
         </LinearLayout>
 
     </LinearLayout>

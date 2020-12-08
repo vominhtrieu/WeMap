@@ -155,7 +155,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             public void onMapWrapperTouch() {
                 if (isCameraFollowing) {
                     isCameraFollowing = false;
-                    btnLocation.setImageResource(R.drawable.ic_baseline_location);
+                    btnLocation.clearColorFilter();
                 }
             }
         });
@@ -188,7 +188,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                             public void onFinish() {
                                 if (check && !isCameraFollowing) {
                                     isCameraFollowing = true;
-                                    btnLocation.setImageResource(R.drawable.ic_baseline_location_following);
+                                    int color = getResources().getColor(R.color.colorPrimary);
+                                    btnLocation.setColorFilter(color);
                                 }
                             }
 
@@ -196,7 +197,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                             public void onCancel() {
                                 if (!isCameraFollowing) {
                                     isCameraFollowing = false;
-                                    btnLocation.setImageResource(R.drawable.ic_baseline_location);
+                                    btnLocation.clearColorFilter();
                                 }
                             }
                         });
@@ -213,11 +214,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             public void onClick(View v) {
                 if (isContactShown) {
                     hideAllAddress();
-                    btnContact.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_btn_hide_contact, null));
+                    btnContact.clearColorFilter();
                     isContactShown = false;
                 } else {
                     showAllAddress();
-                    btnContact.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_btn_show_contact, null));
+                    int color = getResources().getColor(R.color.colorPrimary);
+                    btnContact.setColorFilter(color);
                     isContactShown = true;
                 }
             }
@@ -269,7 +271,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             return;
         //Display location indicator
         if (mCurrentLocation == null) {
-            btnLocation.setImageResource(R.drawable.ic_baseline_location_following);
+            int color = getResources().getColor(R.color.colorPrimary);
+            btnLocation.setColorFilter(color);
+
             BitmapDrawable bitmapDrawable = (BitmapDrawable) ResourcesCompat.getDrawable(getResources(), R.drawable.location_indicator,
                     context.getTheme());
             Bitmap bitmap = Bitmap.createScaledBitmap(bitmapDrawable.getBitmap(), 72, 72, false);
@@ -311,7 +315,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
 
     public void stopFollowing() {
         isCameraFollowing = false;
-        btnLocation.setImageResource(R.drawable.ic_baseline_location);
+        btnLocation.clearColorFilter();
     }
 
     public void drawRoute(LatLng start, LatLng end, String mode) {

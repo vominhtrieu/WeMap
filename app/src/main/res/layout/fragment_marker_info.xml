@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    card_view:cardCornerRadius="5dp"
-    card_view:cardElevation="5dp"
-    card_view:cardUseCompatPadding="true">
+    app:cardCornerRadius="5dp"
+    app:cardElevation="5dp"
+    app:cardUseCompatPadding="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -98,8 +98,7 @@
                 android:layout_height="35dp"
                 android:layout_gravity="top|end"
                 android:layout_marginStart="5dp"
-                android:background="@drawable/ic_baseline_close"
-                android:shadowColor="@android:color/black" />
+                android:background="@drawable/ic_baseline_close" />
         </LinearLayout>
 
         <LinearLayout
@@ -107,37 +106,37 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnDirection"
+                style="@style/Widget.MaterialComponents.Button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:layout_marginEnd="10dp"
-                android:background="@drawable/btn_background"
-                android:drawableStart="@android:drawable/ic_menu_directions"
-                android:paddingStart="5dp"
-                android:paddingEnd="10dp"
+                android:paddingVertical="10dp"
                 android:text="@string/btn_direction"
                 android:textAlignment="textStart"
-                android:textAllCaps="false"
-                android:textColor="#000"
-                android:textSize="16sp" />
+                android:textColor="#fff"
+                android:textSize="16sp"
+                app:cornerRadius="20dp"
+                app:icon="@drawable/ic_baseline_directions"
+                app:iconSize="20sp" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAdd"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
-                android:layout_marginTop="5dp"
-                android:background="@drawable/btn_background"
-                android:drawableStart="@drawable/ic_baseline_add"
-                android:paddingStart="5dp"
-                android:paddingEnd="10dp"
+                android:paddingVertical="10dp"
                 android:text="@string/btn_add_contact"
-                android:textAlignment="textStart"
-                android:textAllCaps="false"
-                android:textColor="#000"
-                android:textSize="16sp" />
+                android:textColor="@color/colorPrimary"
+                android:textSize="16sp"
+                app:cornerRadius="20dp"
+                app:icon="@drawable/ic_baseline_add"
+                app:iconSize="20sp"
+                app:iconTint="@color/colorPrimary"
+                app:strokeColor="@color/colorPrimary" />
         </LinearLayout>
 
     </LinearLayout>

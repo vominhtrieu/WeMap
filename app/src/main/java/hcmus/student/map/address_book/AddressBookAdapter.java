@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Geocoder;
 import android.view.LayoutInflater;
@@ -227,18 +228,17 @@ public class AddressBookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         });
 
         if (place.getFavorite().equals("1"))
-            btnFavorite.setImageResource(R.drawable.ic_baseline_favorite_red);
+            btnFavorite.setColorFilter(Color.parseColor("#ec5858"));
         else
-            btnFavorite.setImageResource(R.drawable.ic_baseline_favorite);
+            btnFavorite.setColorFilter(Color.parseColor("#000000"));
+
         btnFavorite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (place.getFavorite().equals("0")) {
                     mAddressProvider.addFavorite(place.getId());
-                    btnFavorite.setImageResource(R.drawable.ic_baseline_favorite_red);
                 } else {
                     mAddressProvider.removeFavorite(place.getId());
-                    btnFavorite.setImageResource(R.drawable.ic_baseline_favorite);
                 }
                 getUpdate();
             }
