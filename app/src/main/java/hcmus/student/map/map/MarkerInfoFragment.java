@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Color;
 import android.location.Geocoder;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,10 +15,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.Formatter;
 import java.util.Locale;
@@ -38,7 +35,7 @@ public class MarkerInfoFragment extends Fragment implements View.OnClickListener
     private LatLng latLng;
     private Context context;
     Button btnAdd, btnClose, btnDirection;
-    TextView txtPlaceName, txtLat, txtLng,txtTemperature,txtHumidity,txtWind;
+    TextView txtPlaceName, txtLatLng, txtLng, txtTemperature, txtHumidity, txtWind;
     private ImageView ivIcon;
 
     public static MarkerInfoFragment newInstance(Marker marker) {
@@ -54,7 +51,7 @@ public class MarkerInfoFragment extends Fragment implements View.OnClickListener
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.activity = (MainActivity) getActivity();
-        context=getContext();
+        context = getContext();
         Bundle args = getArguments();
         latLng = new LatLng(args.getDouble("lat"), args.getDouble("lng"));
     }
@@ -65,15 +62,14 @@ public class MarkerInfoFragment extends Fragment implements View.OnClickListener
         View view = inflater.inflate(R.layout.fragment_marker_info, container, false);
 
         txtPlaceName = view.findViewById(R.id.txtPlaceName);
-        txtLat = view.findViewById(R.id.txtLat);
-        txtLng = view.findViewById(R.id.txtLng);
+        txtLatLng = view.findViewById(R.id.txtLatLng);
         btnAdd = view.findViewById(R.id.btnAdd);
         btnDirection = view.findViewById(R.id.btnDirection);
         btnClose = view.findViewById(R.id.btnClose);
-        txtTemperature=view.findViewById(R.id.txtTemperature);
-        txtHumidity=view.findViewById(R.id.txtHumidity);
-        txtWind=view.findViewById(R.id.txtWind);
-        ivIcon=view.findViewById(R.id.ivIcon);
+        txtTemperature = view.findViewById(R.id.txtTemperature);
+        txtHumidity = view.findViewById(R.id.txtHumidity);
+        txtWind = view.findViewById(R.id.txtWind);
+        ivIcon = view.findViewById(R.id.ivIcon);
 
 
         StringBuilder sb = new StringBuilder();
@@ -85,11 +81,7 @@ public class MarkerInfoFragment extends Fragment implements View.OnClickListener
         AddressLine addressLine = new AddressLine(new Geocoder(getContext()), this);
         addressLine.execute(latLng);
 
-        String latStr = getResources().getString(R.string.txt_latitude);
-        String lngStr = getResources().getString(R.string.txt_longitude);
-        txtLat.setText(formatter.format("%s %.2f", latStr, latLng.latitude).toString());
-        sb.setLength(0);
-        txtLng.setText(formatter.format("%s %.2f", lngStr, latLng.longitude).toString());
+        txtLatLng.setText(formatter.format("(%.2f, %.2f)", latLng.latitude, latLng.longitude).toString());
 
         btnAdd.setOnClickListener(this);
         btnDirection.setOnClickListener(this);
@@ -136,19 +128,14 @@ public class MarkerInfoFragment extends Fragment implements View.OnClickListener
             ivIcon.setColorFilter(Color.BLACK);
             StringBuilder sb1 = new StringBuilder();
             Formatter formatter1 = new Formatter(sb1, Locale.US);
-            txtTemperature.setText(formatter1.format("%s %.2f°", "Temperature: ",detailWeather.getTemperature()).toString());
+            txtTemperature.setText(formatter1.format("%.2f°", detailWeather.getTemperature()).toString());
             StringBuilder sb2 = new StringBuilder();
             Formatter formatter2 = new Formatter(sb2, Locale.US);
-            txtWind.setText(formatter2.format("%s %.2fmph", "Wind Speed: ",detailWeather.getWindSpeed()).toString());
+            txtWind.setText(formatter2.format("%.2fmph", detailWeather.getWindSpeed()).toString());
             StringBuilder sb3 = new StringBuilder();
             Formatter formatter3 = new Formatter(sb3, Locale.US);
-            txtHumidity.setText(formatter3.format("%s %.2f%%", "Humidity: ",detailWeather.getHumidity()).toString());
-        } else {
-            txtTemperature.setText(R.string.txtUnknownLocation);
-            txtHumidity.setText(R.string.txtUnknownLocation);
-            txtWind.setText(R.string.txtUnknownLocation);
+            txtHumidity.setText(formatter3.format("%.2f%%", detailWeather.getHumidity()).toString());
         }
-
     }
 }
 
