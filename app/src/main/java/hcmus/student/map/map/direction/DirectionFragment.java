@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.SearchView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -37,6 +38,7 @@ public class DirectionFragment extends Fragment implements DirectionFragmentCall
     Place origin;
     Place dest;
     SearchView svOrigin, svDest;
+    TextView txtDuration;
     String mode;
     TabLayout tabLayout;
 
@@ -64,6 +66,7 @@ public class DirectionFragment extends Fragment implements DirectionFragmentCall
         View view = inflater.inflate(R.layout.fragment_direction, null, false);
         svOrigin = view.findViewById(R.id.svOrigin);
         svDest = view.findViewById(R.id.svDest);
+        txtDuration = view.findViewById(R.id.txtDuration);
         RecyclerView lvFirstSearchResult = view.findViewById(R.id.lvFirstSearchResult);
         RecyclerView lvSecondSearchResult = view.findViewById(R.id.lvSecondSearchResult);
         tabLayout = view.findViewById(R.id.tabs);
@@ -237,5 +240,11 @@ public class DirectionFragment extends Fragment implements DirectionFragmentCall
         notUserTypingChecker += 2;
         svOrigin.setQuery(originName, false);
         svDest.setQuery(destName, false);
+    }
+
+    @Override
+    public void onDurationChange(String duration, int color) {
+        txtDuration.setText(duration);
+        txtDuration.setTextColor(color);
     }
 }

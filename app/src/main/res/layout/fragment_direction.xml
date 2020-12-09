@@ -10,13 +10,13 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="10dp" >
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="10dp">
+            android:orientation="horizontal">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -40,7 +40,7 @@
                     <SearchView
                         android:id="@+id/svOrigin"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="40dp"
                         android:layout_marginStart="1dp"
                         android:iconifiedByDefault="false"
                         android:queryBackground="@null"
@@ -70,7 +70,7 @@
                     <SearchView
                         android:id="@+id/svDest"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="40dp"
                         android:layout_marginStart="1dp"
                         android:background="@android:color/white"
                         android:iconifiedByDefault="false"
@@ -97,12 +97,18 @@
                 android:textAlignment="center" />
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/txtDuration"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="5dp"
+            android:textAlignment="center" />
+
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tabs"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="40dp"
             android:layout_marginHorizontal="10dp"
-            android:layout_marginBottom="10dp"
             app:tabIconTint="@color/white_tab_color_selector"
             app:tabIndicator="@drawable/tab_indicator"
             app:tabIndicatorColor="@color/colorPrimary"

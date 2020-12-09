@@ -258,7 +258,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                 }
                 polyline.setWidth(SELECTED_ROUTE_WIDTH);
                 polyline.setZIndex(1);
-                main.openRouteInfo(polyline.getTag().toString(), polyline.getColor());
+                directionFragment.onDurationChange(polyline.getTag().toString(), polyline.getColor());
             }
         });
 
@@ -291,7 +291,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         mCurrentLocation = location;
         double speed = speedMonitor.getSpeed(mCurrentLocation);
         if (speed >= 0)
-            txtSpeed.setText(String.format(Locale.US, "%.1f km/h", speed));
+            txtSpeed.setText(String.format(Locale.US, "%.1f", speed));
         animator.animate(location, isCameraFollowing);
     }
 
@@ -453,7 +453,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             }
             if (i == polylineOptions.size() - 1) {
                 polyline.setWidth(SELECTED_ROUTE_WIDTH);
-                main.openRouteInfo(durations.get(i), polyline.getColor());
+                directionFragment.onDurationChange(durations.get(i), polyline.getColor());
             }
         }
 
