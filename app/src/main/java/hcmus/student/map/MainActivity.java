@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
@@ -64,7 +65,7 @@ public class MainActivity extends FragmentActivity implements MainCallbacks, OnL
         final TabLayout mTabs = findViewById(R.id.tabs);
 
         mViewPager = findViewById(R.id.pager);
-        mViewPager.setUserInputEnabled(false);
+        mViewPager.setUserInputEnabled(false);  //Disable swipe
 
         adapter = new ViewPagerAdapter(this);
         mViewPager.setAdapter(new ViewPagerAdapter(this));

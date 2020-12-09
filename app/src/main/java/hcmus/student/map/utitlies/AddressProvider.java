@@ -30,7 +30,15 @@ public class AddressProvider {
     public void insertPlace(String name, LatLng location, byte[] avatar) {
         mDatabase.insertPlace(name, location, avatar);
         Place newPlace = mDatabase.searchForPlaces(name).get(0);
-        places.add(newPlace);
+        int index = 0;
+        while (places.get(index).getName().compareTo(name) <= 0) {
+            index++;
+        }
+        if (index < places.size()) {
+            places.add(index, newPlace);
+        } else {
+            places.add(newPlace);
+        }
         delegate.onAddressInsert(newPlace);
     }
 

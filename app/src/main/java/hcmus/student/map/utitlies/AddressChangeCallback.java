@@ -1,7 +1,5 @@
 package hcmus.student.map.utitlies;
 
-import com.google.android.gms.maps.model.LatLng;
-
 import hcmus.student.map.model.Place;
 
 public interface AddressChangeCallback {

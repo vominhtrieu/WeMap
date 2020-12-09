@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.location.Geocoder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -80,10 +81,9 @@ public class AddressBookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     public AddressBookAdapter(Context context) {
         this.context = context;
         this.mAddressProvider = ((MainActivity) context).getAddressProvider();
-        //this.mDatabase = new Database(context);
+        this.mDatabase = new Database(context);
         this.places = new ArrayList<>();
         ((MainActivity) context).registerAddressChange(this);
-        mDatabase = new Database(context);
         getUpdate();
     }
 

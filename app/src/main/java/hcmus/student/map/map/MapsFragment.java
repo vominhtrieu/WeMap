@@ -10,6 +10,7 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -491,6 +492,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
 
     @Override
     public void onAddressDelete(int placeId) {
+        Log.e("DEBUG", "onAddressDelete: in map");
         for (Marker marker : mContactMarkers) {
             if (marker.getTag().equals(placeId)) {
                 marker.remove();
