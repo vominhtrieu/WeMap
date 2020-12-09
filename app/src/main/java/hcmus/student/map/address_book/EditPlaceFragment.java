@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -40,7 +41,7 @@ import hcmus.student.map.utitlies.AddressProvider;
 
 import static android.app.Activity.RESULT_OK;
 
-public class EditPlaceFragment extends Fragment implements View.OnClickListener {
+public class EditPlaceFragment extends DialogFragment implements View.OnClickListener {
     MainActivity activity;
     Button btnOK, btnCancel;
     EditText edtNewName;
@@ -133,18 +134,16 @@ public class EditPlaceFragment extends Fragment implements View.OnClickListener 
                         if (selectedImage != null) {
                             place.setAvatar(selectedImage);
                         }
-                        //db.editPlace(place);
-                        activity.backToPreviousFragment();
+                        dismiss();
                         mAddressProvider.updatePlace(place);
-                        //activity.updateOnscreenMarker(latLng, selectedImage);
                     } catch (Exception e) {
-                        //activity.updateOnscreenMarker(latLng, selectedImage);
-                        activity.backToPreviousFragment();
+                        Toast.makeText(activity, "Cannot edit this place", Toast.LENGTH_SHORT).show();
+                        dismiss();
                     }
                 }
                 break;
             case R.id.btnCancel:
-                activity.backToPreviousFragment();
+                dismiss();
                 break;
         }
     }

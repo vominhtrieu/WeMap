@@ -51,8 +51,8 @@
                     android:src="@drawable/ic_baseline_photo_camera"
                     app:backgroundTint="@color/colorPrimary"
                     app:borderWidth="0dp"
-                    app:tint="@android:color/white"
-                    app:elevation="5dp"/>
+                    app:elevation="5dp"
+                    app:tint="@android:color/white" />
 
                 <com.google.android.material.floatingactionbutton.FloatingActionButton
                     android:id="@+id/btnGallery"
@@ -70,11 +70,9 @@
             android:id="@+id/edtName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="20dp"
-            android:hint="@string/txt_place_name"
-            android:textColor="#000"
-            android:textSize="20sp" />
+            android:layout_marginTop="10dp"
+            android:textSize="18sp"
+            android:hint="@string/txt_place_name" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -85,33 +83,36 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCancel"
                 style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                android:layout_width="150dp"
+                android:layout_width="140dp"
                 android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
                 android:paddingVertical="10dp"
                 android:text="@string/btn_cancel"
-                android:textAlignment="textStart"
+                android:textAlignment="center"
                 android:textColor="@color/colorDanger"
                 android:textSize="16sp"
                 app:cornerRadius="20dp"
                 app:icon="@drawable/ic_baseline_close"
-                app:iconSize="16sp"
+                app:iconPadding="0dp"
+                app:iconSize="18sp"
                 app:iconTint="@color/colorDanger"
                 app:strokeColor="@color/colorDanger" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAddContact"
                 style="@style/Widget.MaterialComponents.Button"
-                android:layout_width="150dp"
+                android:layout_width="140dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
+                android:layout_marginStart="5dp"
                 android:paddingVertical="10dp"
-                android:text="@string/btn_add_contact"
-                android:textAlignment="textStart"
+                android:text="@string/txtOk"
+                android:textAlignment="center"
                 android:textColor="#fff"
                 android:textSize="16sp"
                 app:cornerRadius="20dp"
-                app:icon="@drawable/ic_baseline_add" />
+                app:icon="@drawable/ic_baseline_add"
+                app:iconPadding="0dp"
+                app:iconSize="18sp" />
         </LinearLayout>
 
     </LinearLayout>

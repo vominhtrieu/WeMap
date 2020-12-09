@@ -45,7 +45,7 @@
         android:layout_gravity="center_vertical"
         android:src="@drawable/ic_baseline_favorite"
         android:backgroundTint="@android:color/white"
-        android:layout_margin="5dp"
+        android:layout_marginRight="2dp"
         app:borderWidth="0dp"
         app:fabSize="mini" />
 
@@ -54,7 +54,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_margin="5dp"
+        android:layout_marginLeft="2dp"
         android:backgroundTint="@android:color/white"
         android:scaleType="center"
         android:src="@drawable/ic_baseline_location"

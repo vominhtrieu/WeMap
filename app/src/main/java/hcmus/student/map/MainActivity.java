@@ -200,11 +200,7 @@ public class MainActivity extends FragmentActivity implements MainCallbacks, OnL
 
     @Override
     public void editPlaces(Place place) {
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        //fragmentTransaction.setCustomAnimations(R.anim.slide_in_left, R.anim.slide_out_right, R.anim.slide_in_right, R.anim.slide_out_left);
-        fragmentTransaction.replace(R.id.frameBottom, EditPlaceFragment.newInstance(place));
-        fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
+        EditPlaceFragment.newInstance(place).show(getSupportFragmentManager(), null);
     }
 
 
