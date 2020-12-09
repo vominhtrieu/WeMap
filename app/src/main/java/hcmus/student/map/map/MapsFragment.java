@@ -492,10 +492,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
 
     @Override
     public void onAddressDelete(int placeId) {
-        Log.e("DEBUG", "onAddressDelete: in map");
         for (Marker marker : mContactMarkers) {
-            if (marker.getTag().equals(placeId)) {
+            if ((int) marker.getTag() == placeId) {
                 marker.remove();
+                mContactMarkers.remove(marker);
                 break;
             }
         }
