@@ -89,6 +89,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     private boolean isContactShown;
     private SpeedMonitor speedMonitor;
     private FloatingActionButton btnLocation;
+    private FloatingActionButton btnContact;
     private TextView txtSpeed;
     private Handler velocityHandler;
     private Runnable velocityRunnable;
@@ -153,7 +154,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         mMap = googleMap;
 
         btnLocation = getView().findViewById(R.id.btnLocation);
-        final FloatingActionButton btnContact = getView().findViewById(R.id.btnContact);
+        btnContact = getView().findViewById(R.id.btnContact);
         final MapWrapper mapContainer = getView().findViewById(R.id.mapContainer);
 
         mapContainer.setOnMapWrapperTouch(new OnMapWrapperTouch() {
@@ -417,6 +418,14 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         final CameraPosition cameraPosition = new CameraPosition.Builder()
                 .target(markerLoc).zoom(15).tilt(30).build();
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+        for (Place place : mAddressProvider.getPlaces()) {
+            if (compareLatLng(place.getLocation(), location)) {
+                showAllAddress();
+                isContactShown = true;
+
+                break;
+            }
+        }
     }
 
     @Override
