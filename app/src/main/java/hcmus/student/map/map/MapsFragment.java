@@ -10,7 +10,6 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -91,6 +90,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     private SpeedMonitor speedMonitor;
     private FloatingActionButton btnLocation;
     private TextView txtSpeed;
+    private Handler velocityHandler;
+    private Runnable velocityRunnable;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
 
@@ -107,6 +108,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         context = getContext();
         main = (MainActivity) getActivity();
         mRouteStartMarker = mRouteEndMarker = null;
+
+        velocityHandler = new Handler();
+        velocityRunnable = null;
+
         mContactMarkers = new ArrayList<>();
         isCameraFollowing = true;
         isContactShown = false;
@@ -270,6 +275,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     public void onLocationChange(Location location) {
         if (mMap == null)
             return;
+
         //Display location indicator
         if (mCurrentLocation == null) {
             int color = getResources().getColor(R.color.colorPrimary);
@@ -292,6 +298,19 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         double speed = speedMonitor.getSpeed(mCurrentLocation);
         if (speed >= 0)
             txtSpeed.setText(String.format(Locale.US, "%.1f", speed));
+
+        if (velocityRunnable != null) {
+            velocityHandler.removeCallbacks(velocityRunnable);
+        }
+
+        velocityRunnable = new Runnable() {
+            @Override
+            public void run() {
+                txtSpeed.setText("0");
+            }
+        };
+
+        velocityHandler.postDelayed(velocityRunnable, 5000);
         animator.animate(location, isCameraFollowing);
     }
 

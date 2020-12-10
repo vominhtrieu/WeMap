@@ -27,6 +27,7 @@ import java.util.Collections;
 public class LocationService {
     private static final long UPDATE_INTERVAL = 1000;
     private static final long FASTEST_UPDATE_INTERVAL = 1000;
+    private static final long MIN_DISTANCE = 1;
 
     private Context context;
     private FusedLocationProviderClient mClient;
@@ -63,6 +64,7 @@ public class LocationService {
         request.setInterval(UPDATE_INTERVAL);
         request.setFastestInterval(FASTEST_UPDATE_INTERVAL);
         request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        request.setSmallestDisplacement(MIN_DISTANCE);
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
         builder.addAllLocationRequests(Collections.singleton(request));
         SettingsClient settingsClient = LocationServices.getSettingsClient(context);
