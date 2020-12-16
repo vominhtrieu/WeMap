@@ -14,8 +14,6 @@ public interface MainCallbacks {
 
     void openAddContact(LatLng latLng);
 
-    void openRouteInfo(String routeDuration, int routeColor);
-
     void backToPreviousFragment();
 
     void locatePlace(LatLng location);

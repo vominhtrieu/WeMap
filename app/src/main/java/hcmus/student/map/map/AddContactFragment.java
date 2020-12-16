@@ -94,10 +94,10 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnCamera:
-                CameraIntent();
+                cameraIntent();
                 break;
             case R.id.btnGallery:
-                GalleryIntent();
+                galleryIntent();
                 break;
             case R.id.btnAddContact:
                 if (edtName.getText().toString().length() == 0) {
@@ -121,12 +121,12 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
         }
     }
 
-    private  void CameraIntent(){
+    private  void cameraIntent(){
         Intent intent = new Intent("android.media.action.IMAGE_CAPTURE");
         startActivityForResult(intent, REQUEST_CODE_CAMERA);
     }
 
-    private void GalleryIntent(){
+    private void galleryIntent(){
         Intent intent1 = new Intent(Intent.ACTION_PICK);
         intent1.setType("image/*");
         startActivityForResult(intent1, REQUEST_CODE_FOLDER);

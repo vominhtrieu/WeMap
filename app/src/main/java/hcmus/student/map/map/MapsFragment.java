@@ -95,7 +95,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     private Runnable velocityRunnable;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-
     public static MapsFragment newInstance() {
         MapsFragment fragment = new MapsFragment();
         Bundle args = new Bundle();

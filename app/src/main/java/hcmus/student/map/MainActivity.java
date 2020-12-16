@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
@@ -33,7 +32,6 @@ import hcmus.student.map.address_book.EditPlaceFragment;
 import hcmus.student.map.map.AddContactFragment;
 import hcmus.student.map.map.MapsFragment;
 import hcmus.student.map.map.MarkerInfoFragment;
-import hcmus.student.map.map.RouteInfoFragment;
 import hcmus.student.map.map.utilities.LocationChangeCallback;
 import hcmus.student.map.model.Place;
 import hcmus.student.map.utitlies.AddressChangeCallback;
@@ -232,13 +230,6 @@ public class MainActivity extends FragmentActivity implements MainCallbacks, OnL
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.replace(R.id.frameBottom, AddContactFragment.newInstance(latLng));
         fragmentTransaction.addToBackStack(null);
-        fragmentTransaction.commit();
-    }
-
-    @Override
-    public void openRouteInfo(String routeDuration, int routeColor) {
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(R.id.frameRouteInfo, RouteInfoFragment.newInstance(routeDuration, routeColor));
         fragmentTransaction.commit();
     }
 
