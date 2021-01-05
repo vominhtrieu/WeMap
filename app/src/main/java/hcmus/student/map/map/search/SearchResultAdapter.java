@@ -25,6 +25,7 @@ import hcmus.student.map.map.utilities.place.PlaceRespondCallback;
 import hcmus.student.map.map.utilities.place.PlaceSearch;
 import hcmus.student.map.model.Database;
 import hcmus.student.map.model.Place;
+import hcmus.student.map.utitlies.Storage;
 
 public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapter.ViewHolder> implements PlaceRespondCallback {
     final static int DELAY_TYPING = 200;
@@ -147,10 +148,9 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final Place place = places.get(position);
+        Storage storage = new Storage(context);
         if (place.getAvatar() != null) {
-            Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
-            holder.ivAvatar.setBackground(new BitmapDrawable(context.getResources(), bmp));
-            holder.ivAvatar.setImageBitmap(bmp);
+            holder.ivAvatar.setImageBitmap(storage.readImageFromInternalStorage(place.getAvatar()));
         }
         holder.txtPlaceName.setText(place.getName());
 

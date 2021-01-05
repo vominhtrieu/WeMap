@@ -27,7 +27,7 @@ public class AddressProvider {
         return places;
     }
 
-    public void insertPlace(String name, LatLng location, byte[] avatar) {
+    public void insertPlace(String name, LatLng location, String avatar) {
         mDatabase.insertPlace(name, location, avatar);
         Place newPlace = mDatabase.searchForPlaces(name).get(0);
         places = mDatabase.getAllPlaces();

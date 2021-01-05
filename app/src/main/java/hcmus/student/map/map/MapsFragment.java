@@ -60,6 +60,7 @@ import hcmus.student.map.map.utilities.direction.DirectionTask;
 import hcmus.student.map.model.Place;
 import hcmus.student.map.utitlies.AddressChangeCallback;
 import hcmus.student.map.utitlies.AddressProvider;
+import hcmus.student.map.utitlies.Storage;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback, DirectionResponse,
         MapsFragmentCallbacks, LocationChangeCallback, AddressChangeCallback {
@@ -358,15 +359,17 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         new DirectionTask(this).execute(url);
     }
 
-    private Marker createMarker(int id, LatLng location, byte[] avatar) {
+    private Marker createMarker(int id, LatLng location, String avatar) {
         if (mDefaultMarker != null && compareLatLng(mDefaultMarker.getPosition(), location)) {
             mDefaultMarker.remove();
             mDefaultMarker = null;
         }
+
         Bitmap bmpMarker = BitmapFactory.decodeResource(getResources(), R.drawable.marker_frame).copy(Bitmap.Config.ARGB_8888, true);
         bmpMarker = Bitmap.createScaledBitmap(bmpMarker, 100, 110, false);
         if (avatar != null) {
-            Bitmap bmpAvatar = BitmapFactory.decodeByteArray(avatar, 0, avatar.length);
+            Storage storage = new Storage(context);
+            Bitmap bmpAvatar = storage.readImageFromInternalStorage(avatar);
             bmpAvatar = Bitmap.createScaledBitmap(bmpAvatar, 90, 90, false);
             Canvas canvas = new Canvas(bmpMarker);
             canvas.drawBitmap(bmpAvatar, 5, 5, null);

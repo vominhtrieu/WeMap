@@ -35,6 +35,7 @@ import hcmus.student.map.utitlies.AddressChangeCallback;
 import hcmus.student.map.utitlies.AddressLine;
 import hcmus.student.map.utitlies.AddressProvider;
 import hcmus.student.map.utitlies.OnAddressLineResponse;
+import hcmus.student.map.utitlies.Storage;
 
 public class AddressBookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements AddressChangeCallback {
     Context context;
@@ -176,6 +177,7 @@ public class AddressBookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         final FloatingActionButton btnFavorite = holder.btnFavorite;
         final FloatingActionButton btnLocate = holder.btnLocate;
         final ImageButton btnMore = holder.btnMore;
+        final Storage storage = new Storage(context);
 
         txtName.setText(place.getName());
         txtAddressLine.setText(R.string.txt_loading_address_line);
@@ -194,8 +196,7 @@ public class AddressBookAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         addressLine.execute(location);
 
         if (place.getAvatar() != null) {
-            Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
-            ivAvatar.setBackground(new BitmapDrawable(context.getResources(), bmp));
+            ivAvatar.setBackground(new BitmapDrawable(context.getResources(), storage.readImageFromInternalStorage(place.getAvatar())));
         } else {
             ivAvatar.setBackgroundResource(R.drawable.ic_image);
         }

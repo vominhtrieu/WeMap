@@ -1,17 +1,22 @@
 package hcmus.student.map.model;
 
-import android.location.Location;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import com.google.android.gms.maps.model.LatLng;
+
+import java.io.File;
+import java.io.FileInputStream;
 
 public class Place {
     private int id;
     private String name;
     private LatLng location;
-    private byte[] avatar;
+    private String avatar;
     private String favorite;
 
-    public Place(int id, String name, LatLng location, byte[] avatar) {
+    public Place(int id, String name, LatLng location, String avatar) {
         this.id = id;
         this.name = name;
         this.location = location;
@@ -19,7 +24,7 @@ public class Place {
         this.favorite = "0";
     }
 
-    public Place(int id, String name, LatLng location, byte[] avatar, String favorite) {
+    public Place(int id, String name, LatLng location, String avatar, String favorite) {
         this.id = id;
         this.name = name;
         this.location = location;
@@ -39,7 +44,7 @@ public class Place {
         return location;
     }
 
-    public byte[] getAvatar() {
+    public String getAvatar() {
         return avatar;
     }
 
@@ -47,7 +52,7 @@ public class Place {
         this.name = name;
     }
 
-    public void setAvatar(byte[] avatar) {
+    public void setAvatar(String avatar) {
         this.avatar = avatar;
     }
 
@@ -58,11 +63,11 @@ public class Place {
     public void setFavorite(String favorite) {
         this.favorite = favorite;
     }
+
     public Double getLatitude() {
-        if(location!=null)
+        if (location != null)
             return location.latitude;
         return null;
     }
-
 
 }
