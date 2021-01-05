@@ -10,6 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -53,6 +54,8 @@ public class MainActivity extends FragmentActivity implements MainCallbacks, OnL
     private AddressProvider addressProvider;
     private List<AddressChangeCallback> addressDelegates;
 
+    private boolean isGettingLocation = true;
+    private View mProgressBar;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
@@ -60,6 +63,7 @@ public class MainActivity extends FragmentActivity implements MainCallbacks, OnL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mProgressBar = findViewById(R.id.loadingScreen);
         final TabLayout mTabs = findViewById(R.id.tabs);
 
         mViewPager = findViewById(R.id.pager);
@@ -244,6 +248,10 @@ public class MainActivity extends FragmentActivity implements MainCallbacks, OnL
 
     @Override
     public void onLocationChange(Location location) {
+        if (isGettingLocation) {
+            mProgressBar.setVisibility(View.GONE);
+            isGettingLocation = false;
+        }
         mCurrentLocation = location;
         notifyLocationChange();
     }
