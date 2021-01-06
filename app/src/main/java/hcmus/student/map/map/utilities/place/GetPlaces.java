@@ -6,7 +6,7 @@ import java.util.List;
 
 import hcmus.student.map.model.Place;
 import hcmus.student.map.utitlies.FetchUrlTask;
-import hcmus.student.map.map.utilities.direction.JSONParser;
+import hcmus.student.map.utitlies.JSONParser;
 
 
 public class GetPlaces extends AsyncTask<String, String, List<Place>> {

@@ -24,6 +24,8 @@
         android:gravity="center"
         android:orientation="vertical">
 
+        <include layout="@layout/menu_nearby_search"/>
+
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btnContact"
             android:layout_width="wrap_content"

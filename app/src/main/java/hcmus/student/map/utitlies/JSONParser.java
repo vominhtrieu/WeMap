@@ -1,4 +1,4 @@
-package hcmus.student.map.map.utilities.direction;
+package hcmus.student.map.utitlies;
 
 import com.google.android.gms.maps.model.LatLng;
 
@@ -9,6 +9,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import hcmus.student.map.map.utilities.direction.PolylineString;
+import hcmus.student.map.map.utilities.direction.Route;
 import hcmus.student.map.model.Place;
 
 public class JSONParser {
@@ -88,4 +90,5 @@ public class JSONParser {
         }
         return placeList;
     }
+
 }

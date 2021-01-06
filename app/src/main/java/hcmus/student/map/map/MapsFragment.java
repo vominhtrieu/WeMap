@@ -5,20 +5,25 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.hardware.SensorManager;
 import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -50,6 +55,7 @@ import hcmus.student.map.R;
 import hcmus.student.map.map.custom_view.MapWrapper;
 import hcmus.student.map.map.custom_view.OnMapWrapperTouch;
 import hcmus.student.map.map.direction.DirectionFragment;
+import hcmus.student.map.map.search.NearbySearch;
 import hcmus.student.map.map.utilities.LocationChangeCallback;
 import hcmus.student.map.map.utilities.MarkerAnimator;
 import hcmus.student.map.map.utilities.OrientationSensor;
@@ -62,7 +68,7 @@ import hcmus.student.map.utitlies.AddressChangeCallback;
 import hcmus.student.map.utitlies.AddressProvider;
 
 public class MapsFragment extends Fragment implements OnMapReadyCallback, DirectionResponse,
-        MapsFragmentCallbacks, LocationChangeCallback, AddressChangeCallback {
+        MapsFragmentCallbacks, LocationChangeCallback, AddressChangeCallback, View.OnClickListener {
 
     private static final int DEFAULT_ZOOM = 15;
     private static final int EPSILON = 5;
@@ -79,6 +85,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     private Marker mDefaultMarker;
     private AddressProvider mAddressProvider;
     private List<Marker> mContactMarkers;
+    private List<Marker> mResultMarkers;
     private ArrayList<Polyline> mRoutes;
     private Marker mRouteStartMarker, mRouteEndMarker;
     private MapView mMapView;
@@ -93,6 +100,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     private TextView txtSpeed;
     private Handler velocityHandler;
     private Runnable velocityRunnable;
+
+    private FloatingActionButton fabNearbySearch, fabGas;
+    private Animation fab_open, fab_close;
+    private boolean isSearchMenuOpened;
+    private NearbySearch mNearbySearcher;
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     public static MapsFragment newInstance() {
@@ -113,9 +125,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         velocityRunnable = null;
 
         mContactMarkers = new ArrayList<>();
+        mResultMarkers = new ArrayList<>();
         isCameraFollowing = true;
         isContactShown = false;
+        isSearchMenuOpened = false;
         speedMonitor = new SpeedMonitor(context);
+        mNearbySearcher = new NearbySearch(context, this);
         mAddressProvider = main.getAddressProvider();
     }
 
@@ -154,6 +169,12 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
 
         btnLocation = getView().findViewById(R.id.btnLocation);
         btnContact = getView().findViewById(R.id.btnContact);
+
+        fabNearbySearch = getView().findViewById(R.id.fabNearbySearch);
+        fabGas = getView().findViewById(R.id.fabGas);
+        fab_close = AnimationUtils.loadAnimation(context, R.anim.fab_close);
+        fab_open = AnimationUtils.loadAnimation(context, R.anim.fab_open);
+
         final MapWrapper mapContainer = getView().findViewById(R.id.mapContainer);
 
         mapContainer.setOnMapWrapperTouch(new OnMapWrapperTouch() {
@@ -230,6 +251,27 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
                 }
             }
         });
+
+        fabNearbySearch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (isSearchMenuOpened) {
+                    fabNearbySearch.clearColorFilter();
+                    fabGas.setVisibility(View.INVISIBLE);
+                    fabGas.startAnimation(fab_close);
+                    removeSearchResult();
+                    isSearchMenuOpened = false;
+                } else {
+                    int color = getResources().getColor(R.color.colorPrimary);
+                    fabNearbySearch.setColorFilter(color);
+                    fabGas.setVisibility(View.VISIBLE);
+                    fabGas.startAnimation(fab_open);
+                    isSearchMenuOpened = true;
+                }
+            }
+        });
+
+        fabGas.setOnClickListener(this);
 
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
@@ -358,21 +400,36 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         new DirectionTask(this).execute(url);
     }
 
-    private Marker createMarker(int id, LatLng location, byte[] avatar) {
+    private Marker createMarker(String type, int id, LatLng location, byte[] avatar) {
         if (mDefaultMarker != null && compareLatLng(mDefaultMarker.getPosition(), location)) {
             mDefaultMarker.remove();
             mDefaultMarker = null;
         }
-        Bitmap bmpMarker = BitmapFactory.decodeResource(getResources(), R.drawable.marker_frame).copy(Bitmap.Config.ARGB_8888, true);
-        bmpMarker = Bitmap.createScaledBitmap(bmpMarker, 100, 110, false);
-        if (avatar != null) {
-            Bitmap bmpAvatar = BitmapFactory.decodeByteArray(avatar, 0, avatar.length);
-            bmpAvatar = Bitmap.createScaledBitmap(bmpAvatar, 90, 90, false);
-            Canvas canvas = new Canvas(bmpMarker);
-            canvas.drawBitmap(bmpAvatar, 5, 5, null);
+        Marker newMarker;
+        Bitmap bmpMarker;
+        Canvas canvas;
+        if (!type.isEmpty()) {
+            Drawable vectorBackground = ContextCompat.getDrawable(context, R.drawable.ic_custom_marker_background);
+            vectorBackground.setBounds(0, 0, vectorBackground.getIntrinsicWidth(), vectorBackground.getIntrinsicHeight());
+            Drawable vectorIcon = ContextCompat.getDrawable(context, R.drawable.ic_gas_station);
+            vectorIcon.setBounds(0, 0, vectorIcon.getIntrinsicWidth(), vectorIcon.getIntrinsicHeight());
+            bmpMarker = Bitmap.createBitmap(vectorBackground.getIntrinsicWidth(), vectorBackground.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+            bmpMarker = Bitmap.createScaledBitmap(bmpMarker, 100, 110, false);
+            Bitmap bmpIcon = Bitmap.createBitmap(vectorIcon.getIntrinsicWidth(), vectorIcon.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+            bmpIcon = Bitmap.createScaledBitmap(bmpIcon, 90, 90, false);
+            canvas = new Canvas(bmpMarker);
+            canvas.drawBitmap(bmpIcon, 5, 5, null);
+        } else {
+            bmpMarker = BitmapFactory.decodeResource(getResources(), R.drawable.marker_frame).copy(Bitmap.Config.ARGB_8888, true);
+            bmpMarker = Bitmap.createScaledBitmap(bmpMarker, 100, 110, false);
+            if (avatar != null) {
+                Bitmap bmpAvatar = BitmapFactory.decodeByteArray(avatar, 0, avatar.length);
+                bmpAvatar = Bitmap.createScaledBitmap(bmpAvatar, 90, 90, false);
+                canvas = new Canvas(bmpMarker);
+                canvas.drawBitmap(bmpAvatar, 5, 5, null);
+            }
         }
-
-        Marker newMarker = mMap.addMarker(new MarkerOptions().position(location)
+        newMarker = mMap.addMarker(new MarkerOptions().position(location)
                 .icon(BitmapDescriptorFactory.fromBitmap(bmpMarker)));
         newMarker.setZIndex(3);
         newMarker.setTag(id);
@@ -382,7 +439,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     private void updateContactMarkers() {
         mContactMarkers.clear();
         for (Place place : mAddressProvider.getPlaces()) {
-            Marker newMarker = createMarker(place.getId(), place.getLocation(), place.getAvatar());
+            Marker newMarker = createMarker("", place.getId(), place.getLocation(), place.getAvatar());
             newMarker.setVisible(isContactShown);
             mContactMarkers.add(newMarker);
         }
@@ -421,7 +478,6 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             if (compareLatLng(place.getLocation(), location)) {
                 showAllAddress();
                 isContactShown = true;
-
                 break;
             }
         }
@@ -506,7 +562,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
 
     @Override
     public void onAddressInsert(Place place) {
-        mContactMarkers.add(createMarker(place.getId(), place.getLocation(), place.getAvatar()));
+        mContactMarkers.add(createMarker("", place.getId(), place.getLocation(), place.getAvatar()));
     }
 
     @Override
@@ -528,7 +584,35 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         }
     }
 
+    private void removeSearchResult() {
+        for (Marker marker : mResultMarkers) {
+            marker.remove();
+        }
+        mResultMarkers = new ArrayList<>();
+    }
+
     private boolean compareLatLng(LatLng latLng1, LatLng latLng2) {
         return Math.abs(latLng1.latitude - latLng2.latitude) < THRESHOLD && Math.abs(latLng1.longitude - latLng2.longitude) < THRESHOLD;
+    }
+
+    @Override
+    public void onNearbySearchRespond(String type, List<Place> places) {
+        for (Place place : places) {
+            mResultMarkers.add(createMarker("", place.getId(), place.getLocation(), null));  //replace type with type when done
+        }
+    }
+
+    @Override
+    public void onClick(View v) {
+        LatLng location = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
+        String type = "";
+        switch (v.getId()) {
+            case R.id.fabGas:
+                type = "gas_station";
+                break;
+            default:
+                break;
+        }
+        mNearbySearcher.executeSearch(location, type);
     }
 }

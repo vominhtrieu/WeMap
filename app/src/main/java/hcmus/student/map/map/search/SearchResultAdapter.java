@@ -111,7 +111,7 @@ public class SearchResultAdapter extends RecyclerView.Adapter<SearchResultAdapte
 //    public View getView(int position, View convertView, ViewGroup parent) {
 //        if (convertView == null) {
 //            LayoutInflater inflater = ((Activity) context).getLayoutInflater();
-//            convertView = inflater.inflate(R.layout.row_search_result, null, false);
+//            convertView = inflater.inflate(R.menu_nearby_search.row_search_result, null, false);
 //        }
 //        ImageView ivAvatar = convertView.findViewById(R.id.ivAvatar);
 //        TextView txtPlaceName = convertView.findViewById(R.id.txtPlaceName);
