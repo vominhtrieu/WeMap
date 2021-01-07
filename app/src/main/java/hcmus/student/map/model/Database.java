@@ -40,7 +40,7 @@ public class Database extends SQLiteOpenHelper {
         while (true) {
             Place place = new Place(cursor.getInt(0), cursor.getString(1),
                     new LatLng(cursor.getDouble(2), cursor.getDouble(3)),
-                    cursor.getBlob(4), cursor.getString(5));
+                    cursor.getString(4), cursor.getString(5));
 
             places.add(place);
             if (cursor.isLast()) {
@@ -80,7 +80,7 @@ public class Database extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void insertPlace(String name, LatLng location, byte[] avatar) {
+    public void insertPlace(String name, LatLng location, String avatar) {
         SQLiteDatabase database = getWritableDatabase();
         String sql = "INSERT INTO " + TABLE_NAME + " VALUES(?,?,?,?,?,?)";
         SQLiteStatement statement = database.compileStatement(sql);
@@ -90,7 +90,7 @@ public class Database extends SQLiteOpenHelper {
         statement.bindDouble(3, location.latitude);
         statement.bindDouble(4, location.longitude);
         if (avatar != null)
-            statement.bindBlob(5, avatar);
+            statement.bindString(5, avatar);
         statement.bindString(6, "0");
         statement.executeInsert();
     }
@@ -112,7 +112,7 @@ public class Database extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         String sql = String.format(Locale.US, "CREATE TABLE %s (%s INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                        "%s TEXT, %s REAL UNIQUE, %s REAL UNIQUE, %s BLOB, %s TEXT)",
+                        "%s TEXT, %s REAL UNIQUE, %s REAL UNIQUE, %s TEXT, %s TEXT)",
                 TABLE_NAME, KEY_ID, KEY_NAME, KEY_LATITUDE, KEY_LONGITUDE, KEY_AVATAR, KEY_FAVORITE);
 
         SQLiteStatement statement = db.compileStatement(sql);

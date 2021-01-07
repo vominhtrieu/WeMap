@@ -31,7 +31,7 @@ import hcmus.student.map.map.search.SearchResultAdapter;
 import hcmus.student.map.model.Place;
 
 public class DirectionFragment extends Fragment implements DirectionFragmentCallback {
-    final static String[] transportModes = {"driving", "transit", "walking"};
+    final static String[] transportModes = {"driving", "walking", "transit"};
     MainActivity activity;
     Context context;
     int notUserTypingChecker;

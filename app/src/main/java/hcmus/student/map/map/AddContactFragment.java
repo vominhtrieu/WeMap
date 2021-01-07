@@ -33,6 +33,7 @@ import java.io.InputStream;
 import hcmus.student.map.MainActivity;
 import hcmus.student.map.R;
 import hcmus.student.map.utitlies.AddressProvider;
+import hcmus.student.map.utitlies.Storage;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -43,9 +44,9 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
     ImageButton btnCamera, btnFolder;
     ImageView ivAvatar;
     LatLng latLng;
-    byte[] selectedImage;
+    Bitmap selectedImage;
     AddressProvider mAddressProvider;
-
+    Storage storage;
     int REQUEST_CODE_CAMERA = 123;
     int REQUEST_CODE_FOLDER = 456;
 
@@ -63,6 +64,7 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
         super.onCreate(savedInstanceState);
         activity = (MainActivity) getActivity();
         mAddressProvider = activity.getAddressProvider();
+        storage = new Storage(getContext());
     }
 
     @Nullable
@@ -104,11 +106,9 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
                     Toast.makeText(activity, "Place name is required!", Toast.LENGTH_SHORT).show();
                 } else {
                     try {
-                        mAddressProvider.insertPlace(edtName.getText().toString(), new LatLng(latLng.latitude, latLng.longitude), selectedImage);
-//                        Database db = new Database(getContext());
-//                        db.insertPlace(edtName.getText().toString(), new LatLng(latLng.latitude, latLng.longitude), selectedImage);
+                        mAddressProvider.insertPlace(edtName.getText().toString(), new LatLng(latLng.latitude, latLng.longitude),
+                                storage.saveToInternalStorage(selectedImage));
                         activity.backToPreviousFragment();
-//                        activity.updateOnscreenMarker(latLng, selectedImage);
                     } catch (Exception e) {
                         e.printStackTrace();
                         Toast.makeText(activity, "This place is already in contact book", Toast.LENGTH_SHORT).show();
@@ -134,9 +134,7 @@ public class AddContactFragment extends Fragment implements View.OnClickListener
 
     private void setSelectedImage(Bitmap bitmap) {
         ivAvatar.setImageBitmap(bitmap);
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        this.selectedImage = stream.toByteArray();
+        this.selectedImage = bitmap;
     }
 
     @Override

@@ -25,19 +25,18 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.maps.model.LatLng;
 
-import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.util.Random;
 
 import hcmus.student.map.MainActivity;
 import hcmus.student.map.R;
-
 import hcmus.student.map.model.Place;
 import hcmus.student.map.utitlies.AddressProvider;
+import hcmus.student.map.utitlies.Storage;
 
 import static android.app.Activity.RESULT_OK;
 
@@ -49,8 +48,9 @@ public class EditPlaceFragment extends DialogFragment implements View.OnClickLis
     ImageView ivAvatar;
     Place place;
     LatLng latLng;
-    byte[] selectedImage;
+    Bitmap selectedImage;
     AddressProvider mAddressProvider;
+    Storage storage;
 
     int REQUEST_CODE_CAMERA = 123;
     int REQUEST_CODE_FOLDER = 456;
@@ -63,7 +63,7 @@ public class EditPlaceFragment extends DialogFragment implements View.OnClickLis
         args.putString("name", place.getName());
         args.putDouble("lat", place.getLocation().latitude);
         args.putDouble("lng", place.getLocation().latitude);
-        args.putByteArray("avatar", place.getAvatar());
+        args.putString("avatar", place.getAvatar());
         args.putString("favorite", place.getFavorite());
 
         Log.d("name", place.getName());
@@ -76,6 +76,7 @@ public class EditPlaceFragment extends DialogFragment implements View.OnClickLis
         super.onCreate(savedInstanceState);
         activity = (MainActivity) getActivity();
         mAddressProvider = activity.getAddressProvider();
+        storage = new Storage(getContext());
     }
 
     @Nullable
@@ -95,15 +96,14 @@ public class EditPlaceFragment extends DialogFragment implements View.OnClickLis
 
         latLng = new LatLng(args.getDouble("lat"), args.getDouble("lng"));
 
-        place = new Place(args.getInt("id"), args.getString("name"), latLng, args.getByteArray("avatar"), args.getString("favorite"));
+        place = new Place(args.getInt("id"), args.getString("name"), latLng, args.getString("avatar"), args.getString("favorite"));
 
         edtNewName.setText(place.getName());
         Log.d("name", place.getName());
         Log.d("id", "" + place.getId());
 
         if (place.getAvatar() != null) {
-            Bitmap bmp = BitmapFactory.decodeByteArray(place.getAvatar(), 0, place.getAvatar().length);
-            ivAvatar.setBackground(new BitmapDrawable(view.getResources(), bmp));
+            ivAvatar.setBackground(new BitmapDrawable(view.getResources(), place.getAvatar()));
         }
 
         btnCamera.setOnClickListener(this);
@@ -132,10 +132,10 @@ public class EditPlaceFragment extends DialogFragment implements View.OnClickLis
                         //Database db = new Database(getContext());
                         place.setName(edtNewName.getText().toString());
                         if (selectedImage != null) {
-                            place.setAvatar(selectedImage);
+                            place.setAvatar(storage.saveToInternalStorage(selectedImage));
                         }
-                        dismiss();
                         mAddressProvider.updatePlace(place);
+                        dismiss();
                     } catch (Exception e) {
                         Toast.makeText(activity, "Cannot edit this place", Toast.LENGTH_SHORT).show();
                         dismiss();
@@ -161,9 +161,7 @@ public class EditPlaceFragment extends DialogFragment implements View.OnClickLis
 
     private void setSelectedImage(Bitmap bitmap) {
         ivAvatar.setImageBitmap(bitmap);
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        this.selectedImage = stream.toByteArray();
+        selectedImage = bitmap;
     }
 
     @Override
