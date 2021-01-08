@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <hcmus.student.map.map.custom_view.MapWrapper
+    <hcmus.student.wemap.map.custom_view.MapWrapper
         android:id="@+id/mapContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -14,7 +14,7 @@
             android:id="@+id/map"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
-    </hcmus.student.map.map.custom_view.MapWrapper>
+    </hcmus.student.wemap.map.custom_view.MapWrapper>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -23,6 +23,8 @@
         android:layout_marginEnd="5dp"
         android:gravity="center"
         android:orientation="vertical">
+
+        <include layout="@layout/menu_nearby_search"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/btnContact"
@@ -116,7 +118,7 @@
         android:focusable="true">
 
         <fragment
-            class="hcmus.student.map.map.search.SearchFragment"
+            class="hcmus.student.wemap.map.search.SearchFragment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </FrameLayout>
