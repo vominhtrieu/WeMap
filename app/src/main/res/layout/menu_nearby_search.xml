@@ -1,26 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
+    android:layout_width="wrap_content"
     android:layout_height="match_parent">
+
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAtm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        app:fabCustomSize="45dp"
+        android:backgroundTint="@android:color/white"
+        app:srcCompat="@drawable/ic_baseline_local_atm"
+        app:borderWidth="0dp"
+        android:visibility="invisible"
+        app:elevation="2dp" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabGas"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="5dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        app:fabCustomSize="45dp"
         android:backgroundTint="@android:color/white"
-        android:scaleType="center"
-        android:src="@drawable/ic_gas_station"
-        android:visibility="invisible"
+        app:srcCompat="@drawable/ic_baseline_local_gas_station"
         app:borderWidth="0dp"
+        android:visibility="invisible"
         app:elevation="2dp" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabNearbySearch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="102dp"
         android:layout_marginBottom="5dp"
         android:backgroundTint="@android:color/white"
         android:scaleType="center"

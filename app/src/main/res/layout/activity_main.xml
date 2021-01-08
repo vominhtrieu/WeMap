@@ -28,7 +28,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginBottom="60dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -54,13 +55,19 @@
                 android:indeterminateDrawable="@drawable/custom_progress_icon" />
         </LinearLayout>
 
-        <TextView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
-            android:gravity="center"
-            android:text="Image from Muhammad Haikal Sjukri"
-            android:textColor="#ffffffff" />
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:gravity="center"
+                android:text="Icons from FontAwesome"
+                android:textColor="#ffffffff" />
+        </LinearLayout>
     </FrameLayout>
 
     <androidx.viewpager2.widget.ViewPager2
