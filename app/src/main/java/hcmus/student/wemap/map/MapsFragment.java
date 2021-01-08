@@ -12,7 +12,6 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +47,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
@@ -78,6 +78,8 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     private static final int NORMAL_ROUTE_WIDTH = 8;
     private static final int SELECTED_ROUTE_WIDTH = 12;
     private static final double THRESHOLD = 1e-6;
+    private static final String[] placeTypes = {"gas_station", "atm", "store"};
+    private static final int[] fabIds = {R.id.fabGas, R.id.fabAtm, R.id.fabStore};
 
     private MainActivity main;
     private Context context;
@@ -103,11 +105,15 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
     private TextView txtSpeed;
     private Handler velocityHandler;
     private Runnable velocityRunnable;
+    private List<String> placeTypeList;
 
-    private FloatingActionButton fabNearbySearch, fabGas;
+    private FloatingActionButton fabNearbySearch, fabGas, fabAtm, fabStore;
     private Animation fab_open, fab_close;
     private boolean isSearchMenuOpened;
     private NearbySearch mNearbySearcher;
+    private List<Bitmap> mBitmapMarkers;
+    private List<FloatingActionButton> fabButtons;
+    private static boolean[] fabsStatus = {false, false, false};
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     public static MapsFragment newInstance() {
@@ -129,6 +135,9 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
 
         mContactMarkers = new ArrayList<>();
         mResultMarkers = new ArrayList<>();
+        mBitmapMarkers = new ArrayList<>();
+        fabButtons = new ArrayList<>();
+        placeTypeList = Arrays.asList(placeTypes);
         isCameraFollowing = true;
         isContactShown = false;
         isSearchMenuOpened = false;
@@ -174,12 +183,47 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         btnContact = getView().findViewById(R.id.btnContact);
 
         fabNearbySearch = getView().findViewById(R.id.fabNearbySearch);
-        fabGas = getView().findViewById(R.id.fabGas);
-        final View fabAtm = getView().findViewById(R.id.fabAtm);
+//        fabGas = getView().findViewById(R.id.fabGas);
+//        fabAtm = getView().findViewById(R.id.fabAtm);
+//        fabStore = getView().findViewById(R.id.fabStore);
+        for (int i = 0; i < fabIds.length; i++) {
+            FloatingActionButton fab = getView().findViewById(fabIds[i]);
+            fabButtons.add(fab);
+        }
         fab_close = AnimationUtils.loadAnimation(context, R.anim.fab_close);
         fab_open = AnimationUtils.loadAnimation(context, R.anim.fab_open);
 
         final MapWrapper mapContainer = getView().findViewById(R.id.mapContainer);
+
+        for (int i = 0; i < placeTypeList.size(); i++) {
+            int iconId = 0;
+            String colorHex = "#0F579F";
+            switch (i) {
+                case 0:
+                    iconId = R.drawable.ic_baseline_local_gas_station;
+                    colorHex = "#0F579F";
+                    break;
+                case 1:
+                    iconId = R.drawable.ic_baseline_local_atm;
+                    colorHex = "#FF9900";
+                    break;
+                case 2:
+                    iconId = R.drawable.ic_baseline_storefront_24;
+                    colorHex = "#016938";
+                    break;
+            }
+            Drawable drawable = ContextCompat.getDrawable(context, R.drawable.ic_custom_marker_background);
+            Bitmap bmpMarker = DrawableUtilities.getBitmap(drawable, Color.parseColor(colorHex));
+            bmpMarker = Bitmap.createScaledBitmap(bmpMarker, 75, 100, false);
+
+            drawable = ContextCompat.getDrawable(context, iconId);
+            Bitmap bmpIcon = DrawableUtilities.getBitmap(drawable, Color.WHITE);
+            bmpIcon = Bitmap.createScaledBitmap(bmpIcon, 56, 56, false);
+
+            Canvas canvas = new Canvas(bmpMarker);
+            canvas.drawBitmap(bmpIcon, 12, 10, null);
+            mBitmapMarkers.add(bmpMarker);
+        }
 
         mapContainer.setOnMapWrapperTouch(new OnMapWrapperTouch() {
             @Override
@@ -261,25 +305,43 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             public void onClick(View v) {
                 if (isSearchMenuOpened) {
                     fabNearbySearch.clearColorFilter();
-                    fabGas.setVisibility(View.INVISIBLE);
-                    fabGas.startAnimation(fab_close);
-                    fabAtm.setVisibility(View.INVISIBLE);
-                    fabAtm.startAnimation(fab_close);
+//                    fabGas.setVisibility(View.INVISIBLE);
+//                    fabGas.startAnimation(fab_close);
+//                    fabAtm.setVisibility(View.INVISIBLE);
+//                    fabAtm.startAnimation(fab_close);
+//                    fabStore.setVisibility(View.INVISIBLE);
+//                    fabStore.startAnimation(fab_close);
+                    for (int i = 0; i < fabIds.length; i++) {
+                        fabButtons.get(i).setVisibility(View.INVISIBLE);
+                        fabButtons.get(i).startAnimation(fab_close);
+                    }
                     removeSearchResult();
                     isSearchMenuOpened = false;
+                    for (int i = 0; i < fabIds.length; i++) {
+                        fabButtons.get(i).clearColorFilter();
+                        fabsStatus[i] = false;
+                    }
                 } else {
                     int color = getResources().getColor(R.color.colorPrimary);
                     fabNearbySearch.setColorFilter(color);
-                    fabGas.setVisibility(View.VISIBLE);
-                    fabGas.startAnimation(fab_open);
-                    fabAtm.setVisibility(View.VISIBLE);
-                    fabAtm.startAnimation(fab_open);
+//                    fabGas.setVisibility(View.VISIBLE);
+//                    fabGas.startAnimation(fab_open);
+//                    fabAtm.setVisibility(View.VISIBLE);
+//                    fabAtm.startAnimation(fab_open);
+//                    fabStore.setVisibility(View.VISIBLE);
+//                    fabStore.startAnimation(fab_open);
+                    for (int i = 0; i < fabIds.length; i++) {
+                        fabButtons.get(i).setVisibility(View.VISIBLE);
+                        fabButtons.get(i).startAnimation(fab_open);
+                    }
                     isSearchMenuOpened = true;
                 }
             }
         });
 
-        fabGas.setOnClickListener(this);
+        for (int i = 0; i < fabIds.length; i++) {
+            fabButtons.get(i).setOnClickListener(this);
+        }
 
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
@@ -417,18 +479,31 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         Marker newMarker;
         Bitmap bmpMarker;
         Canvas canvas;
-        if (!type.isEmpty()) {
-            Drawable drawable = ContextCompat.getDrawable(context, R.drawable.ic_custom_marker_background);
-            bmpMarker = DrawableUtilities.getBitmap(drawable);
-            bmpMarker = Bitmap.createScaledBitmap(bmpMarker, 75, 100, false);
-
-            Log.d("Type", type);
-            drawable = ContextCompat.getDrawable(context, R.drawable.ic_baseline_local_gas_station);
-            Bitmap bmpIcon = DrawableUtilities.getBitmap(drawable, Color.WHITE);
-            bmpIcon = Bitmap.createScaledBitmap(bmpIcon, 56, 56, false);
-
-            canvas = new Canvas(bmpMarker);
-            canvas.drawBitmap(bmpIcon, 12, 10, null);
+        if (placeTypeList.contains(type)) {
+//            int iconId = 0;
+//            switch (type) {
+//                case "gas_station":
+//                    iconId = R.drawable.ic_baseline_local_gas_station;
+//                    break;
+//                case "atm":
+//                    iconId = R.drawable.ic_baseline_local_atm;
+//                    break;
+//                case "store":
+//                    iconId = R.drawable.ic_baseline_storefront_24;
+//                    break;
+//            }
+//            Drawable drawable = ContextCompat.getDrawable(context, R.drawable.ic_custom_marker_background);
+//            bmpMarker = DrawableUtilities.getBitmap(drawable, Color.parseColor("#0F579F"));
+//            bmpMarker = Bitmap.createScaledBitmap(bmpMarker, 75, 100, false);
+//
+//            drawable = ContextCompat.getDrawable(context, iconId);
+//            Bitmap bmpIcon = DrawableUtilities.getBitmap(drawable, Color.WHITE);
+//            bmpIcon = Bitmap.createScaledBitmap(bmpIcon, 56, 56, false);
+//
+//            canvas = new Canvas(bmpMarker);
+//            canvas.drawBitmap(bmpIcon, 12, 10, null);
+            int bitmapIndex = placeTypeList.indexOf(type);
+            bmpMarker = mBitmapMarkers.get(bitmapIndex);
         } else {
             bmpMarker = BitmapFactory.decodeResource(getResources(), R.drawable.marker_frame).copy(Bitmap.Config.ARGB_8888, true);
             bmpMarker = Bitmap.createScaledBitmap(bmpMarker, 100, 110, false);
@@ -614,14 +689,53 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
 
     @Override
     public void onClick(View v) {
+        for (int i = 0; i < fabIds.length; i++) {
+            fabButtons.get(i).clearColorFilter();
+        }
+        int buttonIndex = 0;
+        for (int i = 0; i < fabIds.length; i++) {
+            if (v.getId() == fabIds[i]) {
+                buttonIndex = i;
+            }
+        }
+        if (fabsStatus[0] || fabsStatus[1] || fabsStatus[2]) {
+            removeSearchResult();
+            if (fabsStatus[buttonIndex] && v.getId() == fabIds[buttonIndex]) {
+                fabsStatus[buttonIndex] = false;
+                ((FloatingActionButton) v).clearColorFilter();
+            } else {
+                ((FloatingActionButton) v).setColorFilter(getResources().getColor(R.color.colorPrimary));
+                callNearbySearch(v.getId());
+            }
+
+            for (int i = 0; i < fabsStatus.length; i++) {
+                if (i != buttonIndex) {
+                    fabsStatus[i] = false;
+                }
+            }
+        } else {
+            removeSearchResult();
+            ((FloatingActionButton) v).setColorFilter(getResources().getColor(R.color.colorPrimary));
+            callNearbySearch(v.getId());
+        }
+
+    }
+
+    private void callNearbySearch(int fabClickedId) {
         LatLng location = new LatLng(mCurrentLocation.getLatitude(), mCurrentLocation.getLongitude());
         String type = "";
-        switch (v.getId()) {
+        switch (fabClickedId) {
             case R.id.fabGas:
-                type = "gas_station";
+                type = placeTypeList.get(0);
+                fabsStatus[0] = true;
                 break;
-
-            default:
+            case R.id.fabAtm:
+                type = placeTypeList.get(1);
+                fabsStatus[1] = true;
+                break;
+            case R.id.fabStore:
+                type = placeTypeList.get(2);
+                fabsStatus[2] = true;
                 break;
         }
         mNearbySearcher.executeSearch(location, type);

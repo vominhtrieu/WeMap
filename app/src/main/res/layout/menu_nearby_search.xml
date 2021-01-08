@@ -6,10 +6,23 @@
 
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabStore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        app:fabCustomSize="45dp"
+        android:backgroundTint="@android:color/white"
+        app:srcCompat="@drawable/ic_baseline_storefront_24"
+        app:borderWidth="0dp"
+        android:visibility="invisible"
+        app:elevation="2dp" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fabAtm"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
         app:fabCustomSize="45dp"
         android:backgroundTint="@android:color/white"
         app:srcCompat="@drawable/ic_baseline_local_atm"
@@ -22,7 +35,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="50dp"
+        android:layout_marginTop="100dp"
         app:fabCustomSize="45dp"
         android:backgroundTint="@android:color/white"
         app:srcCompat="@drawable/ic_baseline_local_gas_station"
@@ -34,7 +47,7 @@
         android:id="@+id/fabNearbySearch"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="102dp"
+        android:layout_marginTop="150dp"
         android:layout_marginBottom="5dp"
         android:backgroundTint="@android:color/white"
         android:scaleType="center"
