@@ -183,9 +183,7 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
         btnContact = getView().findViewById(R.id.btnContact);
 
         fabNearbySearch = getView().findViewById(R.id.fabNearbySearch);
-//        fabGas = getView().findViewById(R.id.fabGas);
-//        fabAtm = getView().findViewById(R.id.fabAtm);
-//        fabStore = getView().findViewById(R.id.fabStore);
+
         for (int i = 0; i < fabIds.length; i++) {
             FloatingActionButton fab = getView().findViewById(fabIds[i]);
             fabButtons.add(fab);
@@ -218,10 +216,10 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
 
             drawable = ContextCompat.getDrawable(context, iconId);
             Bitmap bmpIcon = DrawableUtilities.getBitmap(drawable, Color.WHITE);
-            bmpIcon = Bitmap.createScaledBitmap(bmpIcon, 56, 56, false);
+            bmpIcon = Bitmap.createScaledBitmap(bmpIcon, 55, 55, false);
 
             Canvas canvas = new Canvas(bmpMarker);
-            canvas.drawBitmap(bmpIcon, 12, 10, null);
+            canvas.drawBitmap(bmpIcon, 10, 10, null);
             mBitmapMarkers.add(bmpMarker);
         }
 
