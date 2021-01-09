@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -19,6 +20,9 @@ public class Storage {
     }
 
     public String saveToInternalStorage(Bitmap bitmapImage) {
+        if (bitmapImage == null) {
+            return null;
+        }
         ContextWrapper cw = new ContextWrapper(context);
         File directory = cw.getDir("images", Context.MODE_PRIVATE);
         Random random = new Random();
@@ -42,6 +46,9 @@ public class Storage {
     }
 
     public Bitmap readImageFromInternalStorage(String filename) {
+        if (filename == null) {
+            return null;
+        }
         Bitmap bitmap = null;
         try {
             File f = new File(filename);

@@ -12,6 +12,7 @@ import android.location.Location;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -507,9 +508,11 @@ public class MapsFragment extends Fragment implements OnMapReadyCallback, Direct
             bmpMarker = Bitmap.createScaledBitmap(bmpMarker, 100, 110, false);
             if (avatar != null) {
                 Bitmap bmpAvatar = (new Storage(context)).readImageFromInternalStorage(avatar);
-                bmpAvatar = Bitmap.createScaledBitmap(bmpAvatar, 90, 90, false);
-                canvas = new Canvas(bmpMarker);
-                canvas.drawBitmap(bmpAvatar, 5, 5, null);
+                if (bmpAvatar != null) {
+                    bmpAvatar = Bitmap.createScaledBitmap(bmpAvatar, 90, 90, false);
+                    canvas = new Canvas(bmpMarker);
+                    canvas.drawBitmap(bmpAvatar, 5, 5, null);
+                }
             }
         }
         newMarker = mMap.addMarker(new MarkerOptions().position(location)
